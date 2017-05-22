@@ -42,7 +42,7 @@ type BoardDataItem = {
 }
 export type BoardData = BoardDataItem[][]
 
-type Board = {
+export type Board = {
     boardData: BoardData,
     columnHints: ColumnHints,
     rowHints: RowHints,
@@ -100,9 +100,9 @@ export class GameProvider {
                 let width = board.columnHintData.length
                 let height = board.rowHintData.length
 
-                for (var y = 0; y < height; y++) {
+                for (let y = 0; y < height; y++) {
                     boardData.push(new Array())
-                    for (var x = 0; x < width; x++) {
+                    for (let x = 0; x < width; x++) {
                         boardData[y].push({value: BOARD_CELL.NIL})
                     }
                 }
@@ -134,7 +134,7 @@ export class GameProvider {
 
     // todo should go to controller
     setBoardSize() {
-        var width = this.boardData[0].length, height = this.boardData.length
+        let width = this.boardData[0].length, height = this.boardData.length
         this.boardSize.x = width * 26 + Math.floor(width / 5) + this.rowHints.getMaxX() * 26 * 2
         this.boardSize.y = height * 26 + Math.floor(height / 5) + this.columnHints.getMaxY() * 26 * 2
         // console.log('board size '+boardSize.x+':'+boardSize.y)
@@ -152,8 +152,8 @@ export class GameProvider {
 
     checkGame(check: boolean) {
         if (this.boardStatus === GAME_STATUS.GAME) {
-            var allColsMatch = this.columnHints.allColsMatch(check)
-            var allRowsMatch = this.rowHints.allRowsMatch(check)
+            let allColsMatch = this.columnHints.allColsMatch(check)
+            let allRowsMatch = this.rowHints.allRowsMatch(check)
             if (allColsMatch && allRowsMatch) {
                 this.boardStatus = GAME_STATUS.OVER
                 this.sourceBoard.solved = true
@@ -164,9 +164,9 @@ export class GameProvider {
 
     resetBoard(width: number, height: number) {
         this.boardData.splice(0, this.boardData.length)
-        for (var y = 0; y < height; y++) {
+        for (let y = 0; y < height; y++) {
             this.boardData.push(new Array())
-            for (var x = 0; x < width; x++) {
+            for (let x = 0; x < width; x++) {
                 this.boardData[y].push({ value: BOARD_CELL.NIL })
             }
         }
@@ -174,7 +174,7 @@ export class GameProvider {
         this.rowHints.reset()
         this.undoData.reset()
         this.sourceBoard.solved = false
-        if (this.boardStatus != GAME_STATUS.SETUP) {
+        if (this.boardStatus !== GAME_STATUS.SETUP) {
             this.boardStatus = GAME_STATUS.GAME
         }
     }
@@ -186,13 +186,13 @@ export class GameProvider {
 
         this.columnHints.col = new Array(width)
         // this.columnHints.maxCol = Array(height)
-        for (var x = 0; x < this.columnHints.col.length; x++) {
+        for (let x = 0; x < this.columnHints.col.length; x++) {
             this.columnHints.col[x] = []
         }
 
         this.rowHints.row = new Array(height)
         // this.rowHints.maxRow = Array(width)
-        for (var y = 0; y < this.rowHints.row.length; y++) {
+        for (let y = 0; y < this.rowHints.row.length; y++) {
             this.rowHints.row[y] = []
         }
         this.resetBoard(width, height)
@@ -202,8 +202,8 @@ export class GameProvider {
     initFromSaved(board: Board, status: GAME_STATUS) {
         this.sourceBoard = board
         this.boardData = board.boardData
-        var width = this.boardData[0].length
-        var height = this.boardData.length
+        let width = this.boardData[0].length
+        let height = this.boardData.length
         this.boardIndex = this.savedBoards.indexOf(board)
         this.boardStatus = status
         this.columnHints.col = board.columnHints.col
@@ -241,7 +241,7 @@ export class GameProvider {
     }
 
     deleteCurrentBoard() {
-        for (var i = this.boardIndex + 1; i < this.savedBoards.length; i++) {
+        for (let i = this.boardIndex + 1; i < this.savedBoards.length; i++) {
             if (!this.savedBoards[i].static) {
                 localStorage.setObject(`${BOARD_KEY}${i - 1}`, this.savedBoards[i])
             }
@@ -267,15 +267,15 @@ export class ColumnHints {
         return (y < 0) ? '' : (y < this.col[x].length) ? this.col[x][y].hint.toString() : ''
     }
 
-    private maxCol: any[] = []
+    private maxCol: boolean[] = []
 
-    iterable(): any[] {
+    iterable(): boolean[] {
         this.maxCol.length = this.getMaxY()
         return this.maxCol
     }
 
     getMaxY(): number {
-        var maxY = Math.floor((this.game.boardData.length + 1) / 2)
+        let maxY = Math.floor((this.game.boardData.length + 1) / 2)
         return Math.min(this.getLongestColLength() + ((this.game.boardStatus === GAME_STATUS.SETUP) ? 1 : 0), maxY)
     }
 
@@ -286,8 +286,8 @@ export class ColumnHints {
     }
 
     setHint(x: number, y: number, side: string, value: string): Point {
-        var result = { x: x, y: y }
-        var last = false
+        let result = { x: x, y: y }
+        let last = false
 
         if (side === BOARD_SIDE.TOP) {
             y -= this.getMaxY() - this.col[x].length
@@ -318,10 +318,10 @@ export class ColumnHints {
     }
 
     checkCol(x: number) {
-        var chainLength = 0, hintIndex = 0, match = true
-        var boardHeight = this.game.boardData.length, hintCol = this.col[x], hintSize = hintCol.length
+        let chainLength = 0, hintIndex = 0, match = true
+        let boardHeight = this.game.boardData.length, hintCol = this.col[x], hintSize = hintCol.length
 
-        for (var y = 0; match && y < boardHeight; y++) {
+        for (let y = 0; match && y < boardHeight; y++) {
             if (this.game.boardData[y][x].value === BOARD_CELL.ON) {
                 chainLength++
                 if (y === boardHeight - 1 || this.game.boardData[y + 1][x].value !== BOARD_CELL.ON) {
@@ -336,8 +336,8 @@ export class ColumnHints {
     }
 
     allColsMatch(check: boolean): boolean {
-        var matching = true
-        for (var x = 0; x < this.matching.length; x++) {
+        let matching = true
+        for (let x = 0; x < this.matching.length; x++) {
             if (check) this.checkCol(x)
             matching = matching && this.matching[x]
         }
@@ -346,9 +346,9 @@ export class ColumnHints {
 
     // try to solve the board column based on the hint values
     solveCol(x: number) {
-        var self = this
-        var dataLength = this.game.boardData.length // height
-        var hintLength = self.col[x].length
+        let self = this
+        let dataLength = this.game.boardData.length // height
+        let hintLength = self.col[x].length
 
         /*
         This variable holds one particular variant of all pieces that can be
@@ -357,14 +357,14 @@ export class ColumnHints {
         When building various variants this variable gets initially populated
         with the first variant and then gets updated to match the next variant.
         */
-        var variant = Array(hintLength)
+        let variant = Array(hintLength)
 
         /*
         This variable holds the common result after applying all variants.
         All cells that stay on or off across all variants will be on or off
         in the solution.
         */
-        var solution = Array(dataLength)
+        let solution = Array(dataLength)
 
         /*
         Tries to build a valid variant by starting with the hint [startIndex]
@@ -375,8 +375,8 @@ export class ColumnHints {
         buildVariant(0, 0) builds the first possible variant for all hints.
         */
         function buildVariant(startIndex: number, offset: number) {
-            for (var index = startIndex; index < hintLength; index++) {
-                var piece = {
+            for (let index = startIndex; index < hintLength; index++) {
+                let piece = {
                     start: offset,
                     end: offset + self.col[x][index].hint - 1
                 }
@@ -403,7 +403,7 @@ export class ColumnHints {
                 return buildVariant(0, 0)
             }
             // try to shift a piece one cell forward starting with the last one
-            for (var index = hintLength - 1; index >= 0; index--) {
+            for (let index = hintLength - 1; index >= 0; index--) {
                 if (buildVariant(index, variant[index].start + 1)) return true
             }
             // all pieces are shifted to their last position - cannot build a new variant
@@ -415,14 +415,14 @@ export class ColumnHints {
         Returns "true" if conflict found and "false" if not.
         */
         function variantConflictsWithBoard() {
-            var index = 0, conflict = false
-            for (var y = 0; y < dataLength && !conflict; y++) {
+            let index = 0, conflict = false
+            for (let y = 0; y < dataLength && !conflict; y++) {
                 if (index >= hintLength || y < variant[index].start) {
                     // check conflict with cells outside of variant pieces
                     conflict = (this.game.boardData[y][x].value === BOARD_CELL.ON)
                 } else if (y <= variant[index].end) {
                     // check conflict with cells inside the variant pieces
-                    conflict = (this.game.boardData[y][x].value == BOARD_CELL.OFF)
+                    conflict = (this.game.boardData[y][x].value === BOARD_CELL.OFF)
                     // moving to the next piece
                     if (y === variant[index].end) {
                         index++
@@ -441,8 +441,8 @@ export class ColumnHints {
         all variants will be set to on or off in the solution.
         */
         function applyVariantToSolution() {
-            var index = 0
-            for (var y = 0; y < dataLength; y++) {
+            let index = 0
+            for (let y = 0; y < dataLength; y++) {
                 if (index >= hintLength || y < variant[index].start) {
                     // apply to cells outside of variant pieces
                     solution[y] = (solution[y] === undefined || solution[y] === BOARD_CELL.OFF) ? BOARD_CELL.OFF : BOARD_CELL.NIL
@@ -464,7 +464,7 @@ export class ColumnHints {
         */
         function applySolutionToBoard() {
             this.game.undoData.startBlock()
-            for (var y = 0; y < dataLength; y++) {
+            for (let y = 0; y < dataLength; y++) {
                 if (solution[y] === BOARD_CELL.OFF || solution[y] === BOARD_CELL.ON) {
                     this.game.setBoardData(y, x, solution[y])
                     this.game.rowHints.checkRow(y)
@@ -508,15 +508,15 @@ export class RowHints {
         return (x < 0) ? '' : (x < this.row[y].length) ? this.row[y][x].hint.toString() : ''
     }
 
-    private maxRow: any[] = []
+    private maxRow: boolean[] = []
 
-    iterable(): any[] {
+    iterable(): boolean[] {
         this.maxRow.length = this.getMaxX()
         return this.maxRow
     }
 
     getMaxX(): number {
-        var maxX = Math.floor((this.game.boardData[0].length + 1) / 2)
+        let maxX = Math.floor((this.game.boardData[0].length + 1) / 2)
         return Math.min(this.getLongestRowLength() + ((this.game.boardStatus === GAME_STATUS.SETUP) ? 1 : 0), maxX)
     }
 
@@ -527,8 +527,8 @@ export class RowHints {
     }
 
     setHint(y: number, x: number, side: string, value): Point {
-        var result = { x: x, y: y }
-        var last = false
+        let result = { x: x, y: y }
+        let last = false
 
         if (side === BOARD_SIDE.LEFT) {
             x -= this.getMaxX() - this.row[y].length
@@ -559,10 +559,10 @@ export class RowHints {
     }
 
     checkRow(y: number) {
-        var chainLength = 0, hintIndex = 0, match = true
-        var boardWidth = this.game.boardData[0].length, hintRow = this.row[y], hintSize = hintRow.length
+        let chainLength = 0, hintIndex = 0, match = true
+        let boardWidth = this.game.boardData[0].length, hintRow = this.row[y], hintSize = hintRow.length
 
-        for (var x = 0; match && x < boardWidth; x++) {
+        for (let x = 0; match && x < boardWidth; x++) {
             if (this.game.boardData[y][x].value === BOARD_CELL.ON) {
                 chainLength++
                 if (x === boardWidth - 1 || this.game.boardData[y][x + 1].value !== BOARD_CELL.ON) {
@@ -577,8 +577,8 @@ export class RowHints {
     }
 
     allRowsMatch(check: boolean): boolean {
-        var matching = true
-        for (var y = 0; y < this.matching.length; y++) {
+        let matching = true
+        for (let y = 0; y < this.matching.length; y++) {
             if (check) this.checkRow(y)
             matching = matching && this.matching[y]
         }
@@ -610,19 +610,19 @@ export class RowHints {
             if (!variant[0]) {
                 return buildVariant(0, 0)
             }
-            for (var index = hintLength - 1; index >= 0; index--) {
+            for (let index = hintLength - 1; index >= 0; index--) {
                 if (buildVariant(index, variant[index].start + 1)) return true
             }
             return false
         }
 
         function variantConflictsWithBoard() {
-            var index = 0, conflict = false
-            for (var x = 0; x < dataLength && !conflict; x++) {
+            let index = 0, conflict = false
+            for (let x = 0; x < dataLength && !conflict; x++) {
                 if (index >= hintLength || x < variant[index].start) {
                     conflict = (this.game.boardData[y][x].value === BOARD_CELL.ON)
                 } else if (x <= variant[index].end) {
-                    conflict = (this.game.boardData[y][x].value == BOARD_CELL.OFF)
+                    conflict = (this.game.boardData[y][x].value === BOARD_CELL.OFF)
                     if (x === variant[index].end) {
                         index++
                     }
@@ -636,8 +636,8 @@ export class RowHints {
         }
 
         function applyVariantToSolution() {
-            var index = 0
-            for (var x = 0; x < dataLength; x++) {
+            let index = 0
+            for (let x = 0; x < dataLength; x++) {
                 if (index >= hintLength || x < variant[index].start) {
                     solution[x] = (solution[x] === undefined || solution[x] === BOARD_CELL.OFF) ? BOARD_CELL.OFF : BOARD_CELL.NIL
                 } else if (x <= variant[index].end) {
@@ -652,7 +652,7 @@ export class RowHints {
 
         function applySolutionToBoard() {
             this.game.undoData.startBlock()
-            for (var x = 0; x < dataLength; x++) {
+            for (let x = 0; x < dataLength; x++) {
                 if (solution[x] === BOARD_CELL.OFF || solution[x] === BOARD_CELL.ON) {
                     this.game.setBoardData(y, x, solution[x])
                     this.game.columnHints.checkCol(x)
@@ -679,8 +679,16 @@ export class RowHints {
 
 
 
+type UndoListAtom = {
+    x: number,
+    y: number,
+    was: number,
+    is: number
+}
+type UndoListItem = UndoListAtom | Array<UndoListAtom>
+
 export class UndoData {
-    list: any[] = []
+    list: UndoListItem[] = []
     index: 0
 
     constructor(private game: GameProvider) {}
@@ -691,12 +699,12 @@ export class UndoData {
     }
 
 
-    getCurrentItem() {
-        return (this.index < this.list.length) ? this.list[this.index] : false
+    getCurrentItem(): UndoListItem {
+        return (this.index < this.list.length) ? this.list[this.index] : null
     }
 
 
-    setCurrentItem(value: any) {
+    setCurrentItem(value: UndoListItem) {
         if (this.index < this.list.length) {
             this.list[this.index] = value
         } else {
@@ -711,7 +719,7 @@ export class UndoData {
 
 
     endBlock() {
-        var current = this.getCurrentItem()
+        let current = this.getCurrentItem() as UndoListAtom[]
         if (current.length) {
             this.index++
             console.log(`undo block (${current.length}) added, list(${this.list.length}), index: ${this.index}`)
@@ -722,8 +730,8 @@ export class UndoData {
     }
 
 
-    addItem(item) {
-        var current = this.getCurrentItem()
+    addItem(item: UndoListAtom) {
+        let current = this.getCurrentItem()
         if (Array.isArray(current)) {
             current.push(item)
         } else {
@@ -747,10 +755,10 @@ export class UndoData {
         }
 
         this.index--
-        var current = this.getCurrentItem()
+        let current = this.getCurrentItem()
 
         if (Array.isArray(current)) {
-            for (var i = 0; i < current.length; i++) {
+            for (let i = 0; i < current.length; i++) {
                 doUndo(this.game, current[i])
             }
             console.log(`lock undone, list(${this.list.length}), index: ${this.index}`)
@@ -772,11 +780,11 @@ export class UndoData {
             game.boardData[item.y][item.x].value = item.is
         }
 
-        var current = this.getCurrentItem()
+        let current = this.getCurrentItem()
         this.index++
 
         if (Array.isArray(current)) {
-            for (var i = 0; i < current.length; i++) {
+            for (let i = 0; i < current.length; i++) {
                 doRedo(this.game, current[i])
             }
             console.log(`block redone, list(${this.list.length}), index: ${this.index}`)

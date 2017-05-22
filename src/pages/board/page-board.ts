@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core'
-import { NavController, Gesture, AlertController, ToastController, App, Content, Scroll } from 'ionic-angular'
+import { NavController, Gesture, AlertController, ToastController, App, Content } from 'ionic-angular'
 import { GameProvider, ColumnHints, RowHints, Point, BoardData, 
     GAME_STATUS, BOARD_CELL, BOARD_SIDE, BOARD_HINTKIND } from '../../providers/game/game'
 
@@ -50,9 +50,9 @@ export class BoardPage {
     }
 
     ionViewWillEnter() {
-        var initZoomX = window.innerWidth / this.boardSize.x
-        var initZoomY = window.innerHeight / this.boardSize.y
-        var zoom = Math.min(initZoomX, initZoomY, 1.5)
+        let initZoomX = window.innerWidth / this.boardSize.x
+        let initZoomY = window.innerHeight / this.boardSize.y
+        let zoom = Math.min(initZoomX, initZoomY, 1.5)
         debugger
         //$ionicScrollDelegate.$getByHandle('boardScroll').zoomBy(zoom, true, 0)
         
@@ -79,7 +79,7 @@ export class BoardPage {
     }
 
     boardDivToXY(div): Point {
-        var attrX = div.attributes['x'], attrY = div.attributes['y']
+        let attrX = div.attributes['x'], attrY = div.attributes['y']
         if (attrX && attrY) {
             return {
                 x: parseInt(attrX.value),
@@ -161,9 +161,9 @@ export class BoardPage {
 
     private handleTap(e) {
 
-        var attrKind = e.target.attributes['kind']
-        var attrX = e.target.attributes['x']
-        var attrY = e.target.attributes['y']
+        let attrKind = e.target.attributes['kind']
+        let attrX = e.target.attributes['x']
+        let attrY = e.target.attributes['y']
 
         if (attrKind && attrX && attrY) {
             // $apply(() => {
@@ -180,11 +180,11 @@ export class BoardPage {
 
     private handleHold(e) {
         // $apply(() => {
-            var attrKind = e.target.attributes['kind']
+            let attrKind = e.target.attributes['kind']
 
             // only single touch draws a line
             if (this.isGame() && attrKind && attrKind.value === 'data' && e.gesture.touches.length === 1) {
-                var xy = this.boardDivToXY(e.target)
+                let xy = this.boardDivToXY(e.target)
                 this.dragObj = {
                     start: xy,
                     current: xy,
@@ -210,11 +210,11 @@ export class BoardPage {
     private handleDrag(e) {
         // $apply(() => {
 
-            var attrKind = e.target.attributes['kind']
+            let attrKind = e.target.attributes['kind']
             if (this.isGame() && attrKind && attrKind.value === 'data' && this.dragObj) {
-                var touch = e.gesture.touches[0]
-                var xy = this.boardDivToXY(document.elementFromPoint(touch.clientX, touch.clientY))
-                var firstDrag = false
+                let touch = e.gesture.touches[0]
+                let xy = this.boardDivToXY(document.elementFromPoint(touch.clientX, touch.clientY))
+                let firstDrag = false
 
                 // determine the dragging orientation
                 if (xy && !this.dragObj.orientation) {
@@ -420,6 +420,11 @@ export class BoardPage {
 } // BoardPage
 
 
+
+interface IHintCtrl {
+    show()
+}
+
 class HintPad  {
 
     value = 0
@@ -428,7 +433,7 @@ class HintPad  {
     x = 0
     y = 0
     side: string
-    ctrl: any
+    ctrl: IHintCtrl
 
     getHint: (x, y, side) => string
     setHint: (x, y, side, value) => { x, y }
@@ -452,7 +457,7 @@ class HintPad  {
     private dY = [-1, 1, 0, 0]
 
     move(dir) {
-        var index = this.dirIndex.indexOf(dir)
+        let index = this.dirIndex.indexOf(dir)
         if (index >= 0) {
             this.x += this.dX[index]
             this.y += this.dY[index]
@@ -461,7 +466,7 @@ class HintPad  {
     }
 
     setFromHints() {
-        var hint = this.getHint(this.x, this.y, this.side)
+        let hint = this.getHint(this.x, this.y, this.side)
         this.value = (hint) ? parseInt(hint) : 0
         console.log('hint-pad[' + this.x + ',' + this.y + '] set to ' + this.value)
     }
@@ -469,7 +474,7 @@ class HintPad  {
     change() {
         if (this.setHint) {
             // $apply()
-            var xy = this.setHint(this.x, this.y, this.side, this.value)
+            let xy = this.setHint(this.x, this.y, this.side, this.value)
             this.x = xy.x
             this.y = xy.y
         }
