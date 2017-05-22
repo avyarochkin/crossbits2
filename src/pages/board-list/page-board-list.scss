@@ -1,0 +1,62 @@
+page-board-list {
+    ion-content.content-ios {
+        background-color: $darkBlue;
+    }
+    .stage-slides {
+        .slide-zoom {
+            height: 100%;
+            padding: 2rem;
+        }
+        .stage-slide {
+            height: 100%;
+            background-color: $semiDarkBlue;
+            border-radius: 1rem;
+            overflow-y: auto;
+        }
+        h3 {
+            margin: 0;
+            line-height: 60px;
+            font-weight: normal;
+            text-align: center;
+            color: $ultraLightBlue;
+        }
+        .stage {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 20px;
+            padding: 0;
+
+            .stage-board {
+                position: relative;
+                margin: .5rem;
+                width: 5rem;
+                height: 5rem;
+                background-color: $lightBlue;
+                border-radius: .5rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+                font-size: 1.25rem;
+                color: $darkBlue;
+                &.new {
+                    background-color: $midBlue;
+                    color: $lightBlue;
+                }
+                .board-flag {
+                    position: absolute;
+                    right: 10%;
+                    bottom: 0;
+                    color: $semiDarkBlue;
+                }
+            }
+        }
+        .swiper-pagination-bullets {
+            bottom: .2rem;
+            .swiper-pagination-bullet {
+                background: $lightBlue;
+            }
+        }
+    }
+}

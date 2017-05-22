@@ -1,0 +1,28 @@
+<ion-content scroll="false" has-bouncing="false">
+
+    <ion-slides pager class="stage-slides">
+        <ion-slide
+                *ngFor="let stageBoards of allBoards; let i = index">
+            <div class="stage-slide">
+                <h3 *ngIf="i < allBoards.length-1">STAGE {{i+1}}</h3>
+                <h3 *ngIf="i == allBoards.length-1">SAVED BOARDS</h3>
+                <div class="stage">
+                    <div class="stage-board"
+                            *ngFor="let board of stageBoards"
+                            (click)="loadGame(board)"
+                            (press)="editGame(board)">
+                        <span>{{board.boardData[0].length}}&times;{{board.boardData.length}}</span>
+                        <ion-icon name="trophy" class="board-flag"
+                                *ngIf="board.solved"></ion-icon>
+                    </div>
+                    <div class="stage-board new"
+                            *ngIf="i == allBoards.length-1"
+                            (click)="createGame()">
+                        <ion-icon name="add"></ion-icon>
+                    </div>
+                </div>
+            </div>
+        </ion-slide>
+    </ion-slides>
+
+</ion-content>
