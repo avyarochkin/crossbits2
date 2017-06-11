@@ -1,0 +1,32 @@
+<ion-content class="centered-content">
+
+    <div class="range-block">
+        <div class="range-block-content">
+            <num-picker 
+                [value]="size.x" 
+                [min]="size.minX" 
+                [max]="size.maxX"
+                (change)="changeX($event)"></num-picker>
+            <div>&times;</div>
+            <num-picker 
+                [value]="size.y" 
+                [min]="size.minY" 
+                [max]="size.maxY"
+                (change)="changeY($event)"></num-picker>
+        </div>
+    </div>
+
+    <ion-footer ion-fixed>
+        <ion-toolbar>
+            <ion-buttons start>
+                <button ion-button
+                    (click)="back()">BACK</button>
+            </ion-buttons>
+            <ion-buttons end>
+                <button ion-button
+                    (click)="editBoard()">NEXT</button>
+            </ion-buttons>
+        </ion-toolbar>
+    </ion-footer>
+
+</ion-content>

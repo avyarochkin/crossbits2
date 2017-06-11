@@ -1,0 +1,19 @@
+General:
+    ☐ add app icon
+    ☐ add splashscreen
+    ✔ add visual feedback for the hint solution run @done (6/2/2017, 3:05:41 PM)
+    ✔ remove page bouncing @done (5/30/2017, 11:22:55 PM) removed by adding ion-fixed
+
+BoardSize:
+    ☐ 3d effect for the wheel appears only after page transition (fixed by setting a higher z-index but reappeared after adding ion-fixed)
+
+NumPad:
+    ✔ @high wheel jumps to the discrete positions while scrolling @done (5/30/2017, 3:03:28 PM)
+    ✔ strange wheel positioning in the board size selection @done (5/30/2017, 4:30:03 PM) padding appeared only in ios
+    ✔ @critical backdrop receives click event too early @done (5/31/2017, 12:04:48 AM) called preventDefault()
+    ✔ backdrop does not cover full page @done (6/2/2017, 4:50:09 PM) CSS fix
+    ✔ hide scrollbar @done (5/30/2017, 6:14:54 PM) CSS fix
+Scroll:
+    ☐ @high zooming should be supported
+    ☐ @high scrolling is slow for large boards
+    ✔ add margins for boards if smaller than the page @done (5/31/2017, 12:06:20 AM) flex with auto margins, might not work with zooming

@@ -1,0 +1,132 @@
+<ion-content
+    >
+
+    <ion-scroll #scroll ion-fixed class="boardscroll" scrollX="true" scrollY="true" zoom="true" minZoom="0.2" maxZoom="1.5"
+        (tap)="handleTap($event)"
+        (press)="handlePress($event)"
+        (panmove)="handlePanMove($event)"
+        (panend)="handlePanEnd($event)">
+    <!--<scroller>-->
+        <div #board class="board"
+                [ngClass]="{
+                    setup: isSetup(),
+                    game: isGame(),
+                    gameover: isGameOver()
+                }"
+                [ngStyle]="{
+                    'width.px': boardSize.x,
+                    'height.px': boardSize.y
+                }">
+
+            <!-- top hint line -->
+            <span class="line"
+                    *ngFor="let y of columnHints.iterable(); let iy = index; trackBy: trackByIndex">
+
+                <!-- left empty cells before top hints of the current line -->
+                <span class="cell hidden-cell"
+                        *ngFor="let x of rowHints.iterable(); let ix = index; trackBy: trackByIndex">
+                </span>
+
+                <!-- top hints of the current line -->
+                <div class="cell hint-cell" kind="top-hint" [attr.x]="ix" [attr.y]="iy"
+                        *ngFor="let x of columnHints.col; let ix = index"
+                        [ngClass]="{
+                            match: columnHints.matching[ix],
+                            focus: hintPadAt(ix, iy, 'T'),
+                            stress: solvingColAt(ix, 'top-hint')
+                        }">
+                    {{columnHints.getHint(ix, iy, 'T')}}
+                </div>
+            </span>
+
+            <!-- board line -->
+            <div class="line"
+                    *ngFor="let y of boardData; let iy = index">
+
+                <!-- left hints of the current line -->
+                <span class="cell hint-cell" kind="left-hint" [attr.x]="ix" [attr.y]="iy"
+                        *ngFor="let x of rowHints.iterable(); let ix = index; trackBy: trackByIndex"
+                        [ngClass]="{
+                            match: rowHints.matching[iy],
+                            focus: hintPadAt(ix, iy, 'L'),
+                            stress: solvingRowAt(iy, 'left-hint')
+                        }">
+                    {{rowHints.getHint(ix, iy, 'L')}}
+                </span>
+
+                <!-- board cells of the current line -->
+                <div class="cell" kind="data" [attr.x]="ix" [attr.y]="iy"
+                        *ngFor="let x of y; let ix = index"
+                        [ngClass]="{
+                            on:  x.value===1,
+                            off: x.value===0
+                        }">
+                </div>
+
+                <!-- right hints of the current line -->
+                <span class="cell hint-cell" kind="right-hint" [attr.x]="ix" [attr.y]="iy"
+                        *ngFor="let x of rowHints.iterable(); let ix = index; trackBy: trackByIndex"
+                        [ngClass]="{
+                            match: rowHints.matching[iy],
+                            focus: hintPadAt(ix, iy, 'R'),
+                            stress: solvingRowAt(iy, 'right-hint')
+                        }">
+                    {{rowHints.getHint(ix, iy, 'R')}}
+                </span>
+            </div>
+
+            <!-- bottom hint line -->
+            <span class="line"
+                    *ngFor="let y of columnHints.iterable(); let iy = index; trackBy: trackByIndex">
+
+                <!-- left empty cells before bottom hints of the current line -->
+                <span class="cell hidden-cell"
+                        *ngFor="let x of rowHints.iterable(); let ix = index; trackBy: trackByIndex">
+                </span>
+
+                <!-- bottom hints of the current line -->
+                <div class="cell hint-cell" kind="bottom-hint" [attr.x]="ix" [attr.y]="iy"
+                        *ngFor="let x of columnHints.col; let ix = index"
+                        [ngClass]="{
+                            match: columnHints.matching[ix],
+                            focus: hintPadAt(ix, iy, 'B'),
+                            stress: solvingColAt(ix, 'bottom-hint')
+                        }">
+                    {{columnHints.getHint(ix, iy, 'B')}}
+                </div>
+            </span>
+
+        </div>
+
+    <!--</scroller>-->
+    </ion-scroll>
+
+    <ion-footer ion-fixed>
+        <ion-toolbar>
+            <ion-buttons start>
+                <button ion-button
+                        (click)="back()">BACK</button>
+              
+            </ion-buttons>
+            <ion-buttons end>
+                <button ion-button icon-only
+                        *ngIf="isSetup() &amp;&amp; !isNewBoard()"
+                        (click)="delete()"><ion-icon name="trash"></ion-icon></button>
+                <button ion-button
+                        *ngIf="isSetup()"
+                        (click)="save()">SAVE</button>
+                <button ion-button icon-only
+                        *ngIf="!isSetup()"
+                        (click)="clear()"><ion-icon name="close"></ion-icon></button>
+                <button ion-button icon-only
+                        *ngIf="!isSetup()"
+                        (click)="undo()"
+                        [disabled]="!canUndo()"><ion-icon name="undo"></ion-icon></button>
+                <button ion-button icon-only
+                        *ngIf="!isSetup()"
+                        (click)="redo()"
+                        [disabled]="!canRedo()"><ion-icon name="redo"></ion-icon></button>
+            </ion-buttons>
+        </ion-toolbar>
+    </ion-footer>
+</ion-content>

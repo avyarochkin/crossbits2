@@ -32,7 +32,7 @@
     //"prefer-switch": true,
     "quotemark": [true, "single", "avoid-escape"],
     "semicolon": [true, "never"],
-    "variable-name": [true, "ban-keywords", "check-format"],
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
     "whitespace": [true, "check-branch", "check-operator", "check-typecast"]
   },
   "rulesDirectory": [

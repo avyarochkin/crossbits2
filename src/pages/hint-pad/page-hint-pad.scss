@@ -1,0 +1,33 @@
+page-hint-pad {
+    ion-content.content-ios {
+        background-color: transparent;
+    }
+    .pad {
+        background-color: $midBlue;
+        opacity: 0.5;
+        width: 24rem;
+        height: 24rem;
+        border-radius: 12rem;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        > .line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            &:first-child, &:last-child { justify-content: center; }
+            button {
+                color: $ultraLightBlue;
+            }
+        }
+    }
+    .backdrop {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparentize(black, 0.8);
+    }
+}

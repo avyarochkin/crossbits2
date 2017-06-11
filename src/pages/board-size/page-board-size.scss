@@ -1,0 +1,22 @@
+page-board-size {
+    .range-block {
+        background-color: $midBlue;
+        position: relative;
+        width: 20rem;
+        height: 20rem;
+        border-radius: 2rem;
+        .range-block-content {
+            color: $lightBlue;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            > div {
+                font-family: "Futura-CondensedMedium";
+                font-size: 6rem;
+                line-height: 6rem;
+            }
+        }
+    }
+}

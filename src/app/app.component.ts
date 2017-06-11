@@ -9,7 +9,7 @@ import { BoardListPage } from '../pages/board-list/page-board-list'
     templateUrl: 'app.html'
 })
 export class MyApp {
-    rootPage:any = BoardListPage
+    rootPage = BoardListPage
 
     constructor(
         platform: Platform, 

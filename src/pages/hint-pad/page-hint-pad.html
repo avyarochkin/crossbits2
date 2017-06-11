@@ -1,0 +1,39 @@
+<ion-content class="centered-content">
+    <div class="backdrop" 
+        (click)="dismiss()"></div>
+    <div class="pad">
+        <div class="line">
+            <button ion-button clear icon-only
+                (click)="move('U')"
+                [disabled]="!canMove('U')">
+                <ion-icon name="ios-arrow-up"></ion-icon>
+            </button>
+        </div>
+        <div class="line">
+            <button ion-button clear icon-only
+                (click)="move('L')"
+                [disabled]="!canMove('L')">
+                <ion-icon name="ios-arrow-back"></ion-icon>
+            </button>
+
+            <num-picker 
+                [value]="value" 
+                [min]="min" 
+                [max]="max"
+                (change)="changeNum($event)"></num-picker>
+
+            <button ion-button clear icon-only
+                (click)="move('R')"
+                [disabled]="!canMove('R')">
+                <ion-icon name="ios-arrow-forward"></ion-icon>
+            </button>
+        </div>
+        <div class="line">
+            <button ion-button clear icon-only
+                (click)="move('D')"
+                [disabled]="!canMove('D')">
+                <ion-icon name="ios-arrow-down"></ion-icon>
+            </button>
+        </div>
+    </div>
+</ion-content>

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core'
-import { NavController } from 'ionic-angular'
+import { Component, ViewChild } from '@angular/core'
+import { NavController, Slides } from 'ionic-angular'
 
 import { BoardPage } from '../board/page-board'
+import { BoardSizePage } from '../board-size/page-board-size'
 import { GameProvider, GAME_STATUS, Board } from '../../providers/game/game'
 
 
@@ -14,14 +15,20 @@ export class BoardListPage {
 
     public allBoards: Board[][]
 
+    @ViewChild(Slides) slides: Slides
+    
     constructor(
         public navCtrl: NavController, 
-        public game: GameProvider) {}
+        public game: GameProvider) {
 
-
-    ionViewDidLoad() {
         this.allBoards = this.game.allBoards
-        // console.log('ionViewDidLoad BoardListPage')
+    }
+
+
+    ionViewWillEnter() {
+        // console.log('ionViewWillEnter BoardListPage')
+        // slides should update if orientation changed since last time
+        this.slides.update()
     }
 
 
@@ -34,5 +41,10 @@ export class BoardListPage {
     editGame(board: Board) {
         this.game.initFromSaved(board, GAME_STATUS.SETUP)
         this.navCtrl.push(BoardPage)
+    }
+
+    createGame() {
+        this.navCtrl.push(BoardSizePage)
+        // game will be initialized on the next page
     }
 }
