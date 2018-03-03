@@ -1,11 +1,15 @@
 <ion-content>
 
-    <ion-scroll #scroll ion-fixed class="boardscroll" scrollX="true" scrollY="true" zoom="true" minZoom="0.2" maxZoom="1.5">
-    <!--<scroller>-->
-        <board-canvas
-            (statusChange)="statusChange($event)">
-        </board-canvas>
-    <!--</scroller>-->
+    <ion-scroll #scroll ion-fixed class="boardscroll" scrollX="true" scrollY="true" zoom="false"
+        zoomable
+        [scale]="zoom"
+        [minScale]="minZoom">
+    <!--<zoomer
+        [scale]="zoom"
+        [min]="minZoom">-->
+        <board-canvas #boardCanvas
+            (statusChange)="statusChange($event)"></board-canvas>
+    <!--</zoomer>-->
     </ion-scroll>
 
     <ion-footer ion-fixed>

@@ -15,11 +15,16 @@ export class BoardPage {
     public boardData: BoardData
     public boardSize: Point
 
+    public zoom = 1
+    public minZoom = 1
+
     constructor(
         public navCtrl: NavController, 
         public alertCtrl: AlertController,
         public toastCtrl: ToastController,
         public game: GameProvider) {
+
+        this.navCtrl.swipeBackEnabled = false
 
         this.boardData = this.game.boardData
         this.boardSize = this.game.boardSize
@@ -27,11 +32,11 @@ export class BoardPage {
 
 
     public ionViewWillEnter() {
-        // let initZoomX = window.innerWidth / this.boardSize.x
-        // let initZoomY = window.innerHeight / this.boardSize.y
-        // let zoom = Math.min(initZoomX, initZoomY, 1.5)
-        // $ionicScrollDelegate.$getByHandle('boardScroll').zoomBy(zoom, true, 0)
-        // console.log(`Zoom ${zoom}`)
+        let initZoomX = window.innerWidth / this.board.canvasRef.nativeElement.clientWidth
+        let initZoomY = window.innerHeight / this.board.canvasRef.nativeElement.clientHeight
+        this.zoom = Math.min(initZoomX, initZoomY, 1)
+        this.minZoom = this.zoom
+        console.log(`Zoom: ${this.zoom}`)
     }
 
 
@@ -118,8 +123,9 @@ export class BoardPage {
 
     public statusChange(status: GAME_STATUS) {
         if (status === GAME_STATUS.OVER) {
+            this.zoom = this.minZoom
             const toast = this.toastCtrl.create({
-                message: 'Congratulation!',
+                message: 'Solved!',
                 position: 'middle',
                 duration: 1000
             })

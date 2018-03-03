@@ -9,7 +9,7 @@ import { GameProvider, GAME_STATUS, Board } from '../../providers/game/game'
 //@IonicPage()
 @Component({
     selector: 'page-board-list',
-    templateUrl: 'page-board-list.html',
+    templateUrl: 'page-board-list.html'
 })
 export class BoardListPage {
 
@@ -47,4 +47,5 @@ export class BoardListPage {
         this.navCtrl.push(BoardSizePage)
         // game will be initialized on the next page
     }
+
 }

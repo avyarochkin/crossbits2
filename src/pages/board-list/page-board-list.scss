@@ -2,11 +2,11 @@ page-board-list {
     .stage-slides {
         .slide-zoom {
             height: 100%;
-            padding: 2rem;
+            padding: 2rem 0;
         }
         .stage-slide {
             height: 100%;
-            background-color: $semiDarkBlue;
+            //background-color: $semiDarkBlue;
             border-radius: 1rem;
             overflow-y: auto;
         }
@@ -23,7 +23,7 @@ page-board-list {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            margin: 0 20px;
+            margin: 0 1rem;
             padding: 0;
 
             .stage-board {
@@ -33,6 +33,7 @@ page-board-list {
                 height: 5rem;
                 background-color: $lightBlue;
                 border-radius: .5rem;
+                box-shadow: 0 0 4px $darkBlue;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
@@ -42,6 +43,11 @@ page-board-list {
                 &.new {
                     background-color: $midBlue;
                     color: $lightBlue;
+                }
+                &.activated {
+                    opacity: 0;
+                    transform: scale3d(1.5, 1.5, 1);
+                    transition: all 0.5s;
                 }
                 .board-flag {
                     position: absolute;

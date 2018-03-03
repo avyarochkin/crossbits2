@@ -13,8 +13,8 @@ import { HintPadPage } from '../pages/hint-pad/page-hint-pad'
 import { GameProvider } from '../providers/game/game'
 import { LocalStorageProvider } from '../providers/local-storage/local-storage'
 import { NumPickerComponent } from '../components/num-picker/num-picker'
-import { ZoomerComponent } from '../components/zoomer/zoomer'
 import { BoardCanvasComponent } from '../components/board-canvas/board-canvas'
+import { ZoomableDirective } from '../directives/zoomable/zoomable'
 
 @NgModule({
     declarations: [
@@ -24,8 +24,8 @@ import { BoardCanvasComponent } from '../components/board-canvas/board-canvas'
         BoardPage,
         HintPadPage,
         NumPickerComponent,
-        ZoomerComponent,
-    BoardCanvasComponent
+        BoardCanvasComponent,
+        ZoomableDirective
     ],
     imports: [
         BrowserModule,

@@ -1,8 +1,8 @@
 General:
-    ☐ add app icon
-    ☐ add splashscreen
     ✔ add visual feedback for the hint solution run @done (6/2/2017, 3:05:41 PM)
     ✔ remove page bouncing @done (5/30/2017, 11:22:55 PM) removed by adding ion-fixed
+    ✔ add app icon @done (6/18/2017, 2:46:06 PM)
+    ✔ add splashscreen @done (6/18/2017, 2:47:46 PM)
 
 BoardSize:
     ☐ 3d effect for the wheel appears only after page transition (fixed by setting a higher z-index but reappeared after adding ion-fixed)
@@ -13,7 +13,10 @@ NumPad:
     ✔ @critical backdrop receives click event too early @done (5/31/2017, 12:04:48 AM) called preventDefault()
     ✔ backdrop does not cover full page @done (6/2/2017, 4:50:09 PM) CSS fix
     ✔ hide scrollbar @done (5/30/2017, 6:14:54 PM) CSS fix
-Scroll:
-    ☐ @high zooming should be supported
-    ☐ @high scrolling is slow for large boards
+Board:
     ✔ add margins for boards if smaller than the page @done (5/31/2017, 12:06:20 AM) flex with auto margins, might not work with zooming
+    ✔ @high scrolling is slow for large boards @done (6/18/2017, 2:48:55 PM) turned board into a canvas object
+    ✔ @high zooming should be supported @done (6/18/2017, 2:48:11 PM) implemented directive Zoomable for ion-scroll
+    ✔ @high cell selection should consider scale @done (6/18/2017, 4:54:05 PM)
+    ☐ scrolling is not possible until the first press
+    ☐ zooming should respect the zooming center

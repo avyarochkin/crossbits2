@@ -8,6 +8,11 @@ export type HintPoint = {
     side: BoardSide
 }
 
+const dirIndex = 'UDLR'
+const dX = [0, 0, -1, 1]
+const dY = [-1, 1, 0, 0]
+
+
 @Component({
     selector: 'page-hint-pad',
     templateUrl: 'page-hint-pad.html',
@@ -19,24 +24,20 @@ export class HintPadPage {
     public max = 50
 
     public hintPos: HintPoint
+    public hintPosChanged: (pos: HintPoint) => void
     public hints: IHints
     
     constructor(public navCtrl: NavController, public navParams: NavParams) {
         this.hintPos = navParams.get('pos')
-
+        this.hintPosChanged = navParams.get('posChanged')
         this.hints = navParams.get('hints')
         this.setFromHints()
     }
 
-    private readonly dirIndex = 'UDLR'
-    private readonly dX = [0, 0, -1, 1]
-    private readonly dY = [-1, 1, 0, 0]
-
     public move(dir: string) {
-        let index = this.dirIndex.indexOf(dir)
+        let index = dirIndex.indexOf(dir)
         if (index >= 0) {
-            this.hintPos.x += this.dX[index]
-            this.hintPos.y += this.dY[index]
+            this.setHintPos(this.hintPos.x + dX[index], this.hintPos.y + dY[index])
             this.setFromHints()
         }
     }
@@ -54,12 +55,20 @@ export class HintPadPage {
         if (this.hints) {
             this.value = num
             let xy = this.hints.setHint(this.hintPos.x, this.hintPos.y, this.hintPos.side, this.value.toString())
-            this.hintPos.x = xy.x
-            this.hintPos.y = xy.y
+            this.setHintPos(xy.x, xy.y)
+
         }
     }
 
     public dismiss() {
         this.navCtrl.pop({ animate: false })
+    }
+
+    private setHintPos(x: number, y: number) {
+        this.hintPos.x = x
+        this.hintPos.y = y
+        if (this.hintPosChanged) {
+            this.hintPosChanged(this.hintPos)
+        }
     }
 }

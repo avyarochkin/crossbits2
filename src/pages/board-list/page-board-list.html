@@ -7,7 +7,7 @@
                 <h3 *ngIf="i < allBoards.length-1">STAGE {{i+1}}</h3>
                 <h3 *ngIf="i == allBoards.length-1">SAVED BOARDS</h3>
                 <div class="stage">
-                    <div class="stage-board"
+                    <div tappable class="stage-board"
                             *ngFor="let board of stageBoards"
                             (click)="loadGame(board)"
                             (press)="editGame(board)">
@@ -15,7 +15,7 @@
                         <ion-icon name="trophy" class="board-flag"
                                 *ngIf="board.solved"></ion-icon>
                     </div>
-                    <div class="stage-board new"
+                    <div tappable class="stage-board new"
                             *ngIf="i == allBoards.length-1"
                             (click)="createGame()">
                         <ion-icon name="add"></ion-icon>

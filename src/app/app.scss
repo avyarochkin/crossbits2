@@ -42,7 +42,7 @@ ion-footer {
         &.bar-button-ios { 
             color: $lightest;
             &[icon-only] {
-                ion-icon { padding: 0 0.75rem}
+                ion-icon { padding: 0 1rem}
             }
         }
     }
