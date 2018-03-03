@@ -217,10 +217,8 @@ export class GameProvider {
         this.boardStatus = status
         this.columnHints.col = board.columnHints.col
         this.columnHints.matching = new Array(width)
-        // this.columnHints.maxCol = Array(height)
         this.rowHints.row = board.rowHints.row
         this.rowHints.matching = new Array(height)
-        // this.rowHints.maxRow = Array(width)
         this.setBoardSize()
         this.checkGame(true)
     }
@@ -297,12 +295,12 @@ export class ColumnHints implements IHints {
         return (y < 0) ? '' : (y < this.col[x].length) ? this.col[x][y].hint.toString() : ''
     }
 
-    private maxCol: boolean[] = []
+    /*private maxCol: boolean[] = []
 
     iterable(): boolean[] {
         this.maxCol.length = this.getMaxY()
         return this.maxCol
-    }
+    }*/
 
     getMaxY(): number {
         let maxY = Math.floor((this.game.boardData.length + 1) / 2)
@@ -548,12 +546,12 @@ export class RowHints implements IHints {
         return (x < 0) ? '' : (x < this.row[y].length) ? this.row[y][x].hint.toString() : ''
     }
 
-    private maxRow: boolean[] = []
+    /*private maxRow: boolean[] = []
 
     iterable(): boolean[] {
         this.maxRow.length = this.getMaxX()
         return this.maxRow
-    }
+    }*/
 
     getMaxX(): number {
         let maxX = Math.floor((this.game.boardData[0].length + 1) / 2)
