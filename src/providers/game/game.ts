@@ -437,7 +437,7 @@ export class ColumnHints implements IHints {
         */
         function buildNextVariant() {
             // if not initialized, build the first variant
-            if (!variant[0]) {
+            if (hintLength > 0 && !variant[0]) {
                 return buildVariant(0, 0)
             }
             // try to shift a piece one cell forward starting with the last one
@@ -656,7 +656,7 @@ export class RowHints implements IHints {
         }
 
         function buildNextVariant() {
-            if (!variant[0]) {
+            if (hintLength > 0 && !variant[0]) {
                 return buildVariant(0, 0)
             }
             for (let index = hintLength - 1; index >= 0; index--) {
