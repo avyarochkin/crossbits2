@@ -769,10 +769,10 @@ export class UndoData {
         let current = this.getCurrentItem() as UndoListAtom[]
         if (Array.isArray(current) && current.length) {
             this.index++
-            console.log(`undo block (${current.length}) added, list(${this.list.length}), index: ${this.index}`)
+            //console.log(`undo block (${current.length}) added, list(${this.list.length}), index: ${this.index}`)
         } else {
             this.list.splice(this.index, 1)
-            console.log(`undo block canceled, list(${this.list.length}), index: ${this.index}`)
+            //console.log(`undo block canceled, list(${this.list.length}), index: ${this.index}`)
         }
     }
 
@@ -785,7 +785,7 @@ export class UndoData {
             this.list.splice(this.index, this.list.length)
             this.list.push(item)
             this.index++
-            console.log(`undo item added, list(${this.list.length}), index: ${this.index}`)
+            //console.log(`undo item added, list(${this.list.length}), index: ${this.index}`)
         }
     }
 
@@ -808,10 +808,10 @@ export class UndoData {
             for (let i in current) {
                 doUndo(this.game, current[i])
             }
-            console.log(`lock undone, list(${this.list.length}), index: ${this.index}`)
+            //console.log(`lock undone, list(${this.list.length}), index: ${this.index}`)
         } else {
             doUndo(this.game, current)
-            console.log(`item undone, list(${this.list.length}), index: ${this.index}`)
+            //console.log(`item undone, list(${this.list.length}), index: ${this.index}`)
         }
     }
 
@@ -834,10 +834,10 @@ export class UndoData {
             for (let i in current) {
                 doRedo(this.game, current[i])
             }
-            console.log(`block redone, list(${this.list.length}), index: ${this.index}`)
+            //console.log(`block redone, list(${this.list.length}), index: ${this.index}`)
         } else {
             doRedo(this.game, current)
-            console.log(`item redone, list(${this.list.length}), index: ${this.index}`)
+            //console.log(`item redone, list(${this.list.length}), index: ${this.index}`)
         }
     }
 }
