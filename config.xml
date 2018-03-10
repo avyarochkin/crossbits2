@@ -3,7 +3,7 @@
     <name>crossbits 2.0</name>
     <description>crossbits 2.0</description>
     <author email="info@braintrain.io" href="http://">BrainTrain</author>
-    <content original-src="index.html" src="http://192.168.1.117:8100" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-navigation href="http://192.168.2.120:8100" />
