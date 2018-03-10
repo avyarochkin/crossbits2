@@ -574,6 +574,8 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
             pos: this.hintPos,
             posChanged: () => this.paint(),
             hints: hints
+        }, { 
+            enableBackdropDismiss: false 
         })
         modal.onDidDismiss(() => {
             this.hintPos = null
