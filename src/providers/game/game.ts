@@ -215,6 +215,7 @@ export class GameProvider {
         let height = this.boardData.length
         this.savedBoardIndex = this.savedBoards.indexOf(board)
         this.boardStatus = status
+        // TODO should go to ColumnHints and RowHints
         this.columnHints.col = board.columnHints.col
         this.columnHints.matching = new Array(width)
         this.rowHints.row = board.rowHints.row
