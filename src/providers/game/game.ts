@@ -216,10 +216,8 @@ export class GameProvider {
         this.savedBoardIndex = this.savedBoards.indexOf(board)
         this.boardStatus = status
         // TODO should go to ColumnHints and RowHints
-        this.columnHints.col = board.columnHints.col
-        this.columnHints.matching = new Array(width)
-        this.rowHints.row = board.rowHints.row
-        this.rowHints.matching = new Array(height)
+        this.columnHints.assign(board.columnHints)
+        this.rowHints.assign(board.rowHints)
         this.setBoardSize()
         this.checkGame(true)
     }
@@ -277,42 +275,40 @@ export interface IHints {
 
 export class ColumnHints implements IHints {
 
-    col: HintCell[][] = []
-    matching: boolean[] = []
+    public col: HintCell[][] = []
+    public matching: boolean[] = []
 
     constructor(private game: GameProvider) {}
 
-    init(width: number) {
+    public init(width: number) {
         this.col = new Array(width)
         for (let x = 0; x < width; x++) {
             this.col[x] = []
         }
     }
 
-    getHint(x: number, y: number, side: BoardSide): string {
+    public assign(columnHints: ColumnHints) {
+        this.col = columnHints.col
+        this.reset()
+    }
+
+    public getHint(x: number, y: number, side: BoardSide): string {
         if (side === BOARD_SIDE.TOP) {
             y -= this.getMaxY() - this.col[x].length
         }
         return (y < 0) ? '' : (y < this.col[x].length) ? this.col[x][y].hint.toString() : ''
     }
 
-    /*private maxCol: boolean[] = []
-
-    iterable(): boolean[] {
-        this.maxCol.length = this.getMaxY()
-        return this.maxCol
-    }*/
-
-    getMaxY(): number {
+    public getMaxY(): number {
         let maxY = Math.floor((this.game.boardData.length + 1) / 2)
         return Math.min(this.getLongestColLength() + ((this.game.boardStatus === GAME_STATUS.SETUP) ? 1 : 0), maxY)
     }
 
-    getLongestColLength(): number {
+    private getLongestColLength(): number {
         return this.col.reduce((prev, col) => Math.max(prev, col.length), 0)
     }
 
-    setHint(x: number, y: number, side: BoardSide, value: string): Point {
+    public setHint(x: number, y: number, side: BoardSide, value: string): Point {
         let result = { x: x, y: y }
         let last = false
 
@@ -344,7 +340,7 @@ export class ColumnHints implements IHints {
         return result
     }
 
-    canMove(hintPad: HintPadPage, dir: string): boolean {
+    public canMove(hintPad: HintPadPage, dir: string): boolean {
         switch (dir) {
             case 'U': return hintPad.hintPos.y > 0
             case 'D': return hintPad.hintPos.y < this.getMaxY() - 1
@@ -354,7 +350,7 @@ export class ColumnHints implements IHints {
         return false
     }
 
-    checkCol(x: number) {
+    public checkCol(x: number) {
         let chainLength = 0, hintIndex = 0, match = true
         let boardHeight = this.game.boardData.length, hintCol = this.col[x], hintSize = hintCol.length
 
@@ -372,7 +368,7 @@ export class ColumnHints implements IHints {
         this.matching[x] = match && (hintIndex === hintSize)
     }
 
-    allColsMatch(checkCol: boolean): boolean {
+    public allColsMatch(checkCol: boolean): boolean {
         let matching = true
         for (let x = 0; x < this.matching.length; x++) {
             if (checkCol) this.checkCol(x)
@@ -382,7 +378,7 @@ export class ColumnHints implements IHints {
     }
 
     // try to solve the board column based on the hint values
-    solveCol(x: number) {
+    public solveCol(x: number) {
         let self = this
         let dataLength = this.game.boardData.length // height
         let hintLength = self.col[x].length
@@ -519,7 +515,7 @@ export class ColumnHints implements IHints {
         applySolutionToBoard()
     } // solveCol
 
-    reset() {
+    public reset() {
         this.matching = new Array(this.col.length)
     }
 }
@@ -528,42 +524,40 @@ export class ColumnHints implements IHints {
 
 export class RowHints implements IHints {
 
-    row: HintCell[][] = []
-    matching: boolean[] = []
+    public row: HintCell[][] = []
+    public matching: boolean[] = []
 
     constructor(private game: GameProvider) {}
 
-    init(height) {
+    public init(height) {
         this.row = new Array(height)
         for (let y = 0; y < height; y++) {
             this.row[y] = []
         }
     }
 
-    getHint(x: number, y: number, side: BoardSide): string {
+    public assign(rowHints: RowHints) {
+        this.row = rowHints.row
+        this.reset()
+    }
+
+    public getHint(x: number, y: number, side: BoardSide): string {
         if (side === BOARD_SIDE.LEFT) {
             x -= this.getMaxX() - this.row[y].length
         }
         return (x < 0) ? '' : (x < this.row[y].length) ? this.row[y][x].hint.toString() : ''
     }
 
-    /*private maxRow: boolean[] = []
-
-    iterable(): boolean[] {
-        this.maxRow.length = this.getMaxX()
-        return this.maxRow
-    }*/
-
-    getMaxX(): number {
+    public getMaxX(): number {
         let maxX = Math.floor((this.game.boardData[0].length + 1) / 2)
         return Math.min(this.getLongestRowLength() + ((this.game.boardStatus === GAME_STATUS.SETUP) ? 1 : 0), maxX)
     }
 
-    getLongestRowLength(): number {
+    private getLongestRowLength(): number {
         return this.row.reduce((prev, row) => Math.max(prev, row.length), 0)
     }
 
-    setHint(x: number, y: number, side: BoardSide, value): Point {
+    public setHint(x: number, y: number, side: BoardSide, value): Point {
         let result = { x: x, y: y }
         let last = false
 
@@ -595,7 +589,7 @@ export class RowHints implements IHints {
         return result
     }
 
-    canMove(hintPad: HintPadPage, dir: string): boolean {
+    public canMove(hintPad: HintPadPage, dir: string): boolean {
         switch (dir) {
             case 'U': return hintPad.hintPos.y > 0
             case 'D': return hintPad.hintPos.y < this.row.length - 1
@@ -606,7 +600,7 @@ export class RowHints implements IHints {
     }
 
 
-    checkRow(y: number) {
+    public checkRow(y: number) {
         let chainLength = 0, hintIndex = 0, match = true
         let boardWidth = this.game.boardData[0].length, hintRow = this.row[y], hintSize = hintRow.length
 
@@ -624,7 +618,7 @@ export class RowHints implements IHints {
         this.matching[y] = match && (hintIndex === hintSize)
     }
 
-    allRowsMatch(checkRow: boolean): boolean {
+    public allRowsMatch(checkRow: boolean): boolean {
         let matching = true
         for (let y = 0; y < this.matching.length; y++) {
             if (checkRow) this.checkRow(y)
@@ -634,7 +628,7 @@ export class RowHints implements IHints {
     }
 
     // try to solve the board row based on the hint values
-    solveRow(y: number) {
+    public solveRow(y: number) {
         let self = this
         let dataLength = this.game.boardData[0].length // width
         let hintLength = self.row[y].length
@@ -720,7 +714,7 @@ export class RowHints implements IHints {
         applySolutionToBoard()
     }
 
-    reset() {
+    public reset() {
         this.matching = new Array(this.row.length)
     }
 }
