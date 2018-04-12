@@ -112,8 +112,8 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         const maxBoardX = this.game.boardData[0].length
         const maxBoardY = this.game.boardData.length
-        const maxColHintY = this.game.columnHints.getMaxY()
-        const maxRowHintX = this.game.rowHints.getMaxX()
+        const maxColHintY = this.game.columnHints.getMaxIndexInLine()
+        const maxRowHintX = this.game.rowHints.getMaxIndexInLine()
 
         const pxRowHintWidth = maxRowHintX * cellSize
         const pxColHintHeight = maxColHintY * cellSize
@@ -138,7 +138,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // column hints: highlight and text
 
-        for (let x = 0; x < this.game.columnHints.col.length; x++) {
+        for (let x = 0; x < this.game.columnHints.hints.length; x++) {
 
             ctx.fillStyle = colors.light
             // highlight top hint column while solving
@@ -164,13 +164,13 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
                 ctx.fillStyle = this.game.columnHints.matching[x] ? colors.lightest : colors.ultraLight
                 // cell text
-                const topHint = this.game.columnHints.getHint(x, y, BOARD_SIDE.TOP)
+                const topHint = this.game.columnHints.getHintXY(x, y, BOARD_SIDE.TOP)
                 if (topHint) {
                     ctx.fillText(topHint,
                         pxRowHintWidth + x * cellSize + halfCellSize,
                         y * cellSize + halfCellSize)
                 }
-                const bottomHint = this.game.columnHints.getHint(x, y, BOARD_SIDE.BOTTOM)
+                const bottomHint = this.game.columnHints.getHintXY(x, y, BOARD_SIDE.BOTTOM)
                 if (bottomHint) {
                     ctx.fillText(bottomHint,
                         pxRowHintWidth + x * cellSize + halfCellSize,
@@ -188,7 +188,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // row hints: highlight and text
 
-        for (let y = 0; y < this.game.rowHints.row.length; y++) {
+        for (let y = 0; y < this.game.rowHints.hints.length; y++) {
 
             ctx.fillStyle = colors.light
             // highlight left hint row while solving
@@ -214,13 +214,13 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
                 ctx.fillStyle = this.game.rowHints.matching[y] ? colors.lightest : colors.ultraLight
                 // cell text
-                const leftHint = this.game.rowHints.getHint(x, y, BOARD_SIDE.LEFT)
+                const leftHint = this.game.rowHints.getHintXY(x, y, BOARD_SIDE.LEFT)
                 if (leftHint) {
                     ctx.fillText(leftHint,
                         x * cellSize + halfCellSize,
                         pxColHintHeight + y * cellSize + halfCellSize)
                 }
-                const rightHint = this.game.rowHints.getHint(x, y, BOARD_SIDE.RIGHT)
+                const rightHint = this.game.rowHints.getHintXY(x, y, BOARD_SIDE.RIGHT)
                 if (rightHint) {
                     ctx.fillText(rightHint,
                         pxRowHintWidth + pxBoardWidth + x * cellSize + halfCellSize,
@@ -298,8 +298,8 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         const maxBoardX = this.game.boardData[0].length
         const maxBoardY = this.game.boardData.length
-        const maxColHintY = this.game.columnHints.getMaxY()
-        const maxRowHintX = this.game.rowHints.getMaxX()
+        const maxColHintY = this.game.columnHints.getMaxIndexInLine()
+        const maxRowHintX = this.game.rowHints.getMaxIndexInLine()
 
         const x = Math.trunc(offsetX / cellSize)
         const y = Math.trunc(offsetY / cellSize)
@@ -542,7 +542,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
             this.solvePos = { x: x, kind: kind }
             this.paint()
             setTimeout(() => {
-                this.game.columnHints.solveCol(x)
+                this.game.columnHints.solveLine(x)
                 this.checkGameStatus()
                 this.solvePos = null
                 this.paint()
@@ -556,7 +556,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
             this.solvePos = { y: y, kind: kind }
             this.paint()
             setTimeout(() => {
-                this.game.rowHints.solveRow(y)
+                this.game.rowHints.solveLine(y)
                 this.checkGameStatus()
                 this.solvePos = null
                 this.paint()

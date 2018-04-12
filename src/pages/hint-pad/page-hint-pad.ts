@@ -46,7 +46,7 @@ export class HintPadPage {
         return this.hints.canMove(this, dir)
     }
     public setFromHints() {
-        let hint = this.hints.getHint(this.hintPos.x, this.hintPos.y, this.hintPos.side)
+        let hint = this.hints.getHintXY(this.hintPos.x, this.hintPos.y, this.hintPos.side)
         this.value = (hint) ? parseInt(hint) : 0
         console.log(`hint-pad[${this.hintPos.x},${this.hintPos.y}] set to ${this.value}`)
     }
@@ -54,7 +54,7 @@ export class HintPadPage {
     public changeNum(num) {
         if (this.hints) {
             this.value = num
-            let xy = this.hints.setHint(this.hintPos.x, this.hintPos.y, this.hintPos.side, this.value.toString())
+            let xy = this.hints.setHintXY(this.hintPos.x, this.hintPos.y, this.hintPos.side, this.value.toString())
             this.setHintPos(xy.x, xy.y)
 
         }
