@@ -471,13 +471,18 @@ export abstract class Hints {
             self.game.checkGame(false)
         }
 
+        let allVariantsConflictWithBoard = true
+
         // main algorithm (self explanatory)
         while (buildNextVariant()) {
             if (!variantConflictsWithBoard()) {
                 applyVariantToSolution()
+                allVariantsConflictWithBoard = false
             }
         }
         applySolutionToBoard()
+
+        if (allVariantsConflictWithBoard) console.warn(`All variants conflict with board!`)
     } // solveLine
 
 }
