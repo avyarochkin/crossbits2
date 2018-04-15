@@ -267,6 +267,8 @@ export class GameProvider {
     }
 }
 
+
+
 export interface IHints {
     getHintXY(x: number, y: number, side: BoardSide): string
     setHintXY(x: number, y: number, side: BoardSide, value: string): Point
@@ -278,7 +280,7 @@ export abstract class Hints {
     public hints: HintCell[][] = []
     public matching: boolean[] = []
 
-    constructor(public game: GameProvider) {}
+    constructor(protected game: GameProvider) {}
 
     public init(length: number) {
         this.hints = new Array(length)
@@ -300,38 +302,54 @@ export abstract class Hints {
         return this.hints.reduce((prev, line) => Math.max(prev, line.length), 0)
     }
 
+    /*
+    Should return the length of each board row or column that each hint line 
+    will be linked to. For the column hints it should return the board height, 
+    for the row hints - the board width.  
+    */
     protected abstract getBoardLength(): number
+
+    /*
+    Should return the cell value from the game board for the hint lineIndex and 
+    board indexInLine. For the column hints lineIndex should map to the board 
+    <x> and indexInLine should map to <y>. For the row hints - vice versa. 
+    */
+    protected abstract getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL
+
+    /*
+    Should set the game board cell to the given value. The cell should be
+    located via the hint lineIndex and the board indexInLine, which should be
+    mapped to the board <x,y> exactly as in getBoardDataValue().
+    */
+    protected abstract setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL)
 
     public getMaxIndexInLine(): number {
         let maxIndexInLine = Math.floor((this.getBoardLength() + 1) / 2)
         return Math.min(this.getLongestLineLength() + ((this.game.boardStatus === GAME_STATUS.SETUP) ? 1 : 0), maxIndexInLine)
     }
 
-    protected abstract getBoardDataItem(lineIndex: number, indexInLine: number): BoardDataItem
-    protected abstract setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL)
-
     public checkLine(lineIndex: number) {
         let chainLength = 0, hintIndex = 0, match = true
-        let boardLength = this.getBoardLength(), hintLine = this.hints[lineIndex], hintSize = hintLine.length
+        let boardLength = this.getBoardLength(), hintLine = this.hints[lineIndex]
 
         for (let indexInLine = 0; match && indexInLine < boardLength; indexInLine++) {
-            if (this.getBoardDataItem(lineIndex, indexInLine).value === BOARD_CELL.ON) {
+            if (this.getBoardDataValue(lineIndex, indexInLine) === BOARD_CELL.ON) {
                 chainLength++
-                if (indexInLine === boardLength - 1 || this.getBoardDataItem(lineIndex, indexInLine + 1).value !== BOARD_CELL.ON) {
-                    match = (hintIndex < hintSize && hintLine[hintIndex].hint === chainLength)
+                if (indexInLine === boardLength - 1 || this.getBoardDataValue(lineIndex, indexInLine + 1) !== BOARD_CELL.ON) {
+                    match = (hintIndex < hintLine.length && hintLine[hintIndex].hint === chainLength)
                     hintIndex++
                 }
             } else {
                 chainLength = 0
             }
         }
-        this.matching[lineIndex] = match && (hintIndex === hintSize)
+        this.matching[lineIndex] = match && (hintIndex === hintLine.length)
     }
 
-    public allLinesMatch(checkLine: boolean): boolean {
+    public allLinesMatch(enforceChecks: boolean): boolean {
         let matching = true
         for (let lineIndex = 0; lineIndex < this.matching.length; lineIndex++) {
-            if (checkLine) this.checkLine(lineIndex)
+            if (enforceChecks) this.checkLine(lineIndex)
             matching = matching && this.matching[lineIndex]
         }
         return matching
@@ -418,10 +436,10 @@ export abstract class Hints {
             for (let indexInLine = 0; indexInLine < dataLength && !conflict; indexInLine++) {
                 if (variantIndex >= hintLength || indexInLine < variant[variantIndex].start) {
                     // check conflict with cells outside of variant pieces
-                    conflict = (self.getBoardDataItem(lineIndex, indexInLine).value === BOARD_CELL.ON)
+                    conflict = (self.getBoardDataValue(lineIndex, indexInLine) === BOARD_CELL.ON)
                 } else if (indexInLine <= variant[variantIndex].end) {
                     // check conflict with cells inside the variant pieces
-                    conflict = (self.getBoardDataItem(lineIndex, indexInLine).value === BOARD_CELL.OFF)
+                    conflict = (self.getBoardDataValue(lineIndex, indexInLine) === BOARD_CELL.OFF)
                     // moving to the next piece
                     if (indexInLine === variant[variantIndex].end) {
                         variantIndex++
@@ -495,8 +513,8 @@ export class ColumnHints extends Hints implements IHints {
         return this.game.boardData.length
     }
 
-    protected getBoardDataItem(lineIndex: number, indexInLine: number): BoardDataItem {
-        return this.game.boardData[indexInLine][lineIndex]
+    protected getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL {
+        return this.game.boardData[indexInLine][lineIndex].value
     }
 
     protected setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL) {
@@ -561,8 +579,8 @@ export class RowHints extends Hints implements IHints {
         return this.game.boardData[0].length
     }
 
-    protected getBoardDataItem(lineIndex: number, indexInLine: number): BoardDataItem {
-        return this.game.boardData[lineIndex][indexInLine]
+    protected getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL {
+        return this.game.boardData[lineIndex][indexInLine].value
     }
 
     protected setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL) {
