@@ -350,7 +350,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
 
     private handleTap(input: HammerInput) {
-        console.log(`[tap event]`)
+        //console.log(`[tap event]`)
 
         const boardPos = this.getBoardPos(input)
 
@@ -400,7 +400,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
 
     private handlePress(input: HammerInput) {
-        console.log(`[press event]`)
+        //console.log(`[press event]`)
 
         const boardPos = this.getBoardPos(input)
         const singleTouch = !(input.srcEvent instanceof TouchEvent) || input.srcEvent.touches.length === 1
@@ -421,7 +421,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
 
     private handlePanMove(input: HammerInput) {
-        console.log(`[pan move event]`)
+        //console.log(`[pan move event]`)
 
         const boardPos = this.getBoardPos(input)
 
@@ -473,7 +473,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
 
     private handlePanEnd(input: HammerInput) {
-        console.log(`[pan end event]`)
+        //console.log(`[pan end event]`)
         if (this.panData) {
             this.panData = null
             this.enableScroll(true)

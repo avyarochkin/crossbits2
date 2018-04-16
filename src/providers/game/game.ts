@@ -406,7 +406,7 @@ export abstract class Hints {
         Returns "true" if could build a valid variant and "false" if not.
         buildVariant(0, 0) builds the first possible variant for all hints.
         */
-        function buildVariant(startIndex: number, offset: number) {
+        function buildVariant(startIndex: number, offset: number): boolean {
             for (let indexInLine = startIndex; indexInLine < hintLength; indexInLine++) {
                 let piece = {
                     start: offset,
@@ -429,7 +429,7 @@ export abstract class Hints {
         If <variant> variable is not initialized, tries to build the first one.
         Returns "true" if could build a valid variant and "false" if not.
         */
-        function buildNextVariant() {
+        function buildNextVariant(): boolean {
             // if not initialized, build the first variant
             if (hintLength > 0 && !variant[0]) {
                 return buildVariant(0, 0)
@@ -446,7 +446,7 @@ export abstract class Hints {
         Checks if <variant> conflicts with any column cells set to on/off.
         Returns "true" if conflict found and "false" if not.
         */
-        function variantConflictsWithBoard() {
+        function variantConflictsWithBoard(): boolean {
             let variantIndex = 0, conflict = false
             for (let indexInLine = 0; indexInLine < dataLength && !conflict; indexInLine++) {
                 if (variantIndex >= hintLength || indexInLine < variant[variantIndex].start) {
