@@ -534,6 +534,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
             this.paint()
             this.statusChangeEmitter.emit(this.game.boardStatus)
         }
+        this.game.saveBoard()
     }
 
 

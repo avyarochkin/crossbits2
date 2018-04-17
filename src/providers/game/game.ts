@@ -30,7 +30,8 @@ export const
         HINT_RIGHT: 'right-hint',
         DATA: 'data'
     },
-    BOARD_KEY = 'board'
+    BOARD_KEY = 'board',
+    SOLVED_KEY= 'solved'
 
 
 export type Point = {
@@ -48,6 +49,7 @@ type BoardDataItem = {
 export type BoardData = BoardDataItem[][]
 
 export type Board = {
+    nr: string,
     boardData: BoardData,
     columnHints: ColumnHints,
     rowHints: RowHints,
@@ -55,7 +57,12 @@ export type Board = {
     solved?: boolean
 }
 
-export type SavedBoard = {
+export type SavedBoardData = {
+    boardData: BoardData,
+    solved: boolean
+}
+
+export type SerializedBoard = {
     boardData: BoardData,
     columnHints: { hints: HintCell [][] },
     rowHints: { hints: HintCell[][] },
@@ -84,7 +91,7 @@ export class GameProvider {
     }
 
     allBoards: Board[][] = []
-    savedBoards: SavedBoard[] = []
+    savedBoards: SerializedBoard[] = []
 
     sourceBoard: Board
     savedBoardIndex = 0
@@ -94,10 +101,10 @@ export class GameProvider {
     boardData: BoardData = []
 
     loadSavedBoards() {
-        let board: SavedBoard
+        let board: SerializedBoard
         let index = 0
         do {
-            board = this.localStorage.getObject(BOARD_KEY.concat(index.toString())) as SavedBoard
+            board = this.localStorage.getObject(BOARD_KEY.concat(index.toString())) as SerializedBoard
             if (board) {
                 this.savedBoards.push(board)
                 index++
@@ -110,13 +117,21 @@ export class GameProvider {
         return staticBoards.map((stage) => {
             return stage.map((board) => {
                 let boardData: BoardData = []
+                let boardSolved = false
                 let width = board.columnHintData.length
                 let height = board.rowHintData.length
 
-                for (let y = 0; y < height; y++) {
-                    boardData.push(new Array())
-                    for (let x = 0; x < width; x++) {
-                        boardData[y].push({value: BOARD_CELL.NIL})
+                let savedData = this.localStorage.getObject(SOLVED_KEY.concat(board.nr)) as SavedBoardData
+
+                if (savedData) {
+                    boardData = savedData.boardData
+                    boardSolved = savedData.solved
+                } else {
+                    for (let y = 0; y < height; y++) {
+                        boardData.push(new Array())
+                        for (let x = 0; x < width; x++) {
+                            boardData[y].push({value: BOARD_CELL.NIL})
+                        }
                     }
                 }
 
@@ -135,10 +150,12 @@ export class GameProvider {
                 })
 
                 return {
+                    nr: board.nr,
                     boardData: boardData,
                     columnHints: columnHints,
                     rowHints: rowHints,
-                    static: true
+                    static: true,
+                    solved: boardSolved
                 }
             })
         })
@@ -173,6 +190,14 @@ export class GameProvider {
                 console.log(`Game solved!`)
             }
         }
+    }
+
+    saveBoard(board?: Board) {
+        if (!board) board = this.sourceBoard
+        this.localStorage.setObject(SOLVED_KEY.concat(board.nr), { 
+            boardData: board.boardData, 
+            solved: board.solved 
+        })
     }
 
     resetBoard(width?: number, height?: number) {
@@ -242,7 +267,7 @@ export class GameProvider {
     }
 
     saveCurrentBoard() {
-        let board: SavedBoard = {
+        let board: SerializedBoard = {
             boardData: this.boardData,
             columnHints: { hints: this.columnHints.hints },
             rowHints: { hints: this.rowHints.hints },
