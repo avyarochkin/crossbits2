@@ -236,13 +236,13 @@ export abstract class Hints {
         Copies only the cells set to on or off.
         */
         function applySolutionToBoard() {
-            self.game.undoData.startBlock()
+            self.game.undoStack.startBlock()
             for (let solutionIndex = 0; solutionIndex < dataLength; solutionIndex++) {
                 if (solution[solutionIndex] === BOARD_CELL.OFF || solution[solutionIndex] === BOARD_CELL.ON) {
                     self.setBoardDataValue(lineIndex, solutionIndex, solution[solutionIndex])
                 }
             }
-            self.game.undoData.endBlock()
+            self.game.undoStack.endBlock()
             self.checkLine(lineIndex)
             self.game.checkGame(false)
         }

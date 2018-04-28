@@ -448,7 +448,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 boardPos.y = this.panData.start.y
                 this.panData.current = boardPos
                 if (!firstPan) {
-                    this.game.undoData.undo()
+                    this.game.undoStack.undo()
                 }
                 if (boardPos.x !== this.panData.start.x) {
                     this.setCellsAtoB(boardPos, this.panData.start, this.panData.value)
@@ -461,7 +461,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 boardPos.x = this.panData.start.x
                 this.panData.current = boardPos
                 if (!firstPan) {
-                    this.game.undoData.undo()
+                    this.game.undoStack.undo()
                 }
                 if (boardPos.y !== this.panData.start.y) {
                     this.setCellsAtoB(boardPos, this.panData.start, this.panData.value)
@@ -518,11 +518,11 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         const dx = Math.sign(B.x - A.x)
         const dy = Math.sign(B.y - A.y)
         if (dx !== 0 || dy !== 0) {
-            this.game.undoData.startBlock()
+            this.game.undoStack.startBlock()
             for (let x = A.x, y = A.y; (dx === 0 || x !== B.x + dx) && (dy === 0 || y !== B.y + dy); x += dx, y += dy) {
                 this.game.setBoardXY(x, y, value)
             }
-            this.game.undoData.endBlock()
+            this.game.undoStack.endBlock()
             this.checkGameStatus()
             this.paint()
         }
@@ -603,13 +603,13 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
 
     public undo() {
-        this.game.undoData.undo()
+        this.game.undoStack.undo()
         this.paint()
     }
 
 
     public redo() {
-        this.game.undoData.redo()
+        this.game.undoStack.redo()
         this.paint()
     }
 

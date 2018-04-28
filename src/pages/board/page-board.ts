@@ -94,12 +94,12 @@ export class BoardPage {
 
 
     public canUndo() {
-        return this.isGame() && this.game.undoData.canUndo()
+        return this.isGame() && this.game.undoStack.canUndo()
     }
 
 
     public canRedo() {
-        return this.isGame() && this.game.undoData.canRedo()
+        return this.isGame() && this.game.undoStack.canRedo()
     }
 
 
