@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
-import { BoardSide, IHints } from '../../providers/game/game'
+import { BoardSide } from '../../providers/game/game'
+import { IHints } from '../../providers/game/hints'
 
 export type HintPoint = {
     x: number,

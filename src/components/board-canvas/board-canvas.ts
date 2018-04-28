@@ -2,7 +2,8 @@ import { Component, ElementRef, OnInit, ViewChild, Output, EventEmitter, OnDestr
 import { Gesture, ModalController, App } from 'ionic-angular'
 // import { DIRECTION_HORIZONTAL, DIRECTION_VERTICAL } from 'ionic-angular/gestures/hammer'
 
-import { BOARD_SIDE, BOARD_CELL, BOARD_PART, GAME_STATUS, GameProvider, BoardSide, IHints, Point } from '../../providers/game/game'
+import { BOARD_SIDE, BOARD_CELL, BOARD_PART, GAME_STATUS, GameProvider, BoardSide, Point } from '../../providers/game/game'
+import { IHints } from '../../providers/game/hints'
 import { HintPadPage, HintPoint } from '../../pages/hint-pad/page-hint-pad'
 
 const colors = {
