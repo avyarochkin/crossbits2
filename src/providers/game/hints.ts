@@ -25,8 +25,12 @@ export abstract class Hints {
         }
     }
 
-    public assign(newHints: Hints) {
-        this.hints = newHints.hints
+    public initWith(hints: HintCell[][]) {
+        this.hints = hints
+    }
+
+    public assign(fromHints: Hints) {
+        this.hints = fromHints.hints
         this.reset()
     }
 
@@ -97,6 +101,10 @@ export abstract class Hints {
             : ''
     }
 
+    public getHints() {
+        return this.hints
+    }
+
     // try to solve the board line based on the hint values
     public solveLine(lineIndex: number) {
         let self = this
@@ -144,15 +152,16 @@ export abstract class Hints {
         */
         function buildVariant(startIndex: number, offset: number): boolean {
             for (let indexInLine = startIndex; indexInLine < hintLength; indexInLine++) {
-                let piece = {
-                    start: offset,
-                    end: offset + self.hints[lineIndex][indexInLine].hint - 1
-                }
+                let pieceEnd = offset + self.hints[lineIndex][indexInLine].hint - 1
+
                 // if the piece goes beyond column limit, the building is not possible
-                if (piece.end >= dataLength) return false
-                variant[indexInLine] = piece
+                if (pieceEnd >= dataLength) return false
+                variant[indexInLine] = {
+                    start: offset,
+                    end: pieceEnd
+                }
                 // next piece should start by skipping 1 cell after this one
-                offset = piece.end + 2
+                offset = pieceEnd + 2
             }
             // all pieces are built successfully
             return true
@@ -198,7 +207,6 @@ export abstract class Hints {
                 }
             }
             //console.log(`${variant.map(item => { return `${item.start}:${item.end}` })} - ${conflict ? 'conflict' : 'OK'}`)
-
             return conflict
         }
 
@@ -212,22 +220,23 @@ export abstract class Hints {
             let variantIndex = 0
             let solutionApplicable = false
             for (let solutionIndex = 0; solutionIndex < dataLength; solutionIndex++) {
+                let value = solution[solutionIndex]
                 if (variantIndex >= hintLength || solutionIndex < variant[variantIndex].start) {
                     // apply to cells outside of variant pieces
-                    solution[solutionIndex] = (solution[solutionIndex] === undefined || solution[solutionIndex] === BOARD_CELL.OFF) ? BOARD_CELL.OFF : BOARD_CELL.NIL
+                    value = (value === undefined || value === BOARD_CELL.OFF) ? BOARD_CELL.OFF : BOARD_CELL.NIL
                 } else if (solutionIndex <= variant[variantIndex].end) {
                     // apply to cells inside the variant pieces
-                    solution[solutionIndex] = (solution[solutionIndex] === undefined || solution[solutionIndex] === BOARD_CELL.ON) ? BOARD_CELL.ON : BOARD_CELL.NIL
+                    value = (value === undefined || value === BOARD_CELL.ON) ? BOARD_CELL.ON : BOARD_CELL.NIL
                     // moving to the next piece
                     if (solutionIndex === variant[variantIndex].end) {
                         variantIndex++
                     }
                 }
+                solution[solutionIndex] = value
                 // if at least one cell is set or unset, the solution is applicable
-                if (solution[solutionIndex] !== BOARD_CELL.NIL) solutionApplicable = true
+                solutionApplicable = solutionApplicable || (value !== BOARD_CELL.NIL)
             }
             //console.log(`Solution: ${solution}`)
-
             return solutionApplicable
         }
 
@@ -238,8 +247,9 @@ export abstract class Hints {
         function applySolutionToBoard() {
             self.game.undoStack.startBlock()
             for (let solutionIndex = 0; solutionIndex < dataLength; solutionIndex++) {
-                if (solution[solutionIndex] === BOARD_CELL.OFF || solution[solutionIndex] === BOARD_CELL.ON) {
-                    self.setBoardDataValue(lineIndex, solutionIndex, solution[solutionIndex])
+                let value = solution[solutionIndex]
+                if (value === BOARD_CELL.OFF || value === BOARD_CELL.ON) {
+                    self.setBoardDataValue(lineIndex, solutionIndex, value)
                 }
             }
             self.game.undoStack.endBlock()

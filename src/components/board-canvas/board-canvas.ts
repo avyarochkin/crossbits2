@@ -139,7 +139,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // column hints: highlight and text
 
-        for (let x = 0; x < this.game.columnHints.hints.length; x++) {
+        for (let x = 0; x < maxBoardX; x++) {
 
             ctx.fillStyle = colors.light
             // highlight top hint column while solving
@@ -189,7 +189,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // row hints: highlight and text
 
-        for (let y = 0; y < this.game.rowHints.hints.length; y++) {
+        for (let y = 0; y < maxBoardY; y++) {
 
             ctx.fillStyle = colors.light
             // highlight left hint row while solving

@@ -45,12 +45,12 @@ type BoardDataItem = {
 }
 export type BoardData = BoardDataItem[][]
 
-export type Board = {
-    nr: string,
-    boardData: BoardData,
-    columnHints: ColumnHints,
-    rowHints: RowHints,
-    static: boolean,
+export class Board {
+    nr: string
+    boardData: BoardData
+    columnHints: ColumnHints
+    rowHints: RowHints
+    static: boolean
     solved?: boolean
 }
 
@@ -133,18 +133,18 @@ export class GameProvider {
                 }
 
                 let columnHints = new ColumnHints(this)
-                columnHints.hints = board.columnHintData.map(function(col) {
+                columnHints.initWith(board.columnHintData.map(function(col) {
                     return col.map((value) => {
                         return { hint: value }
                     })
-                })
+                }))
 
                 let rowHints = new RowHints(this)
-                rowHints.hints = board.rowHintData.map(function(row) {
+                rowHints.initWith(board.rowHintData.map(function(row) {
                     return row.map((value) => {
                         return { hint: value }
                     })
-                })
+                }))
 
                 return {
                     nr: board.nr,
@@ -233,8 +233,6 @@ export class GameProvider {
     initFromSaved(board: Board, status: GAME_STATUS) {
         this.sourceBoard = board
         this.boardData = board.boardData
-        let width = this.boardData[0].length
-        let height = this.boardData.length
         this.savedBoardIndex = this.savedBoards.indexOf(board)
         this.boardStatus = status
         // TODO should go to ColumnHints and RowHints
@@ -266,8 +264,8 @@ export class GameProvider {
     saveCurrentBoard() {
         let board: SerializedBoard = {
             boardData: this.boardData,
-            columnHints: { hints: this.columnHints.hints },
-            rowHints: { hints: this.rowHints.hints },
+            columnHints: { hints: this.columnHints.getHints() },
+            rowHints: { hints: this.rowHints.getHints() },
             static: false
         }
         this.localStorage.setObject(`${BOARD_KEY}${this.savedBoardIndex}`, board)
