@@ -259,21 +259,26 @@ export abstract class Hints {
 
         // main algorithm (self explanatory)
         let variantsFound = 0
+        let givenUp = false
         let time = performance.now()
 
         createBoardLine()
-        while (buildNextVariant()) {
+        while (!givenUp && buildNextVariant()) {
             if (!variantConflictsWithBoard()) {
                 variantsFound++
-                if (!applyVariantToSolution()) break
+                givenUp = !applyVariantToSolution() || performance.now() - time >= 60000
             }
         }
-        applySolutionToBoard()
+        if (!givenUp) {
+            applySolutionToBoard()
+        }
 
         // logging stats
         time = (performance.now() - time) / 1000
-        if (variantsFound > 0) {
-            console.log(`${variantsFound} variant(s) found in ${time.toFixed(3)}s`)
+        if (givenUp) {
+            console.log(`Given up after ${variantsFound.toLocaleString()} variant(s) in ${time.toFixed(3)}s`)
+        } else if (variantsFound > 0) {
+            console.log(`${variantsFound.toLocaleString()} variant(s) found in ${time.toFixed(3)}s`)
         } else {
             console.warn(`No variants found in ${time.toFixed(3)}s`)
         }
