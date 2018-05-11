@@ -45,12 +45,12 @@ type BoardDataItem = {
 }
 export type BoardData = BoardDataItem[][]
 
-export class Board {
-    nr: string
-    boardData: BoardData
-    columnHints: ColumnHints
-    rowHints: RowHints
-    static: boolean
+export type Board = {
+    nr: string,
+    boardData: BoardData,
+    columnHints: ColumnHints,
+    rowHints: RowHints,
+    static: boolean,
     solved?: boolean
 }
 
