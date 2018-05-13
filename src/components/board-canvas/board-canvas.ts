@@ -544,7 +544,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
             this.solvePos = { x: x, kind: kind }
             this.paint()
             setTimeout(() => {
-                this.game.columnHints.solveLine(x)
+                this.game.solveColumn(x)
                 this.checkGameStatus()
                 this.solvePos = null
                 this.paint()
@@ -558,7 +558,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
             this.solvePos = { y: y, kind: kind }
             this.paint()
             setTimeout(() => {
-                this.game.rowHints.solveLine(y)
+                this.game.solveRow(y)
                 this.checkGameStatus()
                 this.solvePos = null
                 this.paint()

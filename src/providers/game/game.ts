@@ -177,6 +177,22 @@ export class GameProvider {
         return this.boardData[y][x].value = value
     }
 
+    solveColumn(x: number) {
+        this.undoStack.startBlock()
+        this.columnHints.solveLine(x)
+        this.undoStack.endBlock()
+        this.columnHints.checkLine(x)
+        this.checkGame(false)
+    }
+
+    solveRow(y: number) {
+        this.undoStack.startBlock()
+        this.rowHints.solveLine(y)
+        this.undoStack.endBlock()
+        this.rowHints.checkLine(y)
+        this.checkGame(false)
+    }
+
     checkGame(check: boolean) {
         if (this.boardStatus === GAME_STATUS.GAME) {
             let allColsMatch = this.columnHints.allLinesMatch(check)

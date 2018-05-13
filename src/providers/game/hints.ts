@@ -11,6 +11,11 @@ export interface IHints {
     canMove(hintPad: HintPadPage, dir: string): boolean
 }
 
+type VariantPiece = {
+    start: number, 
+    end: number
+}
+
 export abstract class Hints {
 
     public hints: HintCell[][] = []
@@ -118,19 +123,19 @@ export abstract class Hints {
         When building various variants this variable gets initially populated
         with the first variant and then gets updated to match the next variant.
         */
-        let variant = Array(hintLength)
+        let variant = Array<VariantPiece>(hintLength)
 
         /*
         This variable holds the common result after applying all variants.
         All cells that stay on or off across all variants will be on or off
         in the solution.
         */
-        let solution = Array(dataLength)
+        let solution = Array<BOARD_CELL>(dataLength)
 
         /*
         This variable holds a copy of the target board line
         */
-        let boardLine = Array(dataLength)
+        let boardLine = Array<BOARD_CELL>(dataLength)
 
         /* 
         Copies the target board line to a local array to achieve better lookup
@@ -156,6 +161,7 @@ export abstract class Hints {
 
                 // if the piece goes beyond column limit, the building is not possible
                 if (pieceEnd >= dataLength) return false
+
                 variant[indexInLine] = {
                     start: offset,
                     end: pieceEnd
@@ -176,7 +182,7 @@ export abstract class Hints {
         */
         function buildNextVariant(): boolean {
             // if not initialized, build the first variant
-            if (hintLength > 0 && !variant[0]) {
+            if (!variant[0]) {
                 return buildVariant(0, 0)
             }
             // try to shift a piece one cell forward starting with the last one
@@ -245,21 +251,17 @@ export abstract class Hints {
         Copies only the cells set to on or off.
         */
         function applySolutionToBoard() {
-            self.game.undoStack.startBlock()
             for (let solutionIndex = 0; solutionIndex < dataLength; solutionIndex++) {
                 let value = solution[solutionIndex]
                 if (value === BOARD_CELL.OFF || value === BOARD_CELL.ON) {
                     self.setBoardDataValue(lineIndex, solutionIndex, value)
                 }
             }
-            self.game.undoStack.endBlock()
-            self.checkLine(lineIndex)
-            self.game.checkGame(false)
         }
 
         // main algorithm (self explanatory)
         let variantsFound = 0
-        let givenUp = false
+        let givenUp = (hintLength === 0)
         let time = performance.now()
 
         createBoardLine()
@@ -284,8 +286,7 @@ export abstract class Hints {
         }
     } // solveLine
 
-}
-
+} // class Hints
 
 
 export class ColumnHints extends Hints implements IHints {
