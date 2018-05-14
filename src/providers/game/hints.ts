@@ -1,15 +1,9 @@
 import { GameProvider, Point, BoardSide, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game'
-import { HintPadPage } from '../../pages/hint-pad/page-hint-pad'
 
 export type HintCell = {
     hint: number
 }
 
-export interface IHints {
-    getHintXY(x: number, y: number, side: BoardSide): string
-    setHintXY(x: number, y: number, side: BoardSide, value: string): Point
-    canMove(hintPad: HintPadPage, dir: string): boolean
-}
 
 type VariantPiece = {
     start: number, 
@@ -109,6 +103,9 @@ export abstract class Hints {
     public getHints() {
         return this.hints
     }
+
+    public abstract getHintXY(x: number, y: number, side: BoardSide): string
+    public abstract setHintXY(x: number, y: number, side: BoardSide, value: string): Point
 
     // try to solve the board line based on the hint values
     public solveLine(lineIndex: number) {
@@ -289,7 +286,7 @@ export abstract class Hints {
 } // class Hints
 
 
-export class ColumnHints extends Hints implements IHints {
+export class ColumnHints extends Hints  {
 
     protected getBoardLength(): number {
         return this.game.boardData.length
@@ -342,20 +339,11 @@ export class ColumnHints extends Hints implements IHints {
         return result
     }
 
-    public canMove(hintPad: HintPadPage, dir: string): boolean {
-        switch (dir) {
-            case 'U': return hintPad.hintPos.y > 0
-            case 'D': return hintPad.hintPos.y < this.getMaxIndexInLine() - 1
-            case 'L': return hintPad.hintPos.x > 0
-            case 'R': return hintPad.hintPos.x < this.hints.length - 1
-        }
-        return false
-    }
 }
 
 
 
-export class RowHints extends Hints implements IHints {
+export class RowHints extends Hints {
 
     protected getBoardLength(): number {
         return this.game.boardData[0].length
@@ -408,13 +396,4 @@ export class RowHints extends Hints implements IHints {
         return result
     }
 
-    public canMove(hintPad: HintPadPage, dir: string): boolean {
-        switch (dir) {
-            case 'U': return hintPad.hintPos.y > 0
-            case 'D': return hintPad.hintPos.y < this.hints.length - 1
-            case 'L': return hintPad.hintPos.x > 0
-            case 'R': return hintPad.hintPos.x < this.getMaxIndexInLine() - 1
-        }
-        return false
-    }
 }

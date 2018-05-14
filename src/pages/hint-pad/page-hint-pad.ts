@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { BoardSide } from '../../providers/game/game'
-import { IHints } from '../../providers/game/hints'
+import { Hints, ColumnHints } from '../../providers/game/hints'
 
 export type HintPoint = {
     x: number,
@@ -26,7 +26,7 @@ export class HintPadPage {
 
     public hintPos: HintPoint
     public hintPosChanged: (pos: HintPoint) => void
-    public hints: IHints
+    public hints: Hints
     
     constructor(public navCtrl: NavController, public navParams: NavParams) {
         this.hintPos = navParams.get('pos')
@@ -44,8 +44,31 @@ export class HintPadPage {
     }
 
     public canMove(dir: string): boolean {
-        return this.hints.canMove(this, dir)
+        if (this.hints instanceof ColumnHints) {
+            return this.canMoveInCols(dir)
+        } else {
+            return this.canMoveInRows(dir)
+        }
     }
+    private canMoveInCols(dir: string): boolean {
+        switch (dir) {
+            case 'U': return this.hintPos.y > 0
+            case 'D': return this.hintPos.y < this.hints.getMaxIndexInLine() - 1
+            case 'L': return this.hintPos.x > 0
+            case 'R': return this.hintPos.x < this.hints.getHints().length - 1
+        }
+        return false
+    }
+    private canMoveInRows(dir: string): boolean {
+        switch (dir) {
+            case 'U': return this.hintPos.y > 0
+            case 'D': return this.hintPos.y < this.hints.getHints().length - 1
+            case 'L': return this.hintPos.x > 0
+            case 'R': return this.hintPos.x < this.hints.getMaxIndexInLine() - 1
+        }
+        return false
+    }
+
     public setFromHints() {
         let hint = this.hints.getHintXY(this.hintPos.x, this.hintPos.y, this.hintPos.side)
         this.value = (hint) ? parseInt(hint) : 0

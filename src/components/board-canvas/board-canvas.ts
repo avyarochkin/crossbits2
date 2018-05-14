@@ -3,7 +3,7 @@ import { Gesture, ModalController, App } from 'ionic-angular'
 // import { DIRECTION_HORIZONTAL, DIRECTION_VERTICAL } from 'ionic-angular/gestures/hammer'
 
 import { BOARD_SIDE, BOARD_CELL, BOARD_PART, GAME_STATUS, GameProvider, BoardSide, Point } from '../../providers/game/game'
-import { IHints } from '../../providers/game/hints'
+import { Hints } from '../../providers/game/hints'
 import { HintPadPage, HintPoint } from '../../pages/hint-pad/page-hint-pad'
 
 const colors = {
@@ -567,7 +567,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     }
 
 
-    private editHint(x: number, y: number, side: BoardSide, hints: IHints) {
+    private editHint(x: number, y: number, side: BoardSide, hints: Hints) {
 
         this.hintPos = { x: x, y: y, side: side }
         this.paint()
