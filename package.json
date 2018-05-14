@@ -25,6 +25,7 @@
         "@ionic-native/status-bar": "3.12.1",
         "@ionic/storage": "2.0.1",
         "@types/hammerjs": "^2.0.35",
+        "ajv": "^6.5.0",
         "cordova-ios": "^4.5.4",
         "cordova-plugin-console": "^1.1.0",
         "cordova-plugin-device": "^1.1.7",
