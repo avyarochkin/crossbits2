@@ -27,7 +27,6 @@
         "@types/hammerjs": "^2.0.35",
         "ajv": "^6.5.0",
         "ajv-keywords": "^3.2.0",
-        "cordova-ios": "^4.5.4",
         "cordova-plugin-console": "^1.1.0",
         "cordova-plugin-device": "^1.1.7",
         "cordova-plugin-splashscreen": "^4.1.0",
@@ -42,7 +41,11 @@
         "zone.js": "0.8.12"
     },
     "devDependencies": {
-        "@ionic/app-scripts": "^3.1.9",
+        "@ionic/app-scripts": "^3.2.2",
+        "cordova-ios": "^5.0.0",
+        "extend": "^3.0.2",
+        "install": "^0.12.2",
+        "npm": "^6.7.0",
         "typescript": "2.3.4"
     },
     "description": "An Ionic project",

@@ -1,8 +1,8 @@
 {
   "name": "crossbits2",
-  "app_id": "ff3b744d",
-  "type": "ionic-angular",
   "integrations": {
     "cordova": {}
-  }
+  },
+  "type": "ionic-angular",
+  "id": "ff3b744d"
 }
