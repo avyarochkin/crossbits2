@@ -41,11 +41,11 @@
         "zone.js": "0.8.12"
     },
     "devDependencies": {
-        "@ionic/app-scripts": "^3.2.2",
+        "@ionic/app-scripts": "^3.2.3",
         "cordova-ios": "^5.0.0",
         "extend": "^3.0.2",
         "install": "^0.12.2",
-        "npm": "^6.7.0",
+        "npm": "^6.9.0",
         "typescript": "2.3.4"
     },
     "description": "An Ionic project",
