@@ -11,6 +11,7 @@
                             *ngFor="let board of stageBoards"
                             (click)="loadGame(board)"
                             (press)="editGame(board)">
+                        <div class="board-num">{{board.nr}}</div>
                         <span>{{board.boardData[0].length}}&times;{{board.boardData.length}}</span>
                         <ion-icon name="trophy" class="board-flag"
                                 *ngIf="board.solved"></ion-icon>

@@ -29,6 +29,16 @@
                 <button ion-button
                     *ngIf="isSetup()"
                     (click)="save()">SAVE</button>
+                <button ion-button
+                    *ngIf="!isSetup()"
+                    (click)="zoomIn()">
+                    <ion-icon name="expand"></ion-icon>
+                </button>
+                <button ion-button
+                    *ngIf="!isSetup()"
+                    (click)="zoomOut()">
+                    <ion-icon name="contract"></ion-icon>
+                </button>
                 <button ion-button icon-only
                     *ngIf="!isSetup()"
                     (click)="clear()">

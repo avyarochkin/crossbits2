@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core'
-import { NavController, AlertController, ToastController } from 'ionic-angular'
+import { NavController, AlertController, ToastController, Scroll } from 'ionic-angular'
 import { GameProvider, Point, BoardData, GAME_STATUS } from '../../providers/game/game'
 import { BoardCanvasComponent } from '../../components/board-canvas/board-canvas'
 
@@ -9,7 +9,7 @@ import { BoardCanvasComponent } from '../../components/board-canvas/board-canvas
     templateUrl: 'page-board.html',
 })
 export class BoardPage {
-
+    @ViewChild('scroll') scroller: Scroll;
     @ViewChild(BoardCanvasComponent) board: BoardCanvasComponent
 
     public boardData: BoardData
@@ -19,7 +19,7 @@ export class BoardPage {
     public minZoom = 1
 
     constructor(
-        public navCtrl: NavController, 
+        public navCtrl: NavController,
         public alertCtrl: AlertController,
         public toastCtrl: ToastController,
         public game: GameProvider) {
@@ -37,6 +37,7 @@ export class BoardPage {
         this.zoom = Math.min(initZoomX, initZoomY, 1)
         this.minZoom = this.zoom
         console.log(`Zoom: ${this.zoom}`)
+        this.scroller.zoom = this.scroller.zoom * 2;
     }
 
 
@@ -44,6 +45,13 @@ export class BoardPage {
         this.navCtrl.pop()
     }
 
+    public zoomIn() {
+        this.zoom = this.zoom * 1.2;
+    }
+
+    public zoomOut() {
+        this.zoom = Math.max(this.zoom / 1.2, this.minZoom);
+    }
 
     public save() {
         this.game.saveCurrentBoard()
