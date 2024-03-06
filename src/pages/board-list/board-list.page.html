@@ -1,6 +1,6 @@
 <ion-content>
 
-    <ion-slides ion-fixed pager class="stage-slides">
+    <ion-slides pager class="stage-slides">
         <ion-slide
                 *ngFor="let stageBoards of allBoards; let i = index">
             <div class="stage-slide">
@@ -8,17 +8,18 @@
                 <h3 *ngIf="i == allBoards.length-1">SAVED BOARDS</h3>
                 <div class="stage">
                     <div tappable class="stage-board"
-                            *ngFor="let board of stageBoards"
-                            (click)="loadGame(board)"
-                            (press)="editGame(board)">
-                        <div class="board-num">{{board.nr}}</div>
-                        <span>{{board.boardData[0].length}}&times;{{board.boardData.length}}</span>
+                        *ngFor="let board of stageBoards"
+                        (click)="loadGame(board)"
+                        (press)="editGame(board)">
+                        <div class="board-num">{{ board.nr }}</div>
+                        <span>{{ board.boardData[0].length }}&times;{{ board.boardData.length }}</span>
                         <ion-icon name="trophy" class="board-flag"
-                                *ngIf="board.solved"></ion-icon>
+                            *ngIf="board.solved">
+                        </ion-icon>
                     </div>
                     <div tappable class="stage-board new"
-                            *ngIf="i == allBoards.length-1"
-                            (click)="createGame()">
+                        *ngIf="i == allBoards.length-1"
+                        (click)="createGame()">
                         <ion-icon name="add"></ion-icon>
                     </div>
                 </div>

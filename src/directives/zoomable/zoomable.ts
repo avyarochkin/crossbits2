@@ -1,15 +1,16 @@
 import { Directive, Input, ElementRef, OnInit } from '@angular/core'
-import { Gesture } from 'ionic-angular'
+import { Point } from 'src/providers/game/game.interface'
+import 'hammerjs'
 
 @Directive({
     selector: '[zoomable]'
 })
 export class ZoomableDirective implements OnInit {
 
-    private gesture: Gesture
+    // private gesture: GestureController
     private minScaleBounce = 0.1
     private maxScaleBounce = 0.4
-    private contentSize: WebKitPoint
+    private contentSize: Point
 
     private scaleObj = {
         startScale: 1,
@@ -18,7 +19,7 @@ export class ZoomableDirective implements OnInit {
         startCenter: { x: 0, y: 0 }
     }
 
-    @Input() 
+    @Input()
     get scale() {
         return this.scaleObj.scale
     }
@@ -30,54 +31,37 @@ export class ZoomableDirective implements OnInit {
     @Input() maxScale = 1
     @Input() minScale = 1
 
-    private scrollingElement: HTMLElement
-    private zoomingElement: HTMLElement
+    private scrollEl: HTMLElement
+    private zoomEl: HTMLElement
 
     constructor(public hostRef: ElementRef) {}
 
 
     public ngOnInit() {
-        this.scrollingElement = this.hostRef.nativeElement.querySelector('.scroll-content')
+        this.scrollEl = this.hostRef.nativeElement
+        this.zoomEl = this.hostRef.nativeElement
+        this.zoomEl.style.height = 'initial'
 
-        this.zoomingElement = this.hostRef.nativeElement.querySelector('.scroll-zoom-wrapper')
-        this.zoomingElement.style.height = 'initial'
-
-        this.gesture = new Gesture(this.hostRef.nativeElement)
-        this.gesture.listen()
-        this.gesture.on('pinch', input => this.handlePinch(input))
-        this.gesture.on('pinchstart', input => this.handlePinchStart(input))
-        this.gesture.on('pinchend', input => this.handlePinchEnd(input))
+        // this.gesture = new Gesture(this.hostRef.nativeElement)
+        // this.gesture.listen()
+        // this.gesture.on('pinch', input => this.handlePinch(input))
+        // this.gesture.on('pinchstart', input => this.handlePinchStart(input))
+        // this.gesture.on('pinchend', input => this.handlePinchEnd(input))
 
         console.log(`[ZoomableDirective initialized]`)
     }
-
-
-    ngAfterContentInit() {
-        this.contentSize = {
-            x: this.zoomingElement.clientWidth,
-            y: this.zoomingElement.clientHeight
-        }   
-        console.log(`contentSize: ${this.contentSize.x}:${this.contentSize.y}`)
-    }
-
-
-    ngOnDestroy() {
-        // this.gesture.destroy()
-        console.log(`[ZoomableDirective destroyed]`)
-    }
-
 
     // event handlers
 
     private handlePinchStart(input: HammerInput) {
         console.log(`[pinch start event]`)
-        
+
         this.scaleObj.startScale = this.scaleObj.scale
         this.scaleObj.center = input.center
 
         this.scaleObj.startCenter = {
-            x: (input.center.x + this.scrollingElement.scrollLeft) / this.scaleObj.startScale,
-            y: (input.center.y + this.scrollingElement.scrollTop) / this.scaleObj.startScale
+            x: (input.center.x + this.scrollEl.scrollLeft) / this.scaleObj.startScale,
+            y: (input.center.y + this.scrollEl.scrollTop) / this.scaleObj.startScale
         }
     }
 
@@ -101,7 +85,6 @@ export class ZoomableDirective implements OnInit {
         }
     }
 
-
     private handlePinchEnd(input: HammerInput) {
         console.log(`[pinch end event]`)
         // this.checkScroll()
@@ -116,35 +99,41 @@ export class ZoomableDirective implements OnInit {
     }
 
     private applyScale() {
-        if (this.zoomingElement) {
+        if (this.zoomEl) {
+            if (this.contentSize == null) {
+                this.contentSize = {
+                    x: this.zoomEl.clientWidth,
+                    y: this.zoomEl.clientHeight
+                }
+                console.log(`contentSize: ${this.contentSize.x}:${this.contentSize.y}`)
+            }
 
-            this.zoomingElement.style.transformOrigin = '0 0'
-            this.zoomingElement.style.transform = `scale3d(${this.scaleObj.scale}, ${this.scaleObj.scale}, 1)`
+            this.zoomEl.style.transformOrigin = '0 0'
+            this.zoomEl.style.transition = 'transform 150ms'
+            this.zoomEl.style.transform = `scale3d(${this.scaleObj.scale}, ${this.scaleObj.scale}, 1)`
 
-            this.zoomingElement.style.width = `${ this.contentSize.x }px`
-            this.zoomingElement.style.height = `${ this.contentSize.y }px`
+            this.zoomEl.style.width = `${ this.contentSize.x }px`
+            this.zoomEl.style.height = `${ this.contentSize.y }px`
 
             this.adjustCenter()
 
         }
     }
 
-
     private adjustCenter() {
         const x = Math.round(this.scaleObj.startCenter.x * this.scaleObj.scale - this.scaleObj.center.x)
         const y = Math.round(this.scaleObj.startCenter.y * this.scaleObj.scale - this.scaleObj.center.y)
 
-        this.zoomingElement.style.left = `${ x > 0 ? 0 : -x }px`
-        this.zoomingElement.style.top = `${ y > 0 ? 0 : -y }px`
+        this.zoomEl.style.left = `${ x > 0 ? 0 : -x }px`
+        this.zoomEl.style.top = `${ y > 0 ? 0 : -y }px`
 
-        this.scrollingElement.scrollLeft = x > 0 ? x : 0
-        this.scrollingElement.scrollTop = y > 0 ? y : 0
+        this.scrollEl.scrollLeft = x > 0 ? x : 0
+        this.scrollEl.scrollTop = y > 0 ? y : 0
 
-        console.log(`Scrolled: 
-            ${ x }/${ this.scrollingElement.scrollLeft }/${ this.zoomingElement.style.left } :
-            ${ y }/${ this.scrollingElement.scrollTop }/${ this.zoomingElement.style.top }`)
+        console.log(`Scrolled:
+            ${ x }/${ this.scrollEl.scrollLeft }/${ this.zoomEl.style.left } :
+            ${ y }/${ this.scrollEl.scrollTop }/${ this.zoomEl.style.top }`)
     }
-
 
     private animateScale(finalScale: number) {
         this.scaleObj.scale += (finalScale - this.scaleObj.scale) / 5
@@ -158,5 +147,4 @@ export class ZoomableDirective implements OnInit {
         }
         // console.log(`Animating to scale ${finalScale} (${this.scaleObj.scale})`)
     }
-
 }

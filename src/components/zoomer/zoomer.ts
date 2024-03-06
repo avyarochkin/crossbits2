@@ -1,5 +1,4 @@
 import { Component, OnInit, ElementRef, Input } from '@angular/core'
-import { Gesture } from 'ionic-angular'
 
 
 @Component({
@@ -8,12 +7,12 @@ import { Gesture } from 'ionic-angular'
 })
 export class ZoomerComponent implements OnInit {
 
-    private gesture: Gesture
+    // private gesture: Gesture
     private minScaleBounce = 0.2
     private maxScaleBounce = 0.2
 
     private scaleObj = {
-        startScale: 1    
+        startScale: 1
     }
 
     @Input() scale = 1
@@ -24,11 +23,11 @@ export class ZoomerComponent implements OnInit {
 
     public ngOnInit() {
         this.zoomerRef.nativeElement.style.position = 'absolute'
-        this.gesture = new Gesture(this.zoomerRef.nativeElement)
-        this.gesture.listen()
-        this.gesture.on('pinch', input => this.handlePinch(input))
-        this.gesture.on('pinchstart', input => this.handlePinchStart(input))
-        this.gesture.on('pinchend', input => this.handlePinchEnd(input))
+        // this.gesture = new Gesture(this.zoomerRef.nativeElement)
+        // this.gesture.listen()
+        // this.gesture.on('pinch', input => this.handlePinch(input))
+        // this.gesture.on('pinchstart', input => this.handlePinchStart(input))
+        // this.gesture.on('pinchend', input => this.handlePinchEnd(input))
 
         // Listen to parent resize
         // this.parentSubject.subscribe(event => {
@@ -53,7 +52,7 @@ export class ZoomerComponent implements OnInit {
 
     private handlePinchStart(input: HammerInput) {
         console.log(`[pinch start event]`)
-        
+
         this.scaleObj.startScale = this.scale
         // this.setCenter(event)
     }
@@ -116,7 +115,7 @@ export class ZoomerComponent implements OnInit {
 
 /*
     //Called after every check of the component's or directive's content.
-    public ngAfterContentChecked() {        
+    public ngAfterContentChecked() {
         this.setContentSize()
     }
 
@@ -133,7 +132,7 @@ export class ZoomerComponent implements OnInit {
         this.size.x = width || window.innerWidth
         this.size.y = height || window.innerHeight
     }
-    
+
     private setContentSize() {
         const x = this.container.nativeElement.clientWidth
         const y = this.container.nativeElement.clientHeight

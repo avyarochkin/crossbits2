@@ -1,0 +1,65 @@
+<ion-content [scrollX]="true" [scrollY]="true">
+
+    <div #scroll class="board-scroll"
+        zoomable
+        [scale]="zoom"
+        [minScale]="minZoom">
+        <board-canvas #boardCanvas
+            (statusChange)="statusChange($event)">
+        </board-canvas>
+    </div>
+
+</ion-content>
+
+<ion-footer>
+    <ion-toolbar>
+
+        <ion-buttons slot="start">
+            <ion-button fill="round"
+                (click)="back()">
+                BACK
+            </ion-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end">
+            <ion-button fill="round" title="Delete"
+                *ngIf="isSetup() && !isNewBoard()"
+                (click)="delete()">
+                <ion-icon name="trash"></ion-icon>
+            </ion-button>
+            <ion-button fill="round"
+                *ngIf="isSetup()"
+                (click)="save()">
+                SAVE
+            </ion-button>
+            <ion-button fill="round" title="Zoom In"
+                *ngIf="!isSetup()"
+                (click)="zoomIn()">
+                <ion-icon name="expand-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="round" title="Zoom Out"
+                *ngIf="!isSetup()"
+                (click)="zoomOut()">
+                <ion-icon name="contract-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="round" title="Clear"
+                *ngIf="!isSetup()"
+                (click)="clear()">
+                <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="round" title="Undo"
+                *ngIf="!isSetup()"
+                (click)="board.undo()"
+                [disabled]="!canUndo()">
+                <ion-icon name="arrow-undo-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="round" title="Redo"
+                *ngIf="!isSetup()"
+                (click)="board.redo()"
+                [disabled]="!canRedo()">
+                <ion-icon name="arrow-redo-outline"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-footer>

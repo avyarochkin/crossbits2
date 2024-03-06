@@ -1,70 +1,10 @@
 import { Injectable } from '@angular/core'
 import { LocalStorageProvider } from '../local-storage/local-storage'
 import { staticBoards } from './data'
-import { HintCell, ColumnHints, RowHints } from './hints'
+import { BOARD_CELL, BOARD_KEY, Board, BoardData, GAME_STATUS, Point, SOLVED_KEY, SavedBoardData, SerializedBoard } from './game.interface'
+import { ColumnHints, RowHints } from './hints'
 import { UndoStack } from './undo-stack'
 
-export enum BOARD_CELL {
-        NIL = -1,
-        OFF = 0,
-        ON = 1
-}
-export enum GAME_STATUS {
-        SETUP,
-        GAME,
-        OVER
-}
-
-export type BoardSide = 'L' | 'R' | 'T' | 'B'
-
-export const
-    BOARD_SIDE = {
-        LEFT: <BoardSide> 'L',
-        RIGHT: <BoardSide> 'R',
-        TOP: <BoardSide> 'T',
-        BOTTOM: <BoardSide> 'B'
-    },
-    BOARD_PART = {
-        HINT_TOP: 'top-hint',
-        HINT_BOTTOM: 'bottom-hint',
-        HINT_LEFT: 'left-hint',
-        HINT_RIGHT: 'right-hint',
-        DATA: 'data'
-    },
-    BOARD_KEY = 'board',
-    SOLVED_KEY= 'solved'
-
-
-export type Point = {
-    x: number,
-    y: number
-}
-
-type BoardDataItem = {
-    value: number
-}
-export type BoardData = BoardDataItem[][]
-
-export type Board = {
-    nr: string,
-    boardData: BoardData,
-    columnHints: ColumnHints,
-    rowHints: RowHints,
-    static: boolean,
-    solved?: boolean
-}
-
-export type SavedBoardData = {
-    boardData: BoardData,
-    solved: boolean
-}
-
-export type SerializedBoard = {
-    boardData: BoardData,
-    columnHints: { hints: HintCell [][] },
-    rowHints: { hints: HintCell[][] },
-    static: boolean
-}
 
 
 @Injectable()
@@ -207,9 +147,9 @@ export class GameProvider {
 
     saveBoard(board?: Board) {
         if (!board) board = this.sourceBoard
-        this.localStorage.setObject(SOLVED_KEY.concat(board.nr), { 
-            boardData: board.boardData, 
-            solved: board.solved 
+        this.localStorage.setObject(SOLVED_KEY.concat(board.nr), {
+            boardData: board.boardData,
+            solved: board.solved
         })
     }
 

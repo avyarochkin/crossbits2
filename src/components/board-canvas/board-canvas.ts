@@ -1,10 +1,10 @@
 import { Component, ElementRef, OnInit, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core'
-import { Gesture, ModalController, App } from 'ionic-angular'
-// import { DIRECTION_HORIZONTAL, DIRECTION_VERTICAL } from 'ionic-angular/gestures/hammer'
+import { Gesture, GestureController, GestureDetail, ModalController, PickerController } from '@ionic/angular'
 
-import { BOARD_SIDE, BOARD_CELL, BOARD_PART, GAME_STATUS, GameProvider, BoardSide, Point } from '../../providers/game/game'
-import { Hints } from '../../providers/game/hints'
-import { HintPadPage, HintPoint } from '../../pages/hint-pad/page-hint-pad'
+import { BOARD_SIDE, BOARD_CELL, BOARD_PART, GAME_STATUS, BoardSide, Point } from 'src/providers/game/game.interface'
+import { Hints } from 'src/providers/game/hints'
+import { HintPoint } from 'src/pages/hint-pad/hint-pad.page'
+import { GameProvider } from 'src/providers/game/game'
 
 const colors = {
     dark: '#002F4D',
@@ -29,6 +29,11 @@ type SolvePos = {
     kind: string
 }
 
+type HintPoint = {
+    x: number,
+    y: number,
+    side: BoardSide
+}
 
 @Component({
     selector: 'board-canvas',
@@ -42,53 +47,45 @@ type SolvePos = {
 export class BoardCanvasComponent implements OnInit, OnDestroy {
 
     @Output('statusChange') statusChangeEmitter = new EventEmitter<GAME_STATUS>()
-    @ViewChild('canvas') canvasRef: ElementRef
+    @ViewChild('canvas', { static: true }) canvasRef: ElementRef
 
     public solvePos: SolvePos = null
     public hintPos: HintPoint = null
     private gesture: Gesture
     private panData: PanData = null
     private scrollingElement: HTMLElement
+    private timer: any
 
     constructor(
-        public app: App,
+        public gestureCtrl: GestureController,
+        public pickerCtrl: PickerController,
         public game: GameProvider,
-        public modalCtrl: ModalController) {}
+        public modalCtrl: ModalController
+    ) { }
 
 
     public ngOnInit() {
-        this.scrollingElement = this.canvasRef.nativeElement.closest('.scroll-content')
+        this.scrollingElement = this.canvasRef.nativeElement
 
-        this.gesture = new Gesture(this.canvasRef.nativeElement)
-        this.gesture.listen()
-
-        const mc = this.gesture['_hammer'] as HammerManager
-        mc.get('press').set({ time: 201 })
-        // mc.get('pan').set({ direction: DIRECTION_HORIZONTAL | DIRECTION_VERTICAL })
-        // pan.recognizeWith(press)
-
-        this.gesture.on('tap', input => this.handleTap(input))
-        this.gesture.on('press', input => this.handlePress(input))
-        this.gesture.on('panmove', input => this.handlePanMove(input))
-        this.gesture.on('panend', input => this.handlePanEnd(input))
-        this.gesture.on('pressup', input => this.handlePanEnd(input))
-
+        this.gesture = this.gestureCtrl.create({
+            el: this.canvasRef.nativeElement,
+            gestureName: 'toggle-cells',
+            threshold: 0,
+            onStart: (detail) => this.handleTouchStart(detail),
+            onMove: (detail) => this.handlePanMove(detail),
+            onEnd: (detail) => this.handleTouchEnd(detail)
+        })
+        this.gesture.enable(true)
         this.enableScroll(true)
         this.paint()
-        console.log(`[BoardCanvasComponent initialized]`)
-        // window.onresize = (e) => {
-        //     console.log(`[window resized]`)
-        // }
     }
 
     public ngOnDestroy() {
-        // this.gesture.destroy()
-        console.log(`[BoardCanvasComponent destroyed]`)
+        this.gesture.destroy()
     }
 
 
     private setViewPort(ctx: CanvasRenderingContext2D, realWidth: number, realHeight: number) {
-
         const backingStoreRatio = ctx['webkitBackingStorePixelRatio'] || ctx['backingStorePixelRatio'] || 1
         const pxRatio = window.devicePixelRatio / backingStoreRatio
         // console.log(`pixel ratio: ${pxRatio}`)
@@ -106,7 +103,6 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
 
     private paint() {
-
         const ctx = this.canvasRef.nativeElement.getContext('2d') as CanvasRenderingContext2D
 
         const halfCellSize = cellSize / 2
@@ -288,14 +284,13 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         }
     }
 
-
-    private getBoardPos(input: HammerInput) {
-
-        const rect = input.target.getBoundingClientRect()        
-        const scaleX = rect.width / input.target.clientWidth
-        const scaleY = rect.height / input.target.clientHeight
-        const offsetX = (input.center.x - rect.left) / scaleX
-        const offsetY = (input.center.y - rect.top) / scaleY
+    private getBoardPos(detail: GestureDetail) {
+        const target = this.canvasRef.nativeElement;
+        const rect = target.getBoundingClientRect()
+        const scaleX = rect.width / target.clientWidth
+        const scaleY = rect.height / target.clientHeight
+        const offsetX = (detail.currentX - rect.left) / scaleX
+        const offsetY = (detail.currentY - rect.top) / scaleY
 
         const maxBoardX = this.game.boardData[0].length
         const maxBoardY = this.game.boardData.length
@@ -308,40 +303,40 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         if (y < maxColHintY) {
             // top hints
             if (x >= maxRowHintX && x < maxRowHintX + maxBoardX) {
-                return { 
-                    x: x - maxRowHintX, 
-                    y: y, 
-                    kind: BOARD_PART.HINT_TOP 
+                return {
+                    x: x - maxRowHintX,
+                    y: y,
+                    kind: BOARD_PART.HINT_TOP
                 }
             }
         } else if (y < maxColHintY + maxBoardY) {
             // left hints or board data or right hints
             if (x < maxRowHintX) {
-                return { 
-                    x: x, 
-                    y: y - maxColHintY, 
-                    kind: BOARD_PART.HINT_LEFT 
+                return {
+                    x: x,
+                    y: y - maxColHintY,
+                    kind: BOARD_PART.HINT_LEFT
                 }
             } else if (x < maxRowHintX + maxBoardX) {
-                return { 
-                    x: x - maxRowHintX, 
-                    y: y - maxColHintY, 
-                    kind: BOARD_PART.DATA 
+                return {
+                    x: x - maxRowHintX,
+                    y: y - maxColHintY,
+                    kind: BOARD_PART.DATA
                 }
             } else {
-                return { 
-                    x: x - maxRowHintX - maxBoardX, 
-                    y: y - maxColHintY, 
-                    kind: BOARD_PART.HINT_RIGHT 
+                return {
+                    x: x - maxRowHintX - maxBoardX,
+                    y: y - maxColHintY,
+                    kind: BOARD_PART.HINT_RIGHT
                 }
             }
         } else {
             // bottom hints
             if (x >= maxRowHintX && x < maxRowHintX + maxBoardX) {
-                return { 
-                    x: x - maxRowHintX, 
-                    y: y - maxColHintY - maxBoardY, 
-                    kind: BOARD_PART.HINT_BOTTOM 
+                return {
+                    x: x - maxRowHintX,
+                    y: y - maxColHintY - maxBoardY,
+                    kind: BOARD_PART.HINT_BOTTOM
                 }
             }
         }
@@ -349,14 +344,28 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         return null
     }
 
+    private handleTouchStart(detail: GestureDetail) {
+        this.timer = setTimeout(() => {
+            this.handlePress(detail)
+            this.timer = null
+        }, 500)
+    }
 
-    private handleTap(input: HammerInput) {
-        //console.log(`[tap event]`)
+    private handleTouchEnd(detail: GestureDetail) {
+        if (this.timer != null) {
+            clearTimeout(this.timer)
+            this.timer = null
+            this.handleTap(detail)
+        }
+        this.handlePanEnd()
+    }
 
-        const boardPos = this.getBoardPos(input)
+    private handleTap(detail: GestureDetail) {
+        console.log(`[tap event]`)
+
+        const boardPos = this.getBoardPos(detail)
 
         if (boardPos) {
-            input.preventDefault()
             if (this.isGame()) {
                 // handle tap in game mode
                 switch (boardPos.kind) {
@@ -392,22 +401,20 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         }
     }
 
-
     private enableScroll(enable: boolean) {
         if (this.scrollingElement) {
             this.scrollingElement.style.overflow = enable ?  'scroll' : 'hidden'
         }
     }
 
+    private handlePress(detail: GestureDetail) {
+        console.log(`[press event]`)
 
-    private handlePress(input: HammerInput) {
-        //console.log(`[press event]`)
-
-        const boardPos = this.getBoardPos(input)
-        const singleTouch = !(input.srcEvent instanceof TouchEvent) || input.srcEvent.touches.length === 1
+        const boardPos = this.getBoardPos(detail)
+        const singleTouch = !(detail.event instanceof TouchEvent) || detail.event.touches.length === 1
 
         if (this.isGame() && singleTouch && boardPos && boardPos.kind === BOARD_PART.DATA) {
-            // console.log(`(start panning)`)
+            console.log(`(start panning)`)
             this.panData = {
                 start: boardPos,
                 current: boardPos,
@@ -420,14 +427,11 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         }
     }
 
-
-    private handlePanMove(input: HammerInput) {
-        //console.log(`[pan move event]`)
-
-        const boardPos = this.getBoardPos(input)
+    private handlePanMove(detail: GestureDetail) {
+        const boardPos = this.getBoardPos(detail)
 
         if (this.panData && this.isGame() && boardPos && boardPos.kind === BOARD_PART.DATA) {
-            // console.log(`(panning)`)
+            console.log(`(panning)`)
 
             let firstPan = false
 
@@ -472,20 +476,17 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         }
     }
 
-
-    private handlePanEnd(input: HammerInput) {
-        //console.log(`[pan end event]`)
+    private handlePanEnd() {
+        console.log(`(pan end event)`)
         if (this.panData) {
             this.panData = null
             this.enableScroll(true)
         }
     }
 
-
     private isSetup(): boolean {
         return (this.game.boardStatus === GAME_STATUS.SETUP)
     }
-
 
     private isGame(): boolean {
         return (this.game.boardStatus === GAME_STATUS.GAME)
@@ -496,14 +497,12 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         return (this.game.boardStatus === GAME_STATUS.OVER)
     }
 
-
     private toggleCell(x: number, y: number) {
         const value = this.game.boardData[y][x].value
         this.game.setBoardXY(x, y, this.toggledCellValue(value))
         this.checkGameStatus()
         this.paint()
     }
-
 
     private toggledCellValue(value: BOARD_CELL): BOARD_CELL {
         return (value === BOARD_CELL.ON)
@@ -512,7 +511,6 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 ? BOARD_CELL.NIL
                 : BOARD_CELL.ON
     }
-
 
     private setCellsAtoB(A: Point, B: Point, value: BOARD_CELL) {
         const dx = Math.sign(B.x - A.x)
@@ -528,7 +526,6 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         }
     }
 
-
     private checkGameStatus() {
         if (this.game.boardStatus === GAME_STATUS.OVER) {
             this.game.finishBoard()
@@ -537,7 +534,6 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         }
         this.game.saveBoard()
     }
-
 
     private solveCol(x: number, kind: string) {
         if (!this.solvePos) {
@@ -552,7 +548,6 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         }
     }
 
-
     private solveRow(y: number, kind: string) {
         if (!this.solvePos) {
             this.solvePos = { y: y, kind: kind }
@@ -566,47 +561,58 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         }
     }
 
-
-    private editHint(x: number, y: number, side: BoardSide, hints: Hints) {
-
+    private async editHint(x: number, y: number, side: BoardSide, hints: Hints) {
         this.hintPos = { x: x, y: y, side: side }
         this.paint()
 
-        const modal = this.modalCtrl.create(HintPadPage, {
-            pos: this.hintPos,
-            posChanged: () => this.paint(),
-            hints: hints
-        }, { 
-            enableBackdropDismiss: false 
-        })
-        modal.onDidDismiss(() => {
-            this.hintPos = null
-            this.paint()
-        })
-        modal.present({ animate: false })
-    }
+        let hint = hints.getHintXY(x, y, side)
+        let selectedIndex = (hint) ? parseInt(hint) : 0
 
+        const picker = await this.pickerCtrl.create({
+            columns: [{
+                name: 'valueColumn',
+                selectedIndex,
+                options: Array.from(
+                    { length: hints.getBoardLength() + 1 },
+                    (_, index) => ({
+                        text: index.toString(),
+                        value: index
+                    })
+                )
+            }],
+            buttons: [
+                { role: 'cancel', text: 'CANCEL' },
+                { role: 'apply', text: 'OK' }
+            ]
+        })
+        picker.onDidDismiss().then(detail => {
+            if (detail.role === 'apply') {
+                const value = detail.data.valueColumn.value
+                hints.setHintXY(x, y, side, value > 0 ? value.toString() : null)
+
+                this.hintPos = null
+                this.paint()
+            }
+        })
+        await picker.present()
+    }
 
     private hintPadAt(x: number, y: number, side: BoardSide): boolean {
         return this.hintPos ? this.hintPos.x === x && this.hintPos.y === y && this.hintPos.side === side : false
     }
 
-
     private solvingColAt(x: number, kind: string): boolean {
         return this.solvePos ? this.solvePos.kind === kind && this.solvePos.x === x : false
     }
-
 
     private solvingRowAt(y: number, kind: string): boolean {
         return this.solvePos ? this.solvePos.kind === kind && this.solvePos.y === y : false
     }
 
-
     public undo() {
         this.game.undoStack.undo()
         this.paint()
     }
-
 
     public redo() {
         this.game.undoStack.redo()

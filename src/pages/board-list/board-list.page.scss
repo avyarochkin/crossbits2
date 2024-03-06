@@ -1,9 +1,10 @@
-page-board-list {
+:host {
     .stage-slides {
+        height: 100%;
         .slide-zoom {
             height: 100%;
             padding: 2rem 0;
-            background-color: $semiDarkBlue;
+            background-color: var(--ion-color-semi-dark);
         }
         .stage-slide {
             height: 100%;
@@ -18,7 +19,7 @@ page-board-list {
             padding-bottom: 1.5rem;
             font-weight: normal;
             text-align: center;
-            color: $ultraLightBlue;
+            color: var(--ion-color-ultra-light);
         }
         .stage {
             display: flex;
@@ -32,18 +33,19 @@ page-board-list {
                 margin: .75rem;
                 width: 5rem;
                 height: 5rem;
-                background-color: $lightBlue;
+                background-color: var(--ion-color-light);
                 border-radius: .5rem;
-                box-shadow: 0 0 4px $darkBlue;
+                box-shadow: 0 0 4px var(--ion-color-dark);
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
+                align-items: center;
                 text-align: center;
                 font-size: 1.25rem;
-                color: $darkBlue;
+                color: var(--ion-color-dark);
                 &.new {
-                    background-color: $midBlue;
-                    color: $lightBlue;
+                    background-color: var(--ion-color-medium);
+                    color: var(--ion-color-light);
                 }
                 &.activated {
                     opacity: 0;
@@ -54,7 +56,7 @@ page-board-list {
                     position: absolute;
                     top: -1.2rem;
                     align-self: center;
-                    color: $ultraLightBlue;
+                    color: var(--ion-color-ultra-light);
                     font-size: 1rem;
                 }
                 .board-flag {
@@ -62,14 +64,14 @@ page-board-list {
                     // right: 10%;
                     bottom: 0;
                     align-self: center;
-                    color: $semiDarkBlue;
+                    color: var(--ion-color-semi-dark);
                 }
             }
         }
         .swiper-pagination-bullets {
             bottom: .2rem;
             .swiper-pagination-bullet {
-                background: $lightBlue;
+                background: var(--ion-color-light);
             }
         }
     }

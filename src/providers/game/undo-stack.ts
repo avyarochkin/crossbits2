@@ -1,12 +1,5 @@
-import { GameProvider, BOARD_CELL } from './game'
-
-type UndoListAtom = {
-    x: number,
-    y: number,
-    was: BOARD_CELL,
-    is: BOARD_CELL
-}
-type UndoListItem = UndoListAtom | Array<UndoListAtom>
+import { GameProvider } from './game'
+import { UndoListAtom, UndoListItem } from './undo-stack.interface'
 
 export class UndoStack {
     list: UndoListItem[] = []

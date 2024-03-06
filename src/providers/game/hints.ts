@@ -1,14 +1,6 @@
-import { GameProvider, Point, BoardSide, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game'
-
-export type HintCell = {
-    hint: number
-}
-
-
-type VariantPiece = {
-    start: number, 
-    end: number
-}
+import { Point, BoardSide, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game.interface'
+import { GameProvider } from './game'
+import { HintCell, VariantPiece } from './hints.interface'
 
 export abstract class Hints {
 
@@ -42,16 +34,16 @@ export abstract class Hints {
     }
 
     /*
-    Should return the length of each board row or column that each hint line 
-    will be linked to. For the column hints it should return the board height, 
-    for the row hints - the board width.  
+    Should return the length of each board row or column that each hint line
+    will be linked to. For the column hints it should return the board height,
+    for the row hints - the board width.
     */
-    protected abstract getBoardLength(): number
+    public abstract getBoardLength(): number
 
     /*
-    Should return the cell value from the game board for the hint lineIndex and 
-    board indexInLine. For the column hints lineIndex should map to the board 
-    <x> and indexInLine should map to <y>. For the row hints - vice versa. 
+    Should return the cell value from the game board for the hint lineIndex and
+    board indexInLine. For the column hints lineIndex should map to the board
+    <x> and indexInLine should map to <y>. For the row hints - vice versa.
     */
     protected abstract getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL
 
@@ -95,8 +87,8 @@ export abstract class Hints {
     }
 
     protected getHint(lineIndex, indexInLine: number): string {
-        return (indexInLine >= 0 && indexInLine < this.hints[lineIndex].length) 
-            ? this.hints[lineIndex][indexInLine].hint.toString() 
+        return (indexInLine >= 0 && indexInLine < this.hints[lineIndex].length)
+            ? this.hints[lineIndex][indexInLine].hint.toString()
             : ''
     }
 
@@ -134,7 +126,7 @@ export abstract class Hints {
         */
         let boardLine = Array<BOARD_CELL>(dataLength)
 
-        /* 
+        /*
         Copies the target board line to a local array to achieve better lookup
         performance (33% faster)
         */
@@ -216,7 +208,7 @@ export abstract class Hints {
         /*
         Applies <variant> to <solution>. All cells that stay on or off across
         all variants will be set to on or off in the solution.
-        Returns "true" if the solution has any cells set to on or off, 
+        Returns "true" if the solution has any cells set to on or off,
         i.e. if the solution is applicable.
         */
         function applyVariantToSolution(): boolean {
@@ -288,7 +280,7 @@ export abstract class Hints {
 
 export class ColumnHints extends Hints  {
 
-    protected getBoardLength(): number {
+    public getBoardLength(): number {
         return this.game.boardData.length
     }
 
@@ -345,7 +337,7 @@ export class ColumnHints extends Hints  {
 
 export class RowHints extends Hints {
 
-    protected getBoardLength(): number {
+    public getBoardLength(): number {
         return this.game.boardData[0].length
     }
 
