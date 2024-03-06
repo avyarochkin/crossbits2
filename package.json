@@ -1,8 +1,8 @@
 {
-    "name": "test",
-    "version": "0.0.1",
-    "author": "Ionic Framework",
-    "homepage": "http://ionicframework.com/",
+    "name": "crossbits",
+    "version": "2.0.0",
+    "author": "Alexey Yarochkin",
+    "homepage": "https://github.com/avyarochkin/crossbits2",
     "private": true,
     "scripts": {
         "ng": "ng",
@@ -33,7 +33,7 @@
         "zone.js": "^0.9.1"
     },
     "devDependencies": {
-        "@angular-devkit/build-angular": "^0.803.26",
+        "@angular-devkit/build-angular": "^0.803.29",
         "@angular/cli": "^8.3.26",
         "@angular/compiler": "^8.2.14",
         "@angular/compiler-cli": "^8.2.14",
@@ -42,7 +42,7 @@
         "@types/node": "~8.9.4",
         "typescript": "^3.4.5"
     },
-    "description": "An Ionic project",
+    "description": "CrossBits",
     "cordova": {
         "platforms": [
             "ios"
