@@ -98,12 +98,7 @@ module.exports = {
         "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/prefer-includes": "error",
         "@typescript-eslint/prefer-literal-enum-member": "error",
-        "@typescript-eslint/prefer-nullish-coalescing": [
-            "error",
-            {
-                "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": true
-            }
-        ],
+        "@typescript-eslint/prefer-nullish-coalescing": "warn",
         "@typescript-eslint/prefer-optional-chain": "error",
         "@typescript-eslint/prefer-readonly": "error",
         "@typescript-eslint/quotes": [
@@ -120,8 +115,7 @@ module.exports = {
         "@typescript-eslint/strict-boolean-expressions": [
             "warn",
             {
-                "allowNullableObject": true,
-                "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": true
+                "allowNullableObject": true
             }
         ],
         "block-scoped-var": "error",

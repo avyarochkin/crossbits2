@@ -106,7 +106,7 @@ export abstract class Hints {
     }
 
     abstract getHintXY(x: number, y: number, side: BoardSide): string
-    abstract setHintXY(x: number, y: number, side: BoardSide, value: string): Point
+    abstract setHintXY(x: number, y: number, side: BoardSide, value: string | null): Point
 
     // try to solve the board line based on the hint values
     solveLine(lineIndex: number) {
@@ -180,7 +180,7 @@ export abstract class Hints {
         */
         function buildNextVariant(): boolean {
             // if not initialized, build the first variant
-            if (!variant[0]) {
+            if (variant[0] == null) {
                 return buildVariant(0, 0)
             }
             // try to shift a piece one cell forward starting with the last one

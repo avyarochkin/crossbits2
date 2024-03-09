@@ -21,7 +21,7 @@ const SOLVE_DELAY_MSEC = 25
 const PRESS_TIME_MSEC = 500
 
 interface PanData {
-    orientation: 'X'|'Y'
+    orientation?: 'X'|'Y'
     start: Point
     current: Point
     value: BOARD_CELL
@@ -53,12 +53,12 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     @Output('statusChange') statusChangeEmitter = new EventEmitter<GAME_STATUS>()
     @ViewChild('canvas', { static: true }) canvasRef: ElementRef<HTMLCanvasElement>
 
-    solvePos: SolvePos = null
-    hintPos: HintPoint = null
+    solvePos: SolvePos | null
+    hintPos: HintPoint | null
     private gesture: Gesture
-    private panData: PanData = null
+    private panData: PanData | null
     private scrollingElement: HTMLElement
-    private timer: NodeJS.Timer
+    private timer: NodeJS.Timer | null
 
     constructor(
         public gestureCtrl: GestureController,
@@ -488,7 +488,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     }
 
     private enableScroll(enable: boolean) {
-        if (this.scrollingElement) {
+        if (this.scrollingElement != null) {
             this.scrollingElement.style.overflow = enable ?  'scroll' : 'hidden'
         }
     }
@@ -505,7 +505,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 start: boardPos,
                 current: boardPos,
                 value: this.toggledCellValue(this.game.boardData[boardPos.y][boardPos.x].value),
-                orientation: null // will be determined later
+                orientation: undefined // will be determined later
             }
             this.enableScroll(false)
         } else {
@@ -543,7 +543,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 if (boardPos.x !== this.panData.start.x) {
                     this.setCellsAtoB(boardPos, this.panData.start, this.panData.value)
                 } else {
-                    this.panData.orientation = null
+                    this.panData.orientation = undefined
                 }
             } else if (this.panData.orientation === 'Y' && boardPos.y !== this.panData.current.y) {
                 // vertical orientation - resetting x-coordinate
@@ -555,7 +555,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 if (boardPos.y !== this.panData.start.y) {
                     this.setCellsAtoB(boardPos, this.panData.start, this.panData.value)
                 } else {
-                    this.panData.orientation = null
+                    this.panData.orientation = undefined
                 }
             }
         }
@@ -676,7 +676,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         })
         void picker.onDidDismiss<{ valueColumn: PickerColumnOption }>().then(detail => {
             if (detail.role === 'apply') {
-                const value = detail.data.valueColumn.value as number
+                const value = detail.data!.valueColumn.value as number
                 hints.setHintXY(x, y, side, value > 0 ? value.toString() : null)
 
                 this.hintPos = null

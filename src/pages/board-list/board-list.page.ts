@@ -59,9 +59,9 @@ export class BoardListPage {
                 { role: 'apply', text: 'OK' }
             ]
         })
-        void picker.onDidDismiss<{ x: PickerColumnOption; y: PickerColumnOption }>().then(async value => {
-            if (value.role === 'apply') {
-                this.game.initWithSize(value.data.x.value as number, value.data.y.value as number, GAME_STATUS.SETUP)
+        void picker.onDidDismiss<{ x: PickerColumnOption; y: PickerColumnOption }>().then(async ({ role, data }) => {
+            if (role === 'apply') {
+                this.game.initWithSize(data!.x.value as number, data!.y.value as number, GAME_STATUS.SETUP)
                 // game will be initialized on the next page
                 await this.navCtrl.navigateForward('/board')
             }

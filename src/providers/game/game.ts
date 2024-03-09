@@ -33,7 +33,7 @@ export class GameProvider {
     allBoards: Board[][] = []
     savedBoards: SerializedBoard[] = []
 
-    sourceBoard: Board
+    sourceBoard?: Board
     savedBoardIndex = 0
     boardStatus: GAME_STATUS = GAME_STATUS.OVER
     boardSize: Point = { x: 0, y: 0 }
@@ -64,7 +64,7 @@ export class GameProvider {
 
                 const savedData = this.localStorage.getObject(SOLVED_KEY.concat(board.nr)) as SavedBoardData
 
-                if (savedData) {
+                if (savedData != null) {
                     boardData = savedData.boardData
                     boardSolved = savedData.solved
                 } else {
@@ -143,7 +143,7 @@ export class GameProvider {
             const allRowsMatch = this.rowHints.allLinesMatch(check)
             if (allColsMatch && allRowsMatch) {
                 this.boardStatus = GAME_STATUS.OVER
-                this.sourceBoard.solved = true
+                this.sourceBoard!.solved = true
                 console.log('Game solved!')
             }
         }
@@ -151,7 +151,7 @@ export class GameProvider {
 
     saveBoard(board?: Board) {
         if (!board) {
-            board = this.sourceBoard
+            board = this.sourceBoard!
         }
         this.localStorage.setObject(SOLVED_KEY.concat(board.nr), {
             boardData: board.boardData,
@@ -160,13 +160,13 @@ export class GameProvider {
     }
 
     resetBoard(width?: number, height?: number) {
-        width = width || this.boardData[0].length
-        height = height || this.boardData.length
+        const boardWidth = width || this.boardData[0].length
+        const boardHeight = height || this.boardData.length
 
         this.boardData.splice(0, this.boardData.length)
-        for (let y = 0; y < height; y++) {
+        for (let y = 0; y < boardHeight; y++) {
             this.boardData.push(new Array<BoardDataItem>())
-            for (let x = 0; x < width; x++) {
+            for (let x = 0; x < boardWidth; x++) {
                 this.boardData[y].push({ value: BOARD_CELL.NIL })
             }
         }
@@ -182,7 +182,7 @@ export class GameProvider {
     }
 
     initWithSize(width: number, height: number, status: GAME_STATUS) {
-        this.sourceBoard = null
+        this.sourceBoard = undefined
         this.boardData = []
         this.savedBoardIndex = this.savedBoards.length
         this.boardStatus = status

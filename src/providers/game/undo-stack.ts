@@ -13,7 +13,7 @@ export class UndoStack {
     }
 
 
-    getCurrentItem(): UndoListItem {
+    getCurrentItem(): UndoListItem | null {
         return (this.index < this.list.length) ? this.list[this.index] : null
     }
 
@@ -76,7 +76,7 @@ export class UndoStack {
                 doUndo(this.game, current[i])
             }
             //console.log(`lock undone, list(${this.list.length}), index: ${this.index}`)
-        } else {
+        } else if (current) {
             doUndo(this.game, current)
             //console.log(`item undone, list(${this.list.length}), index: ${this.index}`)
         }
@@ -102,7 +102,7 @@ export class UndoStack {
                 doRedo(this.game, current[i])
             }
             //console.log(`block redone, list(${this.list.length}), index: ${this.index}`)
-        } else {
+        } else if (current) {
             doRedo(this.game, current)
             //console.log(`item redone, list(${this.list.length}), index: ${this.index}`)
         }

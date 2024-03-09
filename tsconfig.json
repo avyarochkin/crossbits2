@@ -12,6 +12,8 @@
     "module": "esnext",
     "moduleResolution": "node",
     "sourceMap": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
     "target": "es2015",
     "importHelpers": true,
     "typeRoots": [

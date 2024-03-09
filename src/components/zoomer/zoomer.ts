@@ -70,7 +70,7 @@ export class ZoomerComponent implements OnInit {
         this.scale = scale
         this.applyScale()
 
-        event.preventDefault()
+        input.srcEvent.preventDefault()
     }
 
     private handlePinchEnd() {
