@@ -13,7 +13,7 @@ export class ZoomableDirective implements OnInit {
     // private gesture: GestureController
     private contentSize: Point
 
-    private scaleObj = {
+    private readonly scaleObj = {
         startScale: 1,
         scale: 1,
         center: { x: 0, y: 0 },
@@ -141,7 +141,7 @@ export class ZoomableDirective implements OnInit {
 
         if (Math.abs(this.scaleObj.scale - finalScale) > 0.01) {
             this.applyScale()
-            window.requestAnimationFrame(this.animateScale.bind(this, finalScale))
+            window.requestAnimationFrame(this.animateScale.bind(this, finalScale) as FrameRequestCallback)
         } else {
             this.scale = finalScale
             // this.checkScroll()

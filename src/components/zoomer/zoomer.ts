@@ -11,7 +11,7 @@ export class ZoomerComponent implements OnInit {
 
     // private gesture: Gesture
 
-    private scaleObj = {
+    private readonly scaleObj = {
         startScale: 1
     }
 
@@ -105,7 +105,7 @@ export class ZoomerComponent implements OnInit {
 
         if (Math.abs(this.scale - scale) > 0.1) {
             this.applyScale()
-            window.requestAnimationFrame(this.animateScale.bind(this, scale))
+            window.requestAnimationFrame(this.animateScale.bind(this, scale) as FrameRequestCallback)
         } else {
             this.scale = scale
             this.applyScale()

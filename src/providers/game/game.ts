@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { LocalStorageProvider } from '../local-storage/local-storage'
 import { STATIC_BOARDS } from './data'
 import {
-    BOARD_CELL, BOARD_KEY, Board, BoardData, CELLS_IN_GROUP, CELL_SIZE,
+    BOARD_CELL, BOARD_KEY, Board, BoardData, BoardDataItem, CELLS_IN_GROUP, CELL_SIZE,
     GAME_STATUS, Point, SOLVED_KEY, SavedBoardData, SerializedBoard
 } from './game.interface'
 import { ColumnHints, RowHints } from './hints'
@@ -41,15 +41,16 @@ export class GameProvider {
     boardData: BoardData = []
 
     loadSavedBoards() {
-        let board: SerializedBoard
         let index = 0
-        do {
-            board = this.localStorage.getObject(BOARD_KEY.concat(index.toString())) as SerializedBoard
-            if (board) {
+        while (true) {
+            const board = this.localStorage.getObject(BOARD_KEY.concat(index.toString())) as SerializedBoard
+            if (board != null) {
                 this.savedBoards.push(board)
                 index++
+            } else {
+                break
             }
-        } while (board)
+        }
         this.allBoards.push(this.savedBoards as Board[])
     }
 
@@ -68,7 +69,7 @@ export class GameProvider {
                     boardSolved = savedData.solved
                 } else {
                     for (let y = 0; y < height; y++) {
-                        boardData.push(new Array())
+                        boardData.push(new Array<BoardDataItem>())
                         for (let x = 0; x < width; x++) {
                             boardData[y].push({ value: BOARD_CELL.NIL })
                         }
@@ -164,7 +165,7 @@ export class GameProvider {
 
         this.boardData.splice(0, this.boardData.length)
         for (let y = 0; y < height; y++) {
-            this.boardData.push(new Array())
+            this.boardData.push(new Array<BoardDataItem>())
             for (let x = 0; x < width; x++) {
                 this.boardData[y].push({ value: BOARD_CELL.NIL })
             }

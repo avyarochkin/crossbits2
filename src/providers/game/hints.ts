@@ -40,7 +40,7 @@ export abstract class Hints {
     will be linked to. For the column hints it should return the board height,
     for the row hints - the board width.
     */
-    public abstract getBoardLength(): number
+    abstract getBoardLength(): number
 
     /*
     Should return the cell value from the game board for the hint lineIndex and
@@ -105,8 +105,8 @@ export abstract class Hints {
         return this.hints
     }
 
-    public abstract getHintXY(x: number, y: number, side: BoardSide): string
-    public abstract setHintXY(x: number, y: number, side: BoardSide, value: string): Point
+    abstract getHintXY(x: number, y: number, side: BoardSide): string
+    abstract setHintXY(x: number, y: number, side: BoardSide, value: string): Point
 
     // try to solve the board line based on the hint values
     solveLine(lineIndex: number) {
@@ -367,7 +367,7 @@ export class RowHints extends Hints {
         return this.getHint(y, x)
     }
 
-    setHintXY(x: number, y: number, side: BoardSide, value): Point {
+    setHintXY(x: number, y: number, side: BoardSide, value: string): Point {
         const result = { x: x, y: y }
         let last = false
 

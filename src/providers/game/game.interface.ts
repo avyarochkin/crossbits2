@@ -38,7 +38,7 @@ export interface Point {
     y: number
 }
 
-interface BoardDataItem {
+export interface BoardDataItem {
     value: number
 }
 export type BoardData = BoardDataItem[][]

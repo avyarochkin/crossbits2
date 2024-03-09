@@ -87,7 +87,7 @@ module.exports = {
         "@typescript-eslint/no-implied-eval": "error",
         "@typescript-eslint/no-inferrable-types": "error",
         "@typescript-eslint/no-misused-promises": "error",
-        // "@typescript-eslint/no-unsafe-argument": "error", failing with exception
+        "@typescript-eslint/no-unsafe-argument": "error",
         "@typescript-eslint/no-unsafe-assignment": "error",
         "@typescript-eslint/no-unsafe-call": "error",
         "@typescript-eslint/no-unsafe-member-access": "error",
@@ -97,7 +97,12 @@ module.exports = {
         "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/prefer-includes": "error",
         "@typescript-eslint/prefer-literal-enum-member": "error",
-        "@typescript-eslint/prefer-nullish-coalescing": "error",
+        "@typescript-eslint/prefer-nullish-coalescing": [
+            "error",
+            {
+                "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": true
+            }
+        ],
         "@typescript-eslint/prefer-optional-chain": "error",
         "@typescript-eslint/prefer-readonly": "error",
         "@typescript-eslint/quotes": [
@@ -146,7 +151,7 @@ module.exports = {
         "no-extend-native": "error",
         "no-dupe-args": "error",
         "no-dupe-class-members": "error",
-        // "no-dupe-else-if": "error", - not yet supported
+        "no-dupe-else-if": "error",
         "no-dupe-keys": "error",
         "no-duplicate-case": "error",
         "no-duplicate-imports": "error",
@@ -184,19 +189,6 @@ module.exports = {
         "radix": "error",
         "require-atomic-updates": "error",
         "require-await": "error",
-        "semi": "off",
-        "@typescript-eslint/tslint/config": [
-            "error",
-            {
-                "rules": {
-                    "whitespace": [
-                        true,
-                        "check-branch",
-                        "check-operator",
-                        "check-typecast"
-                    ]
-                }
-            }
-        ]
+        "semi": "off"
     }
 };
