@@ -4,8 +4,6 @@ import { Injectable } from '@angular/core'
 @Injectable()
 export class LocalStorageProvider {
 
-    constructor() {}
-
     setObject(key: string, value: object) {
         window.localStorage[key] = JSON.stringify(value)
     }

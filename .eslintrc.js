@@ -23,9 +23,10 @@ module.exports = {
     ],
     "root": true,
     "extends": [
-        // "plugin:@typescript-eslint/eslint-recommended",
-        // "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
+    "ignorePatterns": [".eslintrc.js"],
     "rules": {
         "@typescript-eslint/array-type": "error",
         "@typescript-eslint/consistent-type-definitions": "error",
@@ -85,8 +86,8 @@ module.exports = {
         "@typescript-eslint/no-explicit-any": "error",
         "@typescript-eslint/no-floating-promises": "error",
         "@typescript-eslint/no-implied-eval": "error",
-        "@typescript-eslint/no-inferrable-types": "error",
         "@typescript-eslint/no-misused-promises": "error",
+        '@typescript-eslint/no-this-alias': "warn",
         "@typescript-eslint/no-unsafe-argument": "error",
         "@typescript-eslint/no-unsafe-assignment": "error",
         "@typescript-eslint/no-unsafe-call": "error",
@@ -176,13 +177,11 @@ module.exports = {
         "no-unused-expressions": "error",
         "no-unused-vars": "error",
         "no-use-before-define": "off",
-        "no-var": "error",
         "object-curly-spacing": [
             "error",
             "always"
         ],
         "prefer-arrow-callback": "error",
-        "prefer-const": "error",
         "prefer-object-spread": "error",
         "prefer-template": "error",
         "quotes": "off",
