@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 
-const routes: Routes = [
+const ROUTES: Routes = [
     {
         path: '',
         loadChildren: () => import('src/pages/board-list/board-list.module')
@@ -15,7 +15,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-    imports: [RouterModule.forRoot(routes)],
+    imports: [RouterModule.forRoot(ROUTES)],
     exports: [RouterModule]
 })
 export class AppRoutingModule { }

@@ -4,6 +4,7 @@ import { Point, BoardData, GAME_STATUS } from 'src/providers/game/game.interface
 import { GameProvider } from 'src/providers/game/game'
 import { BoardCanvasComponent } from 'src/components/board-canvas/board-canvas'
 
+const ZOOM_FACTOR = 1.2
 
 @Component({
     selector: 'page-board',
@@ -14,98 +15,98 @@ export class BoardPage {
     @ViewChild('scroll', { static: true }) scroller: ElementRef<HTMLElement>
     @ViewChild(BoardCanvasComponent, { static: true }) board: BoardCanvasComponent
 
-    public boardData: BoardData
-    public boardSize: Point
+    boardData: BoardData
+    boardSize: Point
 
-    public zoom = 1
-    public minZoom = 1
+    zoom = 1
+    minZoom = 1
 
     constructor(
         public navCtrl: NavController,
         public alertCtrl: AlertController,
         public toastCtrl: ToastController,
-        public game: GameProvider)
-    {
+        public game: GameProvider
+    ) {
         this.boardData = this.game.boardData
         this.boardSize = this.game.boardSize
     }
 
-    public ionViewWillEnter() {
-        let initZoomX = window.innerWidth / this.board.canvasRef.nativeElement.clientWidth
-        let initZoomY = window.innerHeight / this.board.canvasRef.nativeElement.clientHeight
+    ionViewWillEnter() {
+        const initZoomX = window.innerWidth / this.board.canvasRef.nativeElement.clientWidth
+        const initZoomY = window.innerHeight / this.board.canvasRef.nativeElement.clientHeight
         this.zoom = Math.min(initZoomX, initZoomY, 1)
         this.minZoom = this.zoom
         console.log(`Initial zoom: ${this.zoom}`)
     }
 
-    public back() {
-        this.navCtrl.pop()
+    async back() {
+        await this.navCtrl.pop()
     }
 
-    public zoomIn() {
-        this.zoom = this.zoom * 1.2
+    zoomIn() {
+        this.zoom = this.zoom * ZOOM_FACTOR
     }
 
-    public zoomOut() {
-        this.zoom = Math.max(this.zoom / 1.2, this.minZoom)
+    zoomOut() {
+        this.zoom = Math.max(this.zoom / ZOOM_FACTOR, this.minZoom)
     }
 
-    public async save() {
+    async save() {
         this.game.saveCurrentBoard()
-        let toast = await this.toastCtrl.create({
+        const toast = await this.toastCtrl.create({
             message: 'Saved',
             position: 'top',
             animated: true,
             duration: 1000
         })
-        toast.onDidDismiss().then(() => {
-            this.navCtrl.navigateRoot('/')
+        void toast.onDidDismiss().then(async () => {
+            await this.navCtrl.navigateRoot('/')
         })
         await toast.present()
     }
 
-    public async delete() {
-        let confirm = await this.alertCtrl.create({
+    async delete() {
+        const confirm = await this.alertCtrl.create({
             header: 'Delete this board?',
-            cssClass:'popup-dark',
+            cssClass: 'popup-dark',
             buttons: [{
                 text: 'Keep',
                 role: 'cancel'
             },{
                 text: 'Delete',
-                handler: () => {
+                handler: async () => {
                     this.game.deleteCurrentBoard()
-                    this.navCtrl.navigateRoot('/')
+                    await this.navCtrl.navigateRoot('/')
                 }
             }]
         })
         await confirm.present()
     }
 
-    public isSetup(): boolean {
+    isSetup(): boolean {
         return (this.game.boardStatus === GAME_STATUS.SETUP)
     }
 
-    public isGame(): boolean {
+    isGame(): boolean {
         return (this.game.boardStatus === GAME_STATUS.GAME)
     }
 
-    public isNewBoard() {
+    isNewBoard() {
         return (this.game.savedBoardIndex >= this.game.savedBoards.length)
     }
 
-    public canUndo() {
+    canUndo() {
         return this.isGame() && this.game.undoStack.canUndo()
     }
 
-    public canRedo() {
+    canRedo() {
         return this.isGame() && this.game.undoStack.canRedo()
     }
 
-    public async clear() {
-        let confirm = await this.alertCtrl.create({
+    async clear() {
+        const confirm = await this.alertCtrl.create({
             header: 'Clear this board?',
-            cssClass:'popup-dark',
+            cssClass: 'popup-dark',
             buttons: [{
                 text: 'No',
                 role: 'cancel'
@@ -119,7 +120,7 @@ export class BoardPage {
         await confirm.present()
     }
 
-    public async statusChange(status: GAME_STATUS) {
+    async statusChange(status: GAME_STATUS) {
         if (status === GAME_STATUS.OVER) {
             this.zoom = this.minZoom
             const toast = await this.toastCtrl.create({

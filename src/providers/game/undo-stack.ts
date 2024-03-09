@@ -5,7 +5,7 @@ export class UndoStack {
     list: UndoListItem[] = []
     index = 0
 
-    constructor(private game: GameProvider) {}
+    constructor(private readonly game: GameProvider) {}
 
     reset() {
         this.list = []
@@ -33,7 +33,7 @@ export class UndoStack {
 
 
     endBlock() {
-        let current = this.getCurrentItem() as UndoListAtom[]
+        const current = this.getCurrentItem() as UndoListAtom[]
         if (Array.isArray(current) && current.length) {
             this.index++
             //console.log(`undo block (${current.length}) added, list(${this.list.length}), index: ${this.index}`)
@@ -45,7 +45,7 @@ export class UndoStack {
 
 
     addItem(item: UndoListAtom) {
-        let current = this.getCurrentItem()
+        const current = this.getCurrentItem()
         if (Array.isArray(current)) {
             current.push(item)
         } else {
@@ -64,15 +64,15 @@ export class UndoStack {
 
     undo() {
 
-        function doUndo(game, item) {
+        function doUndo(game: GameProvider, item: UndoListAtom) {
             game.boardData[item.y][item.x].value = item.was
         }
 
         this.index--
-        let current = this.getCurrentItem()
+        const current = this.getCurrentItem()
 
         if (Array.isArray(current)) {
-            for (let i in current) {
+            for (const i in current) {
                 doUndo(this.game, current[i])
             }
             //console.log(`lock undone, list(${this.list.length}), index: ${this.index}`)
@@ -90,15 +90,15 @@ export class UndoStack {
 
     redo() {
 
-        function doRedo(game, item) {
+        function doRedo(game: GameProvider, item: UndoListAtom) {
             game.boardData[item.y][item.x].value = item.is
         }
 
-        let current = this.getCurrentItem()
+        const current = this.getCurrentItem()
         this.index++
 
         if (Array.isArray(current)) {
-            for (let i in current) {
+            for (const i in current) {
                 doRedo(this.game, current[i])
             }
             //console.log(`block redone, list(${this.list.length}), index: ${this.index}`)

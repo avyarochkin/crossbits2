@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core'
-import { NavController, IonSlides, PickerController } from '@ionic/angular'
+import { NavController, IonSlides, PickerController, PickerColumnOption } from '@ionic/angular'
 
 import { GAME_STATUS, Board } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
@@ -15,7 +15,7 @@ const MAX_BOARD_SIZE = 50
 })
 export class BoardListPage {
 
-    public allBoards: Board[][]
+    allBoards: Board[][]
 
     @ViewChild(IonSlides, { static: true }) slides: IonSlides
 
@@ -30,17 +30,17 @@ export class BoardListPage {
     ionViewWillEnter() {
         // console.log('ionViewWillEnter BoardListPage')
         // slides should update if orientation changed since last time
-        this.slides.update()
+        void this.slides.update()
     }
 
-    loadGame(board: Board) {
+    async loadGame(board: Board) {
         this.game.initFromSaved(board, GAME_STATUS.GAME)
-        this.navCtrl.navigateForward('/board')
+        await this.navCtrl.navigateForward('/board')
     }
 
-    editGame(board: Board) {
+    async editGame(board: Board) {
         this.game.initFromSaved(board, GAME_STATUS.SETUP)
-        this.navCtrl.navigateForward('/board')
+        await this.navCtrl.navigateForward('/board')
     }
 
     async createGame() {
@@ -59,11 +59,11 @@ export class BoardListPage {
                 { role: 'apply', text: 'OK' }
             ]
         })
-        picker.onDidDismiss().then(value => {
+        void picker.onDidDismiss<{ x: PickerColumnOption; y: PickerColumnOption }>().then(async value => {
             if (value.role === 'apply') {
-                this.game.initWithSize(value.data.x.value, value.data.y.value, GAME_STATUS.SETUP)
+                this.game.initWithSize(value.data.x.value as number, value.data.y.value as number, GAME_STATUS.SETUP)
                 // game will be initialized on the next page
-                this.navCtrl.navigateForward('/board')
+                await this.navCtrl.navigateForward('/board')
             }
         })
         await picker.present()
@@ -73,7 +73,7 @@ export class BoardListPage {
 function getPickerCOlumnOptions() {
     return Array.from(
         { length: MAX_BOARD_SIZE - MIN_BOARD_SIZE },
-        (_, index) => ({
+        (el, index) => ({
             text: (index + MIN_BOARD_SIZE).toString(),
             value: index + MIN_BOARD_SIZE
         }))

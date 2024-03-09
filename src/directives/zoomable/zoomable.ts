@@ -2,14 +2,15 @@ import { Directive, Input, ElementRef, OnInit } from '@angular/core'
 import { Point } from 'src/providers/game/game.interface'
 import 'hammerjs'
 
+const MIN_SCALE_BOUNCE = 0.1
+const MAX_SCALE_BOUNCE = 0.4
+
 @Directive({
     selector: '[zoomable]'
 })
 export class ZoomableDirective implements OnInit {
 
     // private gesture: GestureController
-    private minScaleBounce = 0.1
-    private maxScaleBounce = 0.4
     private contentSize: Point
 
     private scaleObj = {
@@ -34,10 +35,10 @@ export class ZoomableDirective implements OnInit {
     private scrollEl: HTMLElement
     private zoomEl: HTMLElement
 
-    constructor(public hostRef: ElementRef) {}
+    constructor(public hostRef: ElementRef<HTMLElement>) {}
 
 
-    public ngOnInit() {
+    ngOnInit() {
         this.scrollEl = this.hostRef.nativeElement
         this.zoomEl = this.hostRef.nativeElement
         this.zoomEl.style.height = 'initial'
@@ -48,13 +49,13 @@ export class ZoomableDirective implements OnInit {
         // this.gesture.on('pinchstart', input => this.handlePinchStart(input))
         // this.gesture.on('pinchend', input => this.handlePinchEnd(input))
 
-        console.log(`[ZoomableDirective initialized]`)
+        console.log('[ZoomableDirective initialized]')
     }
 
     // event handlers
 
     private handlePinchStart(input: HammerInput) {
-        console.log(`[pinch start event]`)
+        console.log('[pinch start event]')
 
         this.scaleObj.startScale = this.scaleObj.scale
         this.scaleObj.center = input.center
@@ -72,21 +73,21 @@ export class ZoomableDirective implements OnInit {
         this.scaleObj.center = input.center
 
         if (input.isFinal) {
-            this.handlePinchEnd(input)
+            this.handlePinchEnd()
         } else {
 
             if (scale > this.maxScale) {
-                scale = this.maxScale + (1 - this.maxScale / scale) * this.maxScaleBounce
+                scale = this.maxScale + (1 - this.maxScale / scale) * MAX_SCALE_BOUNCE
             } else if (scale < this.minScale) {
-                scale = this.minScale - (1 - scale / this.minScale) * this.minScaleBounce
+                scale = this.minScale - (1 - scale / this.minScale) * MIN_SCALE_BOUNCE
             }
 
             this.scale = scale
         }
     }
 
-    private handlePinchEnd(input: HammerInput) {
-        console.log(`[pinch end event]`)
+    private handlePinchEnd() {
+        console.log('[pinch end event]')
         // this.checkScroll()
 
         if (this.scaleObj.scale > this.maxScale) {

@@ -1,12 +1,15 @@
 import { Component, ElementRef, OnInit, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core'
-import { Gesture, GestureController, GestureDetail, ModalController, PickerController } from '@ionic/angular'
+import {
+    Gesture, GestureController, GestureDetail, ModalController, PickerColumnOption, PickerController
+} from '@ionic/angular'
 
-import { BOARD_SIDE, BOARD_CELL, BOARD_PART, GAME_STATUS, BoardSide, Point } from 'src/providers/game/game.interface'
+import {
+    BOARD_SIDE, BOARD_CELL, BOARD_PART, GAME_STATUS, BoardSide, Point, CELL_SIZE, CELLS_IN_GROUP
+} from 'src/providers/game/game.interface'
 import { Hints } from 'src/providers/game/hints'
-import { HintPoint } from 'src/pages/hint-pad/hint-pad.page'
 import { GameProvider } from 'src/providers/game/game'
 
-const colors = {
+const COLORS = {
     dark: '#002F4D',
     semiDark: '#0A4C76',
     mid: '#24668F',
@@ -14,30 +17,31 @@ const colors = {
     ultraLight: '#A6C5D9',
     lightest: '#FFFFFF'
 }
-const cellSize = 25
+const SOLVE_DELAY_MSEC = 25
+const PRESS_TIME_MSEC = 500
 
-type PanData = {
-    orientation: 'X'|'Y',
-    start: Point,
-    current: Point,
+interface PanData {
+    orientation: 'X'|'Y'
+    start: Point
+    current: Point
     value: BOARD_CELL
 }
 
-type SolvePos = {
-    x?: number,
-    y?: number,
+interface SolvePos {
+    x?: number
+    y?: number
     kind: string
 }
 
-type HintPoint = {
-    x: number,
-    y: number,
+interface HintPoint {
+    x: number
+    y: number
     side: BoardSide
 }
 
 @Component({
     selector: 'board-canvas',
-    template: `<canvas #canvas></canvas>`,
+    template: '<canvas #canvas></canvas>',
     styles: [`
         :host {
             display: block;
@@ -47,14 +51,14 @@ type HintPoint = {
 export class BoardCanvasComponent implements OnInit, OnDestroy {
 
     @Output('statusChange') statusChangeEmitter = new EventEmitter<GAME_STATUS>()
-    @ViewChild('canvas', { static: true }) canvasRef: ElementRef
+    @ViewChild('canvas', { static: true }) canvasRef: ElementRef<HTMLCanvasElement>
 
-    public solvePos: SolvePos = null
-    public hintPos: HintPoint = null
+    solvePos: SolvePos = null
+    hintPos: HintPoint = null
     private gesture: Gesture
     private panData: PanData = null
     private scrollingElement: HTMLElement
-    private timer: any
+    private timer: NodeJS.Timer
 
     constructor(
         public gestureCtrl: GestureController,
@@ -64,7 +68,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     ) { }
 
 
-    public ngOnInit() {
+    ngOnInit() {
         this.scrollingElement = this.canvasRef.nativeElement
 
         this.gesture = this.gestureCtrl.create({
@@ -80,16 +84,20 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         this.paint()
     }
 
-    public ngOnDestroy() {
+    ngOnDestroy() {
         this.gesture.destroy()
     }
 
 
     private setViewPort(ctx: CanvasRenderingContext2D, realWidth: number, realHeight: number) {
-        const backingStoreRatio = ctx['webkitBackingStorePixelRatio'] || ctx['backingStorePixelRatio'] || 1
+        // eslint-disable-next-line dot-notation
+        const backingStoreRatio = (ctx['webkitBackingStorePixelRatio'] as number)
+            // eslint-disable-next-line dot-notation
+            || (ctx['backingStorePixelRatio'] as number)
+            || 1
         const pxRatio = window.devicePixelRatio / backingStoreRatio
         // console.log(`pixel ratio: ${pxRatio}`)
-        let el = this.canvasRef.nativeElement
+        const el = this.canvasRef.nativeElement
         el.width = realWidth * pxRatio
         el.height = realHeight * pxRatio
 
@@ -105,17 +113,17 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     private paint() {
         const ctx = this.canvasRef.nativeElement.getContext('2d') as CanvasRenderingContext2D
 
-        const halfCellSize = cellSize / 2
+        const halfCellSize = CELL_SIZE / 2
 
         const maxBoardX = this.game.boardData[0].length
         const maxBoardY = this.game.boardData.length
         const maxColHintY = this.game.columnHints.getMaxIndexInLine()
         const maxRowHintX = this.game.rowHints.getMaxIndexInLine()
 
-        const pxRowHintWidth = maxRowHintX * cellSize
-        const pxColHintHeight = maxColHintY * cellSize
-        const pxBoardWidth = maxBoardX * cellSize
-        const pxBoardHeight = maxBoardY * cellSize
+        const pxRowHintWidth = maxRowHintX * CELL_SIZE
+        const pxColHintHeight = maxColHintY * CELL_SIZE
+        const pxBoardWidth = maxBoardX * CELL_SIZE
+        const pxBoardHeight = maxBoardY * CELL_SIZE
         const pxCanvasWidth = pxRowHintWidth * 2 + pxBoardWidth
         const pxCanvasHeight = pxColHintHeight * 2 + pxBoardHeight
 
@@ -128,131 +136,209 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // COLUMN HINTS
 
-        ctx.fillStyle = this.isSetup() ? colors.mid : colors.semiDark
+        ctx.fillStyle = this.isSetup() ? COLORS.mid : COLORS.semiDark
         // common top and bottom rectangle
-        ctx.fillRect(pxRowHintWidth, 0, pxBoardWidth, pxColHintHeight)
-        ctx.fillRect(pxRowHintWidth, pxColHintHeight + pxBoardHeight, pxBoardWidth, pxColHintHeight)
+        ctx.fillRect(
+            pxRowHintWidth,
+            0,
+            pxBoardWidth,
+            pxColHintHeight
+        )
+        ctx.fillRect(
+            pxRowHintWidth,
+            pxColHintHeight + pxBoardHeight,
+            pxBoardWidth,
+            pxColHintHeight
+        )
 
         // column hints: highlight and text
 
         for (let x = 0; x < maxBoardX; x++) {
 
-            ctx.fillStyle = colors.light
+            ctx.fillStyle = COLORS.light
             // highlight top hint column while solving
             if (this.solvingColAt(x, BOARD_PART.HINT_TOP)) {
-                ctx.fillRect(pxRowHintWidth + x * cellSize, 0, cellSize, pxColHintHeight)
+                ctx.fillRect(
+                    pxRowHintWidth + x * CELL_SIZE,
+                    0,
+                    CELL_SIZE,
+                    pxColHintHeight
+                )
             }
             // highlight bottom hint column while solving
             if (this.solvingColAt(x, BOARD_PART.HINT_BOTTOM)) {
-                ctx.fillRect(pxRowHintWidth + x * cellSize, pxColHintHeight + pxBoardHeight, cellSize, pxColHintHeight)
+                ctx.fillRect(
+                    pxRowHintWidth + x * CELL_SIZE,
+                    pxColHintHeight + pxBoardHeight,
+                    CELL_SIZE,
+                    pxColHintHeight
+                )
             }
 
             // add text and focus highlight for top and bottom hint cells in one common loop
             for (let y = 0; y < maxColHintY; y++) {
 
-                ctx.fillStyle = colors.light
+                ctx.fillStyle = COLORS.light
                 // focus highlights
                 if (this.hintPadAt(x, y, BOARD_SIDE.TOP)) {
-                    ctx.fillRect(pxRowHintWidth + x * cellSize, y * cellSize, cellSize, cellSize)
+                    ctx.fillRect(
+                        pxRowHintWidth + x * CELL_SIZE,
+                        y * CELL_SIZE,
+                        CELL_SIZE,
+                        CELL_SIZE
+                    )
                 }
                 if (this.hintPadAt(x, y, BOARD_SIDE.BOTTOM)) {
-                    ctx.fillRect(pxRowHintWidth + x * cellSize, pxColHintHeight + pxBoardHeight + y * cellSize, cellSize, cellSize)
+                    ctx.fillRect(
+                        pxRowHintWidth + x * CELL_SIZE,
+                        pxColHintHeight + pxBoardHeight + y * CELL_SIZE,
+                        CELL_SIZE,
+                        CELL_SIZE
+                    )
                 }
 
-                ctx.fillStyle = this.game.columnHints.matching[x] ? colors.lightest : colors.ultraLight
+                ctx.fillStyle = this.game.columnHints.matching[x] ? COLORS.lightest : COLORS.ultraLight
                 // cell text
                 const topHint = this.game.columnHints.getHintXY(x, y, BOARD_SIDE.TOP)
                 if (topHint) {
-                    ctx.fillText(topHint,
-                        pxRowHintWidth + x * cellSize + halfCellSize,
-                        y * cellSize + halfCellSize)
+                    ctx.fillText(
+                        topHint,
+                        pxRowHintWidth + x * CELL_SIZE + halfCellSize,
+                        y * CELL_SIZE + halfCellSize
+                    )
                 }
                 const bottomHint = this.game.columnHints.getHintXY(x, y, BOARD_SIDE.BOTTOM)
                 if (bottomHint) {
-                    ctx.fillText(bottomHint,
-                        pxRowHintWidth + x * cellSize + halfCellSize,
-                        pxColHintHeight + pxBoardHeight + y * cellSize + halfCellSize)
+                    ctx.fillText(
+                        bottomHint,
+                        pxRowHintWidth + x * CELL_SIZE + halfCellSize,
+                        pxColHintHeight + pxBoardHeight + y * CELL_SIZE + halfCellSize
+                    )
                 }
             }
         }
 
         // ROW HINTS
 
-        ctx.fillStyle = this.isSetup() ? colors.mid : colors.semiDark
+        ctx.fillStyle = this.isSetup() ? COLORS.mid : COLORS.semiDark
         // common left and right rectangle
-        ctx.fillRect(0, pxColHintHeight, pxRowHintWidth, pxBoardHeight)
-        ctx.fillRect(pxRowHintWidth + pxBoardWidth, pxColHintHeight, pxRowHintWidth, pxBoardHeight)
+        ctx.fillRect(
+            0,
+            pxColHintHeight,
+            pxRowHintWidth,
+            pxBoardHeight
+        )
+        ctx.fillRect(
+            pxRowHintWidth + pxBoardWidth,
+            pxColHintHeight,
+            pxRowHintWidth,
+            pxBoardHeight
+        )
 
         // row hints: highlight and text
 
         for (let y = 0; y < maxBoardY; y++) {
 
-            ctx.fillStyle = colors.light
+            ctx.fillStyle = COLORS.light
             // highlight left hint row while solving
             if (this.solvingRowAt(y, BOARD_PART.HINT_LEFT)) {
-                ctx.fillRect(0, pxColHintHeight + y * cellSize, pxRowHintWidth, cellSize)
+                ctx.fillRect(
+                    0,
+                    pxColHintHeight + y * CELL_SIZE,
+                    pxRowHintWidth,
+                    CELL_SIZE
+                )
             }
             // highlight right hint row while solving
             if (this.solvingRowAt(y, BOARD_PART.HINT_RIGHT)) {
-                ctx.fillRect(pxRowHintWidth + pxBoardWidth, pxColHintHeight + y * cellSize, pxRowHintWidth, cellSize)
+                ctx.fillRect(
+                    pxRowHintWidth + pxBoardWidth,
+                    pxColHintHeight + y * CELL_SIZE,
+                    pxRowHintWidth,
+                    CELL_SIZE
+                )
             }
 
             // add text and focus highlight for left and right hint cells in one common loop
             for (let x = 0; x < maxRowHintX; x++) {
 
-                ctx.fillStyle = colors.light
+                ctx.fillStyle = COLORS.light
                 // focus highlights
                 if (this.hintPadAt(x, y, BOARD_SIDE.LEFT)) {
-                    ctx.fillRect(x * cellSize, pxColHintHeight + y * cellSize, cellSize, cellSize)
+                    ctx.fillRect(
+                        x * CELL_SIZE,
+                        pxColHintHeight + y * CELL_SIZE,
+                        CELL_SIZE,
+                        CELL_SIZE
+                    )
                 }
                 if (this.hintPadAt(x, y, BOARD_SIDE.RIGHT)) {
-                    ctx.fillRect(pxRowHintWidth + pxBoardWidth + x * cellSize, pxColHintHeight + y * cellSize, cellSize, cellSize)
+                    ctx.fillRect(
+                        pxRowHintWidth + pxBoardWidth + x * CELL_SIZE,
+                        pxColHintHeight + y * CELL_SIZE,
+                        CELL_SIZE,
+                        CELL_SIZE
+                    )
                 }
 
-                ctx.fillStyle = this.game.rowHints.matching[y] ? colors.lightest : colors.ultraLight
+                ctx.fillStyle = this.game.rowHints.matching[y] ? COLORS.lightest : COLORS.ultraLight
                 // cell text
                 const leftHint = this.game.rowHints.getHintXY(x, y, BOARD_SIDE.LEFT)
                 if (leftHint) {
-                    ctx.fillText(leftHint,
-                        x * cellSize + halfCellSize,
-                        pxColHintHeight + y * cellSize + halfCellSize)
+                    ctx.fillText(
+                        leftHint,
+                        x * CELL_SIZE + halfCellSize,
+                        pxColHintHeight + y * CELL_SIZE + halfCellSize
+                    )
                 }
                 const rightHint = this.game.rowHints.getHintXY(x, y, BOARD_SIDE.RIGHT)
                 if (rightHint) {
-                    ctx.fillText(rightHint,
-                        pxRowHintWidth + pxBoardWidth + x * cellSize + halfCellSize,
-                        pxColHintHeight + y * cellSize + halfCellSize)
+                    ctx.fillText(
+                        rightHint,
+                        pxRowHintWidth + pxBoardWidth + x * CELL_SIZE + halfCellSize,
+                        pxColHintHeight + y * CELL_SIZE + halfCellSize
+                    )
                 }
             }
         }
 
         // BOARD
 
-        ctx.fillStyle = this.isSetup() ? colors.semiDark : colors.mid
+        ctx.fillStyle = this.isSetup() ? COLORS.semiDark : COLORS.mid
         // common board rectangle
-        ctx.fillRect(pxRowHintWidth, pxColHintHeight, pxBoardWidth, pxBoardHeight)
+        ctx.fillRect(
+            pxRowHintWidth,
+            pxColHintHeight,
+            pxBoardWidth,
+            pxBoardHeight
+        )
 
         // set on and off cells
         for (let y = 0; y < this.game.boardData.length; y++) {
             for (let x = 0; x < this.game.boardData[y].length; x++) {
                 switch (this.game.boardData[y][x].value) {
-                case BOARD_CELL.ON:
-                    ctx.fillStyle = colors.light
-                    break
-                case BOARD_CELL.OFF:
-                    ctx.fillStyle = colors.dark
-                    break
-                default:
-                    continue
+                    case BOARD_CELL.ON:
+                        ctx.fillStyle = COLORS.light
+                        break
+                    case BOARD_CELL.OFF:
+                        ctx.fillStyle = COLORS.dark
+                        break
+                    default:
+                        continue
                 }
-                ctx.fillRect(pxRowHintWidth + x * cellSize, pxColHintHeight + y * cellSize, cellSize, cellSize)
+                ctx.fillRect(
+                    pxRowHintWidth + x * CELL_SIZE,
+                    pxColHintHeight + y * CELL_SIZE,
+                    CELL_SIZE,
+                    CELL_SIZE
+                )
             }
         }
 
         // GRID
 
         if (!this.isGameOver()) {
-            ctx.strokeStyle = colors.dark
+            ctx.strokeStyle = COLORS.dark
 
             // add horizontal lines for all hints and the board in one loop
             for (let y = 0; y < maxBoardY + maxColHintY * 2; y++) {
@@ -261,10 +347,10 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 ctx.lineWidth =
                     y === maxColHintY ||
                     y === maxColHintY + maxBoardY ||
-                    y > maxColHintY && y < maxColHintY + maxBoardY && (y - maxColHintY) % 5 === 0
-                    ? 2 : 1
-                ctx.moveTo(0, y * cellSize)
-                ctx.lineTo(pxCanvasWidth, y * cellSize)
+                    y > maxColHintY && y < maxColHintY + maxBoardY && (y - maxColHintY) % CELLS_IN_GROUP === 0
+                        ? 2 : 1
+                ctx.moveTo(0, y * CELL_SIZE)
+                ctx.lineTo(pxCanvasWidth, y * CELL_SIZE)
                 ctx.stroke()
             }
 
@@ -275,17 +361,17 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 ctx.lineWidth =
                     x === maxRowHintX ||
                     x === maxRowHintX + maxBoardX ||
-                    x > maxRowHintX && x < maxRowHintX + maxBoardX && (x - maxRowHintX) % 5 === 0
-                    ? 2 : 1
-                ctx.moveTo(x * cellSize, 0)
-                ctx.lineTo(x * cellSize, pxCanvasHeight)
+                    x > maxRowHintX && x < maxRowHintX + maxBoardX && (x - maxRowHintX) % CELLS_IN_GROUP === 0
+                        ? 2 : 1
+                ctx.moveTo(x * CELL_SIZE, 0)
+                ctx.lineTo(x * CELL_SIZE, pxCanvasHeight)
                 ctx.stroke()
             }
         }
     }
 
     private getBoardPos(detail: GestureDetail) {
-        const target = this.canvasRef.nativeElement;
+        const target = this.canvasRef.nativeElement
         const rect = target.getBoundingClientRect()
         const scaleX = rect.width / target.clientWidth
         const scaleY = rect.height / target.clientHeight
@@ -297,8 +383,8 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         const maxColHintY = this.game.columnHints.getMaxIndexInLine()
         const maxRowHintX = this.game.rowHints.getMaxIndexInLine()
 
-        const x = Math.trunc(offsetX / cellSize)
-        const y = Math.trunc(offsetY / cellSize)
+        const x = Math.trunc(offsetX / CELL_SIZE)
+        const y = Math.trunc(offsetY / CELL_SIZE)
 
         if (y < maxColHintY) {
             // top hints
@@ -330,14 +416,12 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                     kind: BOARD_PART.HINT_RIGHT
                 }
             }
-        } else {
+        } else if (x >= maxRowHintX && x < maxRowHintX + maxBoardX) {
             // bottom hints
-            if (x >= maxRowHintX && x < maxRowHintX + maxBoardX) {
-                return {
-                    x: x - maxRowHintX,
-                    y: y - maxColHintY - maxBoardY,
-                    kind: BOARD_PART.HINT_BOTTOM
-                }
+            return {
+                x: x - maxRowHintX,
+                y: y - maxColHintY - maxBoardY,
+                kind: BOARD_PART.HINT_BOTTOM
             }
         }
         // outside of tappable area
@@ -348,7 +432,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         this.timer = setTimeout(() => {
             this.handlePress(detail)
             this.timer = null
-        }, 500)
+        }, PRESS_TIME_MSEC)
     }
 
     private handleTouchEnd(detail: GestureDetail) {
@@ -361,7 +445,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     }
 
     private handleTap(detail: GestureDetail) {
-        console.log(`[tap event]`)
+        console.log('[tap event]')
 
         const boardPos = this.getBoardPos(detail)
 
@@ -380,22 +464,24 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                     case BOARD_PART.DATA:
                         this.toggleCell(boardPos.x, boardPos.y)
                         break
+                    default:
                 }
             } else if (this.isSetup()) {
                 // handle tap in setup mode
                 switch (boardPos.kind) {
                     case BOARD_PART.HINT_TOP:
-                        this.editHint(boardPos.x, boardPos.y, BOARD_SIDE.TOP, this.game.columnHints)
+                        void this.editHint(boardPos.x, boardPos.y, BOARD_SIDE.TOP, this.game.columnHints)
                         break
                     case BOARD_PART.HINT_BOTTOM:
-                        this.editHint(boardPos.x, boardPos.y, BOARD_SIDE.BOTTOM, this.game.columnHints)
+                        void this.editHint(boardPos.x, boardPos.y, BOARD_SIDE.BOTTOM, this.game.columnHints)
                         break
                     case BOARD_PART.HINT_LEFT:
-                        this.editHint(boardPos.x, boardPos.y, BOARD_SIDE.LEFT, this.game.rowHints)
+                        void this.editHint(boardPos.x, boardPos.y, BOARD_SIDE.LEFT, this.game.rowHints)
                         break
                     case BOARD_PART.HINT_RIGHT:
-                        this.editHint(boardPos.x, boardPos.y, BOARD_SIDE.RIGHT, this.game.rowHints)
+                        void this.editHint(boardPos.x, boardPos.y, BOARD_SIDE.RIGHT, this.game.rowHints)
                         break
+                    default:
                 }
             }
         }
@@ -408,13 +494,13 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     }
 
     private handlePress(detail: GestureDetail) {
-        console.log(`[press event]`)
+        console.log('[press event]')
 
         const boardPos = this.getBoardPos(detail)
         const singleTouch = !(detail.event instanceof TouchEvent) || detail.event.touches.length === 1
 
         if (this.isGame() && singleTouch && boardPos && boardPos.kind === BOARD_PART.DATA) {
-            console.log(`(start panning)`)
+            console.log('(start panning)')
             this.panData = {
                 start: boardPos,
                 current: boardPos,
@@ -431,7 +517,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         const boardPos = this.getBoardPos(detail)
 
         if (this.panData && this.isGame() && boardPos && boardPos.kind === BOARD_PART.DATA) {
-            console.log(`(panning)`)
+            console.log('(panning)')
 
             let firstPan = false
 
@@ -459,8 +545,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 } else {
                     this.panData.orientation = null
                 }
-            }
-            else if (this.panData.orientation === 'Y' && boardPos.y !== this.panData.current.y) {
+            } else if (this.panData.orientation === 'Y' && boardPos.y !== this.panData.current.y) {
                 // vertical orientation - resetting x-coordinate
                 boardPos.x = this.panData.start.x
                 this.panData.current = boardPos
@@ -477,7 +562,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     }
 
     private handlePanEnd() {
-        console.log(`(pan end event)`)
+        console.log('(pan end event)')
         if (this.panData) {
             this.panData = null
             this.enableScroll(true)
@@ -493,12 +578,12 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     }
 
 
-    public isGameOver() {
+    isGameOver() {
         return (this.game.boardStatus === GAME_STATUS.OVER)
     }
 
     private toggleCell(x: number, y: number) {
-        const value = this.game.boardData[y][x].value
+        const { value } = this.game.boardData[y][x]
         this.game.setBoardXY(x, y, this.toggledCellValue(value))
         this.checkGameStatus()
         this.paint()
@@ -512,12 +597,16 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 : BOARD_CELL.ON
     }
 
-    private setCellsAtoB(A: Point, B: Point, value: BOARD_CELL) {
-        const dx = Math.sign(B.x - A.x)
-        const dy = Math.sign(B.y - A.y)
+    private setCellsAtoB(pointA: Point, pointB: Point, value: BOARD_CELL) {
+        const dx = Math.sign(pointB.x - pointA.x)
+        const dy = Math.sign(pointB.y - pointA.y)
         if (dx !== 0 || dy !== 0) {
             this.game.undoStack.startBlock()
-            for (let x = A.x, y = A.y; (dx === 0 || x !== B.x + dx) && (dy === 0 || y !== B.y + dy); x += dx, y += dy) {
+            for (
+                let x = pointA.x, y = pointA.y;
+                (dx === 0 || x !== pointB.x + dx) && (dy === 0 || y !== pointB.y + dy);
+                x += dx, y += dy
+            ) {
                 this.game.setBoardXY(x, y, value)
             }
             this.game.undoStack.endBlock()
@@ -544,7 +633,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 this.checkGameStatus()
                 this.solvePos = null
                 this.paint()
-            }, 25)
+            }, SOLVE_DELAY_MSEC)
         }
     }
 
@@ -557,7 +646,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 this.checkGameStatus()
                 this.solvePos = null
                 this.paint()
-            }, 25)
+            }, SOLVE_DELAY_MSEC)
         }
     }
 
@@ -565,8 +654,8 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         this.hintPos = { x: x, y: y, side: side }
         this.paint()
 
-        let hint = hints.getHintXY(x, y, side)
-        let selectedIndex = (hint) ? parseInt(hint) : 0
+        const hint = hints.getHintXY(x, y, side)
+        const selectedIndex = (hint) ? parseInt(hint, 10) : 0
 
         const picker = await this.pickerCtrl.create({
             columns: [{
@@ -574,7 +663,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 selectedIndex,
                 options: Array.from(
                     { length: hints.getBoardLength() + 1 },
-                    (_, index) => ({
+                    (el, index) => ({
                         text: index.toString(),
                         value: index
                     })
@@ -585,9 +674,9 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                 { role: 'apply', text: 'OK' }
             ]
         })
-        picker.onDidDismiss().then(detail => {
+        void picker.onDidDismiss<{ valueColumn: PickerColumnOption }>().then(detail => {
             if (detail.role === 'apply') {
-                const value = detail.data.valueColumn.value
+                const value = detail.data.valueColumn.value as number
                 hints.setHintXY(x, y, side, value > 0 ? value.toString() : null)
 
                 this.hintPos = null
@@ -609,17 +698,17 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         return this.solvePos ? this.solvePos.kind === kind && this.solvePos.y === y : false
     }
 
-    public undo() {
+    undo() {
         this.game.undoStack.undo()
         this.paint()
     }
 
-    public redo() {
+    redo() {
         this.game.undoStack.redo()
         this.paint()
     }
 
-    public clear() {
+    clear() {
         this.game.resetBoard()
         this.paint()
     }

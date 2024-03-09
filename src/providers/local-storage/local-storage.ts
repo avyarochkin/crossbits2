@@ -6,15 +6,15 @@ export class LocalStorageProvider {
 
     constructor() {}
 
-    // tslint:disable-next-line:no-any
-    setObject(key: string, value: any) {
+    setObject(key: string, value: object) {
         window.localStorage[key] = JSON.stringify(value)
     }
 
-    // tslint:disable-next-line:no-any
-    getObject(key: string): any {
-        let str = window.localStorage[key]
-        return (str != undefined) ? JSON.parse(str) : null
+    getObject(key: string): object {
+        const str = window.localStorage[key] as string
+        return (str !== undefined)
+            ? JSON.parse(str) as object
+            : null
     }
     delete(key: string) {
         window.localStorage.removeItem(key)

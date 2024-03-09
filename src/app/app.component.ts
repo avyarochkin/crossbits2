@@ -10,8 +10,8 @@ export class MyApp {
     constructor(
         platform: Platform
     ) {
-        platform.ready().then(() => {
-            SplashScreen.hide()
+        void platform.ready().then(async () => {
+            await SplashScreen.hide()
         })
     }
 }

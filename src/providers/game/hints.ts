@@ -2,31 +2,33 @@ import { Point, BoardSide, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game.in
 import { GameProvider } from './game'
 import { HintCell, VariantPiece } from './hints.interface'
 
+const MAX_SOLVE_TIME_MSEC = 60000
+
 export abstract class Hints {
 
-    public hints: HintCell[][] = []
-    public matching: boolean[] = []
+    hints: HintCell[][] = []
+    matching: boolean[] = []
 
     constructor(protected game: GameProvider) {}
 
-    public init(length: number) {
-        this.hints = new Array(length)
+    init(length: number) {
+        this.hints = new Array<HintCell[]>(length)
         for (let lineIndex = 0; lineIndex < length; lineIndex++) {
             this.hints[lineIndex] = []
         }
     }
 
-    public initWith(hints: HintCell[][]) {
+    initWith(hints: HintCell[][]) {
         this.hints = hints
     }
 
-    public assign(fromHints: Hints) {
+    assign(fromHints: Hints) {
         this.hints = fromHints.hints
         this.reset()
     }
 
-    public reset() {
-        this.matching = new Array(this.hints.length)
+    reset() {
+        this.matching = new Array<boolean>(this.hints.length)
     }
 
     protected getLongestLineLength(): number {
@@ -54,19 +56,24 @@ export abstract class Hints {
     */
     protected abstract setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL)
 
-    public getMaxIndexInLine(): number {
-        let maxIndexInLine = Math.floor((this.getBoardLength() + 1) / 2)
-        return Math.min(this.getLongestLineLength() + ((this.game.boardStatus === GAME_STATUS.SETUP) ? 1 : 0), maxIndexInLine)
+    getMaxIndexInLine(): number {
+        const maxIndexInLine = Math.floor((this.getBoardLength() + 1) / 2)
+        return Math.min(
+            this.getLongestLineLength() + ((this.game.boardStatus === GAME_STATUS.SETUP) ? 1 : 0),
+            maxIndexInLine
+        )
     }
 
-    public checkLine(lineIndex: number) {
+    checkLine(lineIndex: number) {
         let chainLength = 0, hintIndex = 0, match = true
-        let boardLength = this.getBoardLength(), hintLine = this.hints[lineIndex]
+        const boardLength = this.getBoardLength(), hintLine = this.hints[lineIndex]
 
         for (let indexInLine = 0; match && indexInLine < boardLength; indexInLine++) {
             if (this.getBoardDataValue(lineIndex, indexInLine) === BOARD_CELL.ON) {
                 chainLength++
-                if (indexInLine === boardLength - 1 || this.getBoardDataValue(lineIndex, indexInLine + 1) !== BOARD_CELL.ON) {
+                if (indexInLine === boardLength - 1
+                    || this.getBoardDataValue(lineIndex, indexInLine + 1) !== BOARD_CELL.ON
+                ) {
                     match = (hintIndex < hintLine.length && hintLine[hintIndex].hint === chainLength)
                     hintIndex++
                 }
@@ -77,22 +84,24 @@ export abstract class Hints {
         this.matching[lineIndex] = match && (hintIndex === hintLine.length)
     }
 
-    public allLinesMatch(enforceChecks: boolean): boolean {
+    allLinesMatch(enforceChecks: boolean): boolean {
         let matching = true
         for (let lineIndex = 0; lineIndex < this.matching.length; lineIndex++) {
-            if (enforceChecks) this.checkLine(lineIndex)
+            if (enforceChecks) {
+                this.checkLine(lineIndex)
+            }
             matching = matching && this.matching[lineIndex]
         }
         return matching
     }
 
-    protected getHint(lineIndex, indexInLine: number): string {
+    protected getHint(lineIndex: number, indexInLine: number): string {
         return (indexInLine >= 0 && indexInLine < this.hints[lineIndex].length)
             ? this.hints[lineIndex][indexInLine].hint.toString()
             : ''
     }
 
-    public getHints() {
+    getHints() {
         return this.hints
     }
 
@@ -100,10 +109,10 @@ export abstract class Hints {
     public abstract setHintXY(x: number, y: number, side: BoardSide, value: string): Point
 
     // try to solve the board line based on the hint values
-    public solveLine(lineIndex: number) {
-        let self = this
-        let dataLength = this.getBoardLength() // height
-        let hintLength = self.hints[lineIndex].length
+    solveLine(lineIndex: number) {
+        const self = this
+        const dataLength = this.getBoardLength() // height
+        const hintLength = self.hints[lineIndex].length
 
         /*
         This variable holds one particular variant of all pieces that can be
@@ -112,19 +121,19 @@ export abstract class Hints {
         When building various variants this variable gets initially populated
         with the first variant and then gets updated to match the next variant.
         */
-        let variant = Array<VariantPiece>(hintLength)
+        const variant = Array<VariantPiece>(hintLength)
 
         /*
         This variable holds the common result after applying all variants.
         All cells that stay on or off across all variants will be on or off
         in the solution.
         */
-        let solution = Array<BOARD_CELL>(dataLength)
+        const solution = Array<BOARD_CELL>(dataLength)
 
         /*
         This variable holds a copy of the target board line
         */
-        let boardLine = Array<BOARD_CELL>(dataLength)
+        const boardLine = Array<BOARD_CELL>(dataLength)
 
         /*
         Copies the target board line to a local array to achieve better lookup
@@ -146,10 +155,10 @@ export abstract class Hints {
         */
         function buildVariant(startIndex: number, offset: number): boolean {
             for (let indexInLine = startIndex; indexInLine < hintLength; indexInLine++) {
-                let pieceEnd = offset + self.hints[lineIndex][indexInLine].hint - 1
+                const pieceEnd = offset + self.hints[lineIndex][indexInLine].hint - 1
 
                 // if the piece goes beyond column limit, the building is not possible
-                if (pieceEnd >= dataLength) return false
+                if (pieceEnd >= dataLength) { return false }
 
                 variant[indexInLine] = {
                     start: offset,
@@ -176,7 +185,7 @@ export abstract class Hints {
             }
             // try to shift a piece one cell forward starting with the last one
             for (let startIndex = hintLength - 1; startIndex >= 0; startIndex--) {
-                if (buildVariant(startIndex, variant[startIndex].start + 1)) return true
+                if (buildVariant(startIndex, variant[startIndex].start + 1)) { return true }
             }
             // all pieces are shifted to their last position - cannot build a new variant
             return false
@@ -241,7 +250,7 @@ export abstract class Hints {
         */
         function applySolutionToBoard() {
             for (let solutionIndex = 0; solutionIndex < dataLength; solutionIndex++) {
-                let value = solution[solutionIndex]
+                const value = solution[solutionIndex]
                 if (value === BOARD_CELL.OFF || value === BOARD_CELL.ON) {
                     self.setBoardDataValue(lineIndex, solutionIndex, value)
                 }
@@ -251,13 +260,13 @@ export abstract class Hints {
         // main algorithm (self explanatory)
         let variantsFound = 0
         let givenUp = (hintLength === 0)
-        let time = performance.now()
+        const startTime = performance.now()
 
         createBoardLine()
         while (!givenUp && buildNextVariant()) {
             if (!variantConflictsWithBoard()) {
                 variantsFound++
-                givenUp = !applyVariantToSolution() || performance.now() - time >= 60000
+                givenUp = !applyVariantToSolution() || performance.now() - startTime >= MAX_SOLVE_TIME_MSEC
             }
         }
         if (!givenUp) {
@@ -265,13 +274,14 @@ export abstract class Hints {
         }
 
         // logging stats
-        time = (performance.now() - time) / 1000
+        const durationStr = (performance.now() - startTime).toLocaleString()
+        const variantsStr = variantsFound.toLocaleString()
         if (givenUp) {
-            console.log(`Given up after ${variantsFound.toLocaleString()} variant(s) in ${time.toFixed(3)}s`)
+            console.warn(`Given up after ${variantsStr} variant(s) in ${durationStr}ms`)
         } else if (variantsFound > 0) {
-            console.log(`${variantsFound.toLocaleString()} variant(s) found in ${time.toFixed(3)}s`)
+            console.info(`${variantsStr} variant(s) found in ${durationStr}ms`)
         } else {
-            console.warn(`No variants found in ${time.toFixed(3)}s`)
+            console.error(`No variants found in ${durationStr}ms`)
         }
     } // solveLine
 
@@ -280,7 +290,7 @@ export abstract class Hints {
 
 export class ColumnHints extends Hints  {
 
-    public getBoardLength(): number {
+    getBoardLength(): number {
         return this.game.boardData.length
     }
 
@@ -293,15 +303,15 @@ export class ColumnHints extends Hints  {
         this.game.rowHints.checkLine(indexInLine)
     }
 
-    public getHintXY(x: number, y: number, side: BoardSide): string {
+    getHintXY(x: number, y: number, side: BoardSide): string {
         if (side === BOARD_SIDE.TOP) {
             y -= this.getMaxIndexInLine() - this.hints[x].length
         }
         return this.getHint(x, y)
     }
 
-    public setHintXY(x: number, y: number, side: BoardSide, value: string): Point {
-        let result = { x: x, y: y }
+    setHintXY(x: number, y: number, side: BoardSide, value: string): Point {
+        const result = { x: x, y: y }
         let last = false
 
         if (side === BOARD_SIDE.TOP) {
@@ -322,7 +332,7 @@ export class ColumnHints extends Hints  {
         }
 
         if (value) {
-            this.hints[x][y].hint = parseInt(value)
+            this.hints[x][y].hint = parseInt(value, 10)
         } else if (last) {
             this.hints[x].splice(y, 1)
         }
@@ -337,7 +347,7 @@ export class ColumnHints extends Hints  {
 
 export class RowHints extends Hints {
 
-    public getBoardLength(): number {
+    getBoardLength(): number {
         return this.game.boardData[0].length
     }
 
@@ -350,15 +360,15 @@ export class RowHints extends Hints {
         this.game.columnHints.checkLine(indexInLine)
     }
 
-    public getHintXY(x: number, y: number, side: BoardSide): string {
+    getHintXY(x: number, y: number, side: BoardSide): string {
         if (side === BOARD_SIDE.LEFT) {
             x -= this.getMaxIndexInLine() - this.hints[y].length
         }
         return this.getHint(y, x)
     }
 
-    public setHintXY(x: number, y: number, side: BoardSide, value): Point {
-        let result = { x: x, y: y }
+    setHintXY(x: number, y: number, side: BoardSide, value): Point {
+        const result = { x: x, y: y }
         let last = false
 
         if (side === BOARD_SIDE.LEFT) {
@@ -379,7 +389,7 @@ export class RowHints extends Hints {
         }
 
         if (value) {
-            this.hints[y][x].hint = parseInt(value)
+            this.hints[y][x].hint = parseInt(value, 10)
         } else if (last) {
             this.hints[y].splice(x, 1)
         }

@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core'
 import { LocalStorageProvider } from '../local-storage/local-storage'
-import { staticBoards } from './data'
-import { BOARD_CELL, BOARD_KEY, Board, BoardData, GAME_STATUS, Point, SOLVED_KEY, SavedBoardData, SerializedBoard } from './game.interface'
+import { STATIC_BOARDS } from './data'
+import {
+    BOARD_CELL, BOARD_KEY, Board, BoardData, CELLS_IN_GROUP, CELL_SIZE,
+    GAME_STATUS, Point, SOLVED_KEY, SavedBoardData, SerializedBoard
+} from './game.interface'
 import { ColumnHints, RowHints } from './hints'
 import { UndoStack } from './undo-stack'
 
@@ -51,14 +54,14 @@ export class GameProvider {
     }
 
     initAllBoards(): Board[][] {
-        return staticBoards.map((stage) => {
+        return STATIC_BOARDS.map((stage) => {
             return stage.map((board) => {
                 let boardData: BoardData = []
                 let boardSolved = false
-                let width = board.columnHintData.length
-                let height = board.rowHintData.length
+                const width = board.columnHintData.length
+                const height = board.rowHintData.length
 
-                let savedData = this.localStorage.getObject(SOLVED_KEY.concat(board.nr)) as SavedBoardData
+                const savedData = this.localStorage.getObject(SOLVED_KEY.concat(board.nr)) as SavedBoardData
 
                 if (savedData) {
                     boardData = savedData.boardData
@@ -67,24 +70,20 @@ export class GameProvider {
                     for (let y = 0; y < height; y++) {
                         boardData.push(new Array())
                         for (let x = 0; x < width; x++) {
-                            boardData[y].push({value: BOARD_CELL.NIL})
+                            boardData[y].push({ value: BOARD_CELL.NIL })
                         }
                     }
                 }
 
-                let columnHints = new ColumnHints(this)
-                columnHints.initWith(board.columnHintData.map(function(col) {
-                    return col.map((value) => {
-                        return { hint: value }
-                    })
-                }))
+                const columnHints = new ColumnHints(this)
+                columnHints.initWith(board.columnHintData.map(col =>
+                    col.map(value => ({ hint: value }))
+                ))
 
-                let rowHints = new RowHints(this)
-                rowHints.initWith(board.rowHintData.map(function(row) {
-                    return row.map((value) => {
-                        return { hint: value }
-                    })
-                }))
+                const rowHints = new RowHints(this)
+                rowHints.initWith(board.rowHintData.map(row =>
+                    row.map(value => ({ hint: value }))
+                ))
 
                 return {
                     nr: board.nr,
@@ -101,9 +100,13 @@ export class GameProvider {
 
     // todo should go to controller
     setBoardSize() {
-        let width = this.boardData[0].length, height = this.boardData.length
-        this.boardSize.x = width * 26 + Math.floor(width / 5) + this.rowHints.getMaxIndexInLine() * 26 * 2
-        this.boardSize.y = height * 26 + Math.floor(height / 5) + this.columnHints.getMaxIndexInLine() * 26 * 2
+        const width = this.boardData[0].length, height = this.boardData.length
+        this.boardSize.x = width * (CELL_SIZE + 1)
+            + Math.floor(width / CELLS_IN_GROUP)
+            + this.rowHints.getMaxIndexInLine() * (CELL_SIZE + 1) * 2
+        this.boardSize.y = height * (CELL_SIZE + 1)
+            + Math.floor(height / CELLS_IN_GROUP)
+            + this.columnHints.getMaxIndexInLine() * (CELL_SIZE + 1) * 2
         // console.log(`board size ${boardSize.x}:${boardSize.y}`)
     }
 
@@ -135,18 +138,20 @@ export class GameProvider {
 
     checkGame(check: boolean) {
         if (this.boardStatus === GAME_STATUS.GAME) {
-            let allColsMatch = this.columnHints.allLinesMatch(check)
-            let allRowsMatch = this.rowHints.allLinesMatch(check)
+            const allColsMatch = this.columnHints.allLinesMatch(check)
+            const allRowsMatch = this.rowHints.allLinesMatch(check)
             if (allColsMatch && allRowsMatch) {
                 this.boardStatus = GAME_STATUS.OVER
                 this.sourceBoard.solved = true
-                console.log(`Game solved!`)
+                console.log('Game solved!')
             }
         }
     }
 
     saveBoard(board?: Board) {
-        if (!board) board = this.sourceBoard
+        if (!board) {
+            board = this.sourceBoard
+        }
         this.localStorage.setObject(SOLVED_KEY.concat(board.nr), {
             boardData: board.boardData,
             solved: board.solved
@@ -218,7 +223,7 @@ export class GameProvider {
     }
 
     saveCurrentBoard() {
-        let board: SerializedBoard = {
+        const board: SerializedBoard = {
             boardData: this.boardData,
             columnHints: { hints: this.columnHints.getHints() },
             rowHints: { hints: this.rowHints.getHints() },
@@ -239,7 +244,7 @@ export class GameProvider {
             }
         }
         this.localStorage.delete(`${BOARD_KEY}${this.savedBoards.length - 1}`)
-            this.savedBoards.splice(this.savedBoardIndex, 1)
+        this.savedBoards.splice(this.savedBoardIndex, 1)
     }
 }
 

@@ -1,15 +1,15 @@
 import { Component, OnInit, ElementRef, Input } from '@angular/core'
 
+export const MIN_SCALE_BOUNCE = 0.2
+export const MAX_SCALE_BOUNCE = 0.2
 
 @Component({
     selector: 'zoomer',
-    template: `<ng-content></ng-content>`,
+    template: '<ng-content></ng-content>',
 })
 export class ZoomerComponent implements OnInit {
 
     // private gesture: Gesture
-    private minScaleBounce = 0.2
-    private maxScaleBounce = 0.2
 
     private scaleObj = {
         startScale: 1
@@ -19,9 +19,9 @@ export class ZoomerComponent implements OnInit {
     @Input('max') maxScale = 1
     @Input('min') minScale = 1
 
-    constructor(public zoomerRef: ElementRef) {}
+    constructor(public zoomerRef: ElementRef<HTMLElement>) {}
 
-    public ngOnInit() {
+    ngOnInit() {
         this.zoomerRef.nativeElement.style.position = 'absolute'
         // this.gesture = new Gesture(this.zoomerRef.nativeElement)
         // this.gesture.listen()
@@ -40,7 +40,7 @@ export class ZoomerComponent implements OnInit {
         this.applyScale()
     }
 
-    public resize() {
+    resize() {
         // Set the wrapper dimensions first
         // this.setWrapperSize(event.width, event.height)
 
@@ -50,21 +50,21 @@ export class ZoomerComponent implements OnInit {
 
     // event handlers
 
-    private handlePinchStart(input: HammerInput) {
-        console.log(`[pinch start event]`)
+    private handlePinchStart() {
+        console.log('[pinch start event]')
 
         this.scaleObj.startScale = this.scale
         // this.setCenter(event)
     }
 
     private handlePinch(input: HammerInput) {
-        console.log(`[pinch event]`)
+        console.log('[pinch event]')
         let scale = this.scaleObj.startScale * input.scale
 
         if (scale > this.maxScale) {
-            scale = this.maxScale + (1 - this.maxScale / scale) * this.maxScaleBounce
+            scale = this.maxScale + (1 - this.maxScale / scale) * MAX_SCALE_BOUNCE
         } else if (scale < this.minScale) {
-            scale = this.minScale - (1 - scale / this.minScale) * this.minScaleBounce
+            scale = this.minScale - (1 - scale / this.minScale) * MIN_SCALE_BOUNCE
         }
 
         this.scale = scale
@@ -73,8 +73,8 @@ export class ZoomerComponent implements OnInit {
         event.preventDefault()
     }
 
-    private handlePinchEnd(input: HammerInput) {
-        console.log(`[pinch end event]`)
+    private handlePinchEnd() {
+        console.log('[pinch end event]')
         // this.checkScroll()
 
         if (this.scale > this.maxScale) {

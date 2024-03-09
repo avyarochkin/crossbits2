@@ -1,8 +1,8 @@
-export type HintCell = {
+export interface HintCell {
     hint: number
 }
 
-export type VariantPiece = {
-    start: number,
+export interface VariantPiece {
+    start: number
     end: number
 }

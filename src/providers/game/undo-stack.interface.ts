@@ -1,10 +1,10 @@
 import { BOARD_CELL } from './game.interface'
 
-export type UndoListAtom = {
-    x: number,
-    y: number,
-    was: BOARD_CELL,
+export interface UndoListAtom {
+    x: number
+    y: number
+    was: BOARD_CELL
     is: BOARD_CELL
 }
 
-export type UndoListItem = UndoListAtom | Array<UndoListAtom>
+export type UndoListItem = UndoListAtom | UndoListAtom[]

@@ -14,6 +14,9 @@ export enum GAME_STATUS {
 
 export type BoardSide = 'L' | 'R' | 'T' | 'B'
 
+export const CELL_SIZE = 25
+export const CELLS_IN_GROUP = 5
+
 export const BOARD_SIDE = {
     LEFT: <BoardSide> 'L',
     RIGHT: <BoardSide> 'R',
@@ -30,38 +33,37 @@ export const BOARD_PART = {
 export const BOARD_KEY = 'board'
 export const SOLVED_KEY= 'solved'
 
-
-export type Point = {
-    x: number,
+export interface Point {
+    x: number
     y: number
 }
 
-type BoardDataItem = {
+interface BoardDataItem {
     value: number
 }
 export type BoardData = BoardDataItem[][]
 
-export type Board = {
-    nr: string,
-    boardData: BoardData,
-    columnHints: ColumnHints,
-    rowHints: RowHints,
-    static: boolean,
+export interface Board {
+    nr: string
+    boardData: BoardData
+    columnHints: ColumnHints
+    rowHints: RowHints
+    static: boolean
     solved?: boolean
 }
 
-export type SavedBoardData = {
-    boardData: BoardData,
+export interface SavedBoardData {
+    boardData: BoardData
     solved: boolean
 }
 
-export type SerializedBoard = {
-    boardData: BoardData,
+export interface SerializedBoard {
+    boardData: BoardData
     columnHints: {
         hints: HintCell[][]
-    },
+    }
     rowHints: {
         hints: HintCell[][]
-    },
+    }
     static: boolean
 }
