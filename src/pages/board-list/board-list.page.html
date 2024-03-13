@@ -1,6 +1,6 @@
 <ion-content>
 
-    <ion-slides pager class="stage-slides">
+    <ion-slides [pager]="true" class="stage-slides">
         <ion-slide
                 *ngFor="let stageBoards of allBoards; let i = index">
             <div class="stage-slide">

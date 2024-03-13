@@ -48,10 +48,11 @@ ion-content {
         &::before { background: none; }
         ion-toolbar {
             --background: transparent;
-            ion-button.button-round {
+            ion-button.button-solid {
                 pointer-events: auto !important;
                 --color: var(--ion-color-lightest);
                 --background: rgba(var(--ion-color-dark-contrast-rgb), 0.3);
+                --border-radius: 64px;
                 --background-hover: none;
                 &:hover:not(.button-disabled) {
                     --background-hover: rgba(var(--ion-color-dark-contrast-rgb), 0.5);

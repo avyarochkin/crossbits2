@@ -3,6 +3,7 @@
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "declaration": false,
+    "downlevelIteration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": [
@@ -23,6 +24,7 @@
   "compileOnSave": false,
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
+    "strictTemplates": true,
     "strictInjectionParameters": true
   }
 }
