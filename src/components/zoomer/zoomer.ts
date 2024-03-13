@@ -57,21 +57,21 @@ export class ZoomerComponent implements OnInit {
         // this.setCenter(event)
     }
 
-    private handlePinch(input: HammerInput) {
-        console.log('[pinch event]')
-        let scale = this.scaleObj.startScale * input.scale
+    // private handlePinch(detail: GestureDetail) {
+    //     console.log('[pinch event]')
+    //     let scale = this.scaleObj.startScale * input.scale
 
-        if (scale > this.maxScale) {
-            scale = this.maxScale + (1 - this.maxScale / scale) * MAX_SCALE_BOUNCE
-        } else if (scale < this.minScale) {
-            scale = this.minScale - (1 - scale / this.minScale) * MIN_SCALE_BOUNCE
-        }
+    //     if (scale > this.maxScale) {
+    //         scale = this.maxScale + (1 - this.maxScale / scale) * MAX_SCALE_BOUNCE
+    //     } else if (scale < this.minScale) {
+    //         scale = this.minScale - (1 - scale / this.minScale) * MIN_SCALE_BOUNCE
+    //     }
 
-        this.scale = scale
-        this.applyScale()
+    //     this.scale = scale
+    //     this.applyScale()
 
-        input.srcEvent.preventDefault()
-    }
+    //     input.srcEvent.preventDefault()
+    // }
 
     private handlePinchEnd() {
         console.log('[pinch end event]')

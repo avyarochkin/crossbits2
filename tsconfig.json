@@ -10,7 +10,7 @@
       "dom",
       "es2018"
     ],
-    "module": "esnext",
+    "module": "es2020",
     "moduleResolution": "node",
     "sourceMap": true,
     "strictNullChecks": true,
