@@ -16,7 +16,7 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
-    "target": "es2015",
+    "target": "es2022",
     "importHelpers": true,
     "typeRoots": [
       "node_modules/@types"

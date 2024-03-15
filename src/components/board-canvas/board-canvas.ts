@@ -58,7 +58,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     private gesture: Gesture
     private panData: PanData | null
     private scrollingElement: HTMLElement
-    private timer: NodeJS.Timer | null
+    private timeout: NodeJS.Timeout | null
 
     constructor(
         public gestureCtrl: GestureController,
@@ -429,16 +429,16 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     }
 
     private handleTouchStart(detail: GestureDetail) {
-        this.timer = setTimeout(() => {
+        this.timeout = setTimeout(() => {
             this.handlePress(detail)
-            this.timer = null
+            this.timeout = null
         }, PRESS_TIME_MSEC)
     }
 
     private handleTouchEnd(detail: GestureDetail) {
-        if (this.timer != null) {
-            clearTimeout(this.timer)
-            this.timer = null
+        if (this.timeout != null) {
+            clearTimeout(this.timeout)
+            this.timeout = null
             this.handleTap(detail)
         }
         this.handlePanEnd()
