@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core'
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core'
 import { RouterModule } from '@angular/router'
 
 import { BoardListPage } from './board-list.page'
@@ -13,5 +13,6 @@ import { CommonModule } from '@angular/common'
     ],
     declarations: [BoardListPage],
     exports: [RouterModule],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class BoardListPageModule {}

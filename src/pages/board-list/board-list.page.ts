@@ -1,5 +1,5 @@
-import { Component, ViewChild } from '@angular/core'
-import { NavController, IonSlides, PickerController, PickerColumnOption } from '@ionic/angular'
+import { Component, ElementRef, ViewChild } from '@angular/core'
+import { NavController, PickerController, PickerColumnOption } from '@ionic/angular'
 
 import { GAME_STATUS, Board } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
@@ -17,20 +17,20 @@ export class BoardListPage {
 
     allBoards: Board[][]
 
-    @ViewChild(IonSlides, { static: true }) slides: IonSlides
+    @ViewChild('swiper', { static: true }) swiperRef: ElementRef
 
     constructor(
         public navCtrl: NavController,
         public pickerCtrl: PickerController,
-        public game: GameProvider) {
-
+        public game: GameProvider
+    ) {
         this.allBoards = this.game.allBoards
     }
 
     ionViewWillEnter() {
         // console.log('ionViewWillEnter BoardListPage')
         // slides should update if orientation changed since last time
-        void this.slides.update()
+        // void this.swiperRef.nativeElement.swiper.update()
     }
 
     async loadGame(board: Board) {
