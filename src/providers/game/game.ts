@@ -138,30 +138,28 @@ export class GameProvider {
     }
 
     checkGame(check: boolean) {
+        if (this.sourceBoard == null) { return }
         if (this.boardStatus === GAME_STATUS.GAME) {
             const allColsMatch = this.columnHints.allLinesMatch(check)
             const allRowsMatch = this.rowHints.allLinesMatch(check)
             if (allColsMatch && allRowsMatch) {
                 this.boardStatus = GAME_STATUS.OVER
-                this.sourceBoard!.solved = true
-                console.log('Game solved!')
+                this.sourceBoard.solved = true
             }
         }
     }
 
-    saveBoard(board?: Board) {
-        if (!board) {
-            board = this.sourceBoard!
-        }
-        this.localStorage.setObject(SOLVED_KEY.concat(board.nr), {
-            boardData: board.boardData,
-            solved: board.solved
+    saveBoard() {
+        if (this.sourceBoard == null) { return }
+        this.localStorage.setObject(SOLVED_KEY.concat(this.sourceBoard.nr), {
+            boardData: this.sourceBoard.boardData,
+            solved: this.sourceBoard.solved
         })
     }
 
     resetBoard(width?: number, height?: number) {
-        const boardWidth = width || this.boardData[0].length
-        const boardHeight = height || this.boardData.length
+        const boardWidth = width ?? this.boardData[0].length
+        const boardHeight = height ?? this.boardData.length
 
         this.boardData.splice(0, this.boardData.length)
         for (let y = 0; y < boardHeight; y++) {

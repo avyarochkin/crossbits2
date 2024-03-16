@@ -99,7 +99,7 @@ export class ZoomableDirective implements OnInit {
     }
 
     private applyScale() {
-        if (this.zoomEl) {
+        if (this.zoomEl != null) {
             if (this.contentSize == null) {
                 this.contentSize = {
                     x: this.zoomEl.clientWidth,

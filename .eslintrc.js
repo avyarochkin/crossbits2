@@ -1,7 +1,3 @@
-/*
-We recommend eventually switching this configuration to extend from the recommended rule sets in typescript-eslint.
-https://github.com/typescript-eslint/tslint-to-eslint-config/blob/master/docs/FAQs.md
-*/
 module.exports = {
     "env": {
         "browser": true,
@@ -18,8 +14,7 @@ module.exports = {
         }
     },
     "plugins": [
-        "@typescript-eslint",
-        "@typescript-eslint/tslint"
+        "@typescript-eslint"
     ],
     "root": true,
     "extends": [
@@ -184,4 +179,4 @@ module.exports = {
         "require-await": "error",
         "semi": "off"
     }
-};
+}
