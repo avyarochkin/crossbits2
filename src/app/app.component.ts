@@ -1,6 +1,4 @@
 import { Component } from '@angular/core'
-import { Platform } from '@ionic/angular'
-import { SplashScreen } from '@capacitor/core'
 import { register } from 'swiper/element/bundle'
 
 @Component({
@@ -8,13 +6,8 @@ import { register } from 'swiper/element/bundle'
     templateUrl: 'app.component.html'
 })
 export class MyApp {
-    constructor(
-        platform: Platform
-    ) {
+    constructor() {
         register()
-        void platform.ready().then(async () => {
-            await SplashScreen.hide()
-        })
     }
 }
 
