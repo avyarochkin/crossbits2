@@ -2,6 +2,7 @@
     .stage-slides {
         height: 100%;
         --swiper-pagination-color: var(--ion-color-ultra-light);
+        --swiper-pagination-bullet-inactive-color: var(--ion-color-medium);
         .slide-zoom {
             height: 100%;
             padding: 2rem 0;
