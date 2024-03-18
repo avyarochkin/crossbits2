@@ -1,15 +1,19 @@
 :host {
     .stage-slides {
         height: 100%;
+        --swiper-pagination-color: var(--ion-color-ultra-light);
         .slide-zoom {
             height: 100%;
             padding: 2rem 0;
             background-color: var(--ion-color-semi-dark);
         }
         .stage-slide {
-            height: 100%;
-            border-radius: 1rem;
             overflow-y: auto;
+        }
+        .stage-slide-container {
+            height: 100%;
+            padding-top: var(--ion-safe-area-top, 0);
+            padding-bottom: var(--ion-safe-area-bottom, 0);
         }
         h3 {
             margin: 0;
@@ -24,54 +28,43 @@
         .stage {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
-            margin: 0 1rem;
-            padding: 0;
+            justify-content: space-evenly;
 
             .stage-board {
                 position: relative;
-                margin: .75rem;
-                width: 5rem;
-                height: 5rem;
+                margin: 1rem;
+                width: 6rem;
+                height: 6rem;
                 background-color: var(--ion-color-light);
-                border-radius: .5rem;
-                box-shadow: 0 0 4px var(--ion-color-dark);
+                border-radius: 1rem;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
                 text-align: center;
                 font-size: 1.25rem;
-                color: var(--ion-color-dark);
+                color: var(--ion-color-semi-dark);
                 &.new {
-                    background-color: var(--ion-color-medium);
-                    color: var(--ion-color-light);
+                    background-color: var(--ion-color-light);
+                    color: var(--ion-color-lightest);
                 }
-                &.activated {
-                    opacity: 0;
-                    transform: scale3d(1.5, 1.5, 1);
-                    transition: all 0.5s;
+                &:active {
+                    background-color: var(--ion-color-medium);
                 }
                 .board-num {
                     position: absolute;
-                    top: -1.2rem;
+                    top: -1.25rem;
                     align-self: center;
-                    color: var(--ion-color-ultra-light);
+                    color: var(--ion-color-light);
                     font-size: 1rem;
                 }
                 .board-flag {
                     position: absolute;
                     // right: 10%;
-                    bottom: 0;
+                    bottom: 0.5rem;
                     align-self: center;
                     color: var(--ion-color-semi-dark);
                 }
-            }
-        }
-        .swiper-pagination-bullets {
-            bottom: .2rem;
-            .swiper-pagination-bullet {
-                background: var(--ion-color-light);
             }
         }
     }

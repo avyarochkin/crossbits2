@@ -1,4 +1,4 @@
-<ion-content [scrollX]="true" [scrollY]="true">
+<ion-content [forceOverscroll]="true" [scrollX]="true" [scrollY]="true">
 
     <div #scroll class="board-scroll"
         zoomable
@@ -13,51 +13,33 @@
 
 <ion-footer>
     <ion-toolbar>
-
         <ion-buttons slot="start">
-            <ion-button fill="solid"
-                (click)="back()">
+            <ion-button fill="solid" (click)="back()">
                 BACK
             </ion-button>
         </ion-buttons>
 
         <ion-buttons slot="end">
-            <ion-button fill="solid" title="Delete"
-                *ngIf="isSetup() && !isNewBoard()"
-                (click)="delete()">
-                <ion-icon name="trash"></ion-icon>
+            <ion-button fill="solid" title="Delete" *ngIf="isSetup() && !isNewBoard()" (click)="delete()">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
             </ion-button>
-            <ion-button fill="solid"
-                *ngIf="isSetup()"
-                (click)="save()">
+            <ion-button fill="solid" *ngIf="isSetup()" (click)="save()">
                 SAVE
             </ion-button>
-            <ion-button fill="solid" title="Zoom In"
-                *ngIf="!isSetup()"
-                (click)="zoomIn()">
-                <ion-icon name="expand-outline"></ion-icon>
+            <ion-button fill="solid" title="Zoom In" *ngIf="!isSetup()" (click)="zoomIn()">
+                <ion-icon name="add-circle-outline" slot="icon-only"></ion-icon>
             </ion-button>
-            <ion-button fill="solid" title="Zoom Out"
-                *ngIf="!isSetup()"
-                (click)="zoomOut()">
-                <ion-icon name="contract-outline"></ion-icon>
+            <ion-button fill="solid" title="Zoom Out" *ngIf="!isSetup()" (click)="zoomOut()">
+                <ion-icon name="remove-circle-outline" slot="icon-only"></ion-icon>
             </ion-button>
-            <ion-button fill="solid" title="Clear"
-                *ngIf="!isSetup()"
-                (click)="clear()">
-                <ion-icon name="trash-outline"></ion-icon>
+            <ion-button fill="solid" title="Clear" *ngIf="!isSetup()" (click)="clear()">
+                <ion-icon name="ban-outline" slot="icon-only"></ion-icon>
             </ion-button>
-            <ion-button fill="solid" title="Undo"
-                *ngIf="!isSetup()"
-                (click)="board.undo()"
-                [disabled]="!canUndo()">
-                <ion-icon name="arrow-undo-outline"></ion-icon>
+            <ion-button fill="solid" title="Undo" *ngIf="!isSetup()" (click)="board.undo()" [disabled]="!canUndo()">
+                <ion-icon name="arrow-undo-outline" slot="icon-only"></ion-icon>
             </ion-button>
-            <ion-button fill="solid" title="Redo"
-                *ngIf="!isSetup()"
-                (click)="board.redo()"
-                [disabled]="!canRedo()">
-                <ion-icon name="arrow-redo-outline"></ion-icon>
+            <ion-button fill="solid" title="Redo" *ngIf="!isSetup()" (click)="board.redo()" [disabled]="!canRedo()">
+                <ion-icon name="arrow-redo-outline" slot="icon-only"></ion-icon>
             </ion-button>
         </ion-buttons>
 

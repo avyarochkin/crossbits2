@@ -115,7 +115,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         const halfCellSize = CELL_SIZE / 2
 
-        const maxBoardX = this.game.boardData[0].length
+        const maxBoardX = this.game.boardData[0]?.length
         const maxBoardY = this.game.boardData.length
         const maxColHintY = this.game.columnHints.getMaxIndexInLine()
         const maxRowHintX = this.game.rowHints.getMaxIndexInLine()

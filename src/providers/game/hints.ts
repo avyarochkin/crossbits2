@@ -348,7 +348,7 @@ export class ColumnHints extends Hints  {
 export class RowHints extends Hints {
 
     getBoardLength(): number {
-        return this.game.boardData[0].length
+        return this.game.boardData[0]?.length
     }
 
     protected getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL {

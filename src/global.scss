@@ -28,16 +28,6 @@
 .scroll-content::-webkit-scrollbar { display: none !important }
 
 ion-content {
-    &.centered-content {
-        > .scroll-content, > .fixed-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    }
-}
-
-ion-content {
     --background: var(--ion-color-dark);
 }
 :root {
@@ -49,13 +39,22 @@ ion-content {
         ion-toolbar {
             --background: transparent;
             ion-button.button-solid {
+                min-height: 2rem;
                 pointer-events: auto !important;
-                --color: var(--ion-color-lightest);
-                --background: rgba(var(--ion-color-dark-contrast-rgb), 0.3);
+                --color: var(--ion-color-ultra-light);
+                --background: rgba(var(--ion-color-dark-contrast-rgb), 0.2);
                 --border-radius: 64px;
                 --background-hover: none;
                 &:hover:not(.button-disabled) {
-                    --background-hover: rgba(var(--ion-color-dark-contrast-rgb), 0.5);
+                    --background-hover: rgba(var(--ion-color-dark-contrast-rgb), 0.3);
+                }
+                --padding-top: 0.25rem;
+                --padding-bottom: 0.25rem;
+                --padding-start: 0.25rem;
+                --padding-end: 0.25rem;
+                &:not(.button-has-icon-only) {
+                    --padding-start: 0.75rem;
+                    --padding-end: 0.75rem;
                 }
             }
         }

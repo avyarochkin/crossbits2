@@ -130,9 +130,9 @@ export class ZoomableDirective implements OnInit {
         this.scrollEl.scrollLeft = x > 0 ? x : 0
         this.scrollEl.scrollTop = y > 0 ? y : 0
 
-        console.log(`Scrolled:
-            ${ x }/${ this.scrollEl.scrollLeft }/${ this.zoomEl.style.left } :
-            ${ y }/${ this.scrollEl.scrollTop }/${ this.zoomEl.style.top }`)
+        // console.log(`Scrolled:
+        //     ${ x }/${ this.scrollEl.scrollLeft }/${ this.zoomEl.style.left } :
+        //     ${ y }/${ this.scrollEl.scrollTop }/${ this.zoomEl.style.top }`)
     }
 
     private animateScale(finalScale: number) {

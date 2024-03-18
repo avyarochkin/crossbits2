@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
+import { GameGuard } from './game.guard'
 
 const ROUTES: Routes = [
     {
@@ -9,6 +10,7 @@ const ROUTES: Routes = [
     },
     {
         path: 'board',
+        canActivate: [GameGuard],
         loadChildren: () => import('src/pages/board/board.module')
             .then(m => m.BoardPageModule)
     }
@@ -16,6 +18,7 @@ const ROUTES: Routes = [
 
 @NgModule({
     imports: [RouterModule.forRoot(ROUTES)],
-    exports: [RouterModule]
+    exports: [RouterModule],
+    providers: [GameGuard]
 })
 export class AppRoutingModule { }
