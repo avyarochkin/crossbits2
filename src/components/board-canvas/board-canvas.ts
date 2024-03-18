@@ -9,14 +9,9 @@ import {
 import { Hints } from 'src/providers/game/hints'
 import { GameProvider } from 'src/providers/game/game'
 
-const COLORS = {
-    dark: '#002F4D',
-    semiDark: '#0A4C76',
-    mid: '#24668F',
-    light: '#408EBF',
-    ultraLight: '#A6C5D9',
-    lightest: '#FFFFFF'
-}
+type ColorName = 'dark' | 'semiDark' | 'medium' | 'light' | 'ultraLight' | 'lightest'
+type ColorMap = Record<ColorName, string>
+
 const SOLVE_DELAY_MSEC = 25
 const PRESS_TIME_MSEC = 500
 
@@ -59,6 +54,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
     private panData: PanData | null
     private scrollingElement: HTMLElement
     private timeout: NodeJS.Timeout | null
+    private colors: ColorMap
 
     constructor(
         public gestureCtrl: GestureController,
@@ -70,7 +66,8 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.scrollingElement = this.canvasRef.nativeElement
-
+        this.colors = this.createColors()
+        console.log(this.colors)
         this.gesture = this.gestureCtrl.create({
             el: this.canvasRef.nativeElement,
             gestureName: 'toggle-cells',
@@ -136,7 +133,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // COLUMN HINTS
 
-        ctx.fillStyle = this.isSetup() ? COLORS.mid : COLORS.semiDark
+        ctx.fillStyle = this.isSetup() ? this.colors.medium : this.colors.semiDark
         // common top and bottom rectangle
         ctx.fillRect(
             pxRowHintWidth,
@@ -155,7 +152,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         for (let x = 0; x < maxBoardX; x++) {
 
-            ctx.fillStyle = COLORS.light
+            ctx.fillStyle = this.colors.light
             // highlight top hint column while solving
             if (this.solvingColAt(x, BOARD_PART.HINT_TOP)) {
                 ctx.fillRect(
@@ -178,7 +175,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
             // add text and focus highlight for top and bottom hint cells in one common loop
             for (let y = 0; y < maxColHintY; y++) {
 
-                ctx.fillStyle = COLORS.light
+                ctx.fillStyle = this.colors.light
                 // focus highlights
                 if (this.hintPadAt(x, y, BOARD_SIDE.TOP)) {
                     ctx.fillRect(
@@ -197,7 +194,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                     )
                 }
 
-                ctx.fillStyle = this.game.columnHints.matching[x] ? COLORS.lightest : COLORS.ultraLight
+                ctx.fillStyle = this.game.columnHints.matching[x] ? this.colors.lightest : this.colors.ultraLight
                 // cell text
                 const topHint = this.game.columnHints.getHintXY(x, y, BOARD_SIDE.TOP)
                 if (topHint) {
@@ -220,7 +217,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // ROW HINTS
 
-        ctx.fillStyle = this.isSetup() ? COLORS.mid : COLORS.semiDark
+        ctx.fillStyle = this.isSetup() ? this.colors.medium : this.colors.semiDark
         // common left and right rectangle
         ctx.fillRect(
             0,
@@ -239,7 +236,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         for (let y = 0; y < maxBoardY; y++) {
 
-            ctx.fillStyle = COLORS.light
+            ctx.fillStyle = this.colors.light
             // highlight left hint row while solving
             if (this.solvingRowAt(y, BOARD_PART.HINT_LEFT)) {
                 ctx.fillRect(
@@ -262,7 +259,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
             // add text and focus highlight for left and right hint cells in one common loop
             for (let x = 0; x < maxRowHintX; x++) {
 
-                ctx.fillStyle = COLORS.light
+                ctx.fillStyle = this.colors.light
                 // focus highlights
                 if (this.hintPadAt(x, y, BOARD_SIDE.LEFT)) {
                     ctx.fillRect(
@@ -281,7 +278,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
                     )
                 }
 
-                ctx.fillStyle = this.game.rowHints.matching[y] ? COLORS.lightest : COLORS.ultraLight
+                ctx.fillStyle = this.game.rowHints.matching[y] ? this.colors.lightest : this.colors.ultraLight
                 // cell text
                 const leftHint = this.game.rowHints.getHintXY(x, y, BOARD_SIDE.LEFT)
                 if (leftHint) {
@@ -304,7 +301,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // BOARD
 
-        ctx.fillStyle = this.isSetup() ? COLORS.semiDark : COLORS.mid
+        ctx.fillStyle = this.isSetup() ? this.colors.semiDark : this.colors.medium
         // common board rectangle
         ctx.fillRect(
             pxRowHintWidth,
@@ -318,10 +315,10 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
             for (let x = 0; x < this.game.boardData[y].length; x++) {
                 switch (this.game.boardData[y][x].value) {
                     case BOARD_CELL.ON:
-                        ctx.fillStyle = COLORS.light
+                        ctx.fillStyle = this.colors.light
                         break
                     case BOARD_CELL.OFF:
-                        ctx.fillStyle = COLORS.dark
+                        ctx.fillStyle = this.colors.dark
                         break
                     default:
                         continue
@@ -338,7 +335,7 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
         // GRID
 
         if (!this.isGameOver()) {
-            ctx.strokeStyle = COLORS.dark
+            ctx.strokeStyle = this.colors.dark
 
             // add horizontal lines for all hints and the board in one loop
             for (let y = 0; y < maxBoardY + maxColHintY * 2; y++) {
@@ -696,6 +693,21 @@ export class BoardCanvasComponent implements OnInit, OnDestroy {
 
     private solvingRowAt(y: number, kind: string): boolean {
         return this.solvePos ? this.solvePos.kind === kind && this.solvePos.y === y : false
+    }
+
+    private createColors(): ColorMap {
+        const colorMap: ColorMap = {
+            dark: 'dark',
+            semiDark: 'semi-dark',
+            medium: 'medium',
+            light: 'light',
+            ultraLight: 'ultra-light',
+            lightest: 'lightest'
+        }
+        Object.entries(colorMap).forEach(([color, cssSuffix]) => {
+            colorMap[color] = getComputedStyle(document.body).getPropertyValue(`--ion-color-${cssSuffix}`)
+        })
+        return colorMap
     }
 
     undo() {
