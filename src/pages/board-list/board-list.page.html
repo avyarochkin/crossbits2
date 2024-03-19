@@ -3,17 +3,26 @@
         <swiper-slide class="stage-slide"
             *ngFor="let stageBoards of allBoards; let i = index">
             <div class="stage-slide-container">
-                <h3>{{ i < allBoards.length-1 ? 'STAGE ' + (i + 1) : 'SAVED BOARDS' }}</h3>
-                <div class="stage">
+                <h3 *ngIf="i < allBoards.length-1; else savedBoardsTitle">STAGE {{ i + 1 }}</h3>
+                <ng-template #savedBoardsTitle>
+                    <h3>
+                        SAVED BOARDS
+                        <ion-button class="editing-button" fill="clear" (click)="editing = !editing">
+                            {{ editing ? 'DONE' : 'EDIT' }}
+                        </ion-button>
+                    </h3>
+                </ng-template>
+
+                <div class="stage" [class.editing]="editing">
                     <button class="stage-board"
+                        [class.editable]="!board.static"
                         *ngFor="let board of stageBoards"
-                        (click)="loadGame(board)"
-                        (press)="editGame(board)">
+                        (click)="loadGame(board)">
                         <div class="board-num">{{ board.nr }}</div>
                         <span>{{ board.boardData[0].length }}&times;{{ board.boardData.length }}</span>
                         <ion-icon name="trophy-outline" class="board-flag" *ngIf="board.solved"></ion-icon>
                     </button>
-                    <button class="stage-board new" *ngIf="i === allBoards.length - 1" (click)="createGame()">
+                    <button class="stage-board new" *ngIf="editing && i === allBoards.length - 1" (click)="createGame()">
                         <ion-icon name="add"></ion-icon>
                     </button>
                 </div>

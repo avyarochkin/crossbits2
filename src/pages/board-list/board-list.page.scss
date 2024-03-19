@@ -26,6 +26,11 @@
             text-align: center;
             color: var(--ion-color-ultra-light);
         }
+        .editing-button {
+            font-size: 1rem;
+            float: right;
+            --color: var(--ion-color-light);
+        }
         .stage {
             display: flex;
             flex-wrap: wrap;
@@ -46,8 +51,7 @@
                 font-size: 1.25rem;
                 color: var(--ion-color-semi-dark);
                 &.new {
-                    background-color: var(--ion-color-light);
-                    color: var(--ion-color-lightest);
+                    background-color: var(--ion-color-ultra-light);
                 }
                 &:active {
                     background-color: var(--ion-color-medium);
@@ -67,6 +71,19 @@
                     color: var(--ion-color-semi-dark);
                 }
             }
+            &.editing {
+                .stage-board {
+                    &.editable {
+                        animation: wobble 250ms infinite;
+                    }
+                }
+            }
         }
     }
+}
+
+@keyframes wobble {
+    25% { transform: rotate(3deg); }
+    75% { transform: rotate(-3deg); }
+    100% { transform: rotate(0deg); }
 }

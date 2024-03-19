@@ -17,6 +17,8 @@ export class BoardListPage {
 
     allBoards: Board[][]
 
+    editing: boolean
+
     @ViewChild('swiper', { static: true }) swiperRef: ElementRef
 
     constructor(
@@ -34,12 +36,7 @@ export class BoardListPage {
     }
 
     async loadGame(board: Board) {
-        this.game.initFromSaved(board, GAME_STATUS.GAME)
-        await this.navCtrl.navigateForward('/board')
-    }
-
-    async editGame(board: Board) {
-        this.game.initFromSaved(board, GAME_STATUS.SETUP)
+        this.game.initFromSaved(board, this.editing ? GAME_STATUS.SETUP : GAME_STATUS.GAME)
         await this.navCtrl.navigateForward('/board')
     }
 
