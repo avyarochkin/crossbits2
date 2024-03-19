@@ -6,8 +6,8 @@
     "private": true,
     "scripts": {
         "ng": "ng",
-        "start": "ionic serve",
-        "start:ios": "ionic capacitor run ios -l --external",
+        "start": "ionic serve -c=dev",
+        "start:ios": "ionic capacitor run ios -l --external -c=dev",
         "build": "ionic build",
         "test": "ng test",
         "eslint": "eslint 'src/**/*.ts'",
