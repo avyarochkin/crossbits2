@@ -10,7 +10,7 @@ export class GameGuard implements CanActivate {
     ) { }
 
     canActivate(): boolean | UrlTree  {
-        return this.game.sourceBoard != null
+        return this.game.boardData.length > 0
             ? true
             : this.router.parseUrl('/')
     }

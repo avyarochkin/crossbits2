@@ -13,7 +13,7 @@ const ZOOM_FACTOR = 1.2
 })
 export class BoardPage {
     @ViewChild('scroll', { static: true }) scroller: ElementRef<HTMLElement>
-    @ViewChild(BoardCanvasComponent, { static: true }) board: BoardCanvasComponent
+    @ViewChild('boardCanvas', { static: false }) board: BoardCanvasComponent
 
     boardData: BoardData
     boardSize: Point

@@ -4,9 +4,12 @@
         zoomable
         [scale]="zoom"
         [minScale]="minZoom">
-        <board-canvas #boardCanvas
+        <board-canvas #boardCanvas *ngIf="!isSetup(); else setupCanvas"
             (statusChange)="statusChange($event)">
         </board-canvas>
+        <ng-template #setupCanvas>
+            <setup-board-canvas #boardCanvas></setup-board-canvas>
+        </ng-template>
     </div>
 
 </ion-content>

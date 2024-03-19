@@ -4,8 +4,9 @@ import { RouterModule } from '@angular/router'
 import { BoardPage } from './board.page'
 import { IonicModule } from '@ionic/angular'
 import { CommonModule } from '@angular/common'
-import { BoardCanvasComponent } from 'src/components/board-canvas/board-canvas'
+import { GameBoardCanvasComponent } from 'src/components/board-canvas/game-board-canvas'
 import { ZoomableDirective } from 'src/directives/zoomable/zoomable'
+import { SetupBoardCanvasComponent } from 'src/components/board-canvas/setup-board-canvas'
 
 @NgModule({
     imports: [
@@ -13,7 +14,12 @@ import { ZoomableDirective } from 'src/directives/zoomable/zoomable'
         CommonModule,
         RouterModule.forChild([{ path: '', component: BoardPage }])
     ],
-    declarations: [BoardPage, BoardCanvasComponent, ZoomableDirective],
+    declarations: [
+        BoardPage,
+        GameBoardCanvasComponent,
+        SetupBoardCanvasComponent,
+        ZoomableDirective
+    ],
     exports: [RouterModule]
 })
 export class BoardPageModule {}
