@@ -1,13 +1,16 @@
 import { Point, BoardSide, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game.interface'
+import { combinations } from './game.utils'
 import { GameProvider } from './game'
 import { HintCell, VariantPiece } from './hints.interface'
 
-const MAX_SOLVE_TIME_MSEC = 60000
+const MAX_SOLVE_TIME_MSEC = 300_000 // 5 minutes
+const MAX_COMBINATIONS = 10_000_000
 
 export abstract class Hints {
 
     hints: HintCell[][] = []
     matching: boolean[] = []
+    private lastLineIndex?: number
 
     constructor(protected game: GameProvider) {}
 
@@ -29,6 +32,7 @@ export abstract class Hints {
 
     reset() {
         this.matching = new Array<boolean>(this.hints.length)
+        this.lastLineIndex = undefined
     }
 
     protected getLongestLineLength(): number {
@@ -110,10 +114,21 @@ export abstract class Hints {
 
     // try to solve the board line based on the hint values
     solveLine(lineIndex: number) {
+        console.group(`Solving ${this.constructor.name}[${lineIndex}]`)
         const self = this
         const dataLength = this.getBoardLength() // height
         const hintLength = self.hints[lineIndex].length
+        const numberOfCombinations = this.getNumberOfCombinations(lineIndex)
+        const tooManyCombinations = numberOfCombinations > MAX_COMBINATIONS && this.lastLineIndex !== lineIndex
+        this.lastLineIndex = lineIndex
 
+        if (tooManyCombinations) {
+            console.warn(`${numberOfCombinations.toLocaleString()} possible variants. Are you sure?`)
+            console.groupEnd()
+            return
+        } else {
+            console.info(`${numberOfCombinations.toLocaleString()} possible variants`)
+        }
         /*
         This variable holds one particular variant of all pieces that can be
         allocated in column "x" according to its hint. The variable represents
@@ -274,17 +289,29 @@ export abstract class Hints {
         }
 
         // logging stats
-        const durationStr = (performance.now() - startTime).toLocaleString()
+        const duration = performance.now() - startTime
+        const durationStr = duration.toLocaleString()
         const variantsStr = variantsFound.toLocaleString()
         if (givenUp) {
-            console.warn(`Given up after ${variantsStr} variant(s) in ${durationStr}ms`)
+            if (duration >= MAX_SOLVE_TIME_MSEC) {
+                console.warn(`Given up after ${variantsStr} variant(s) in ${durationStr}ms`)
+            } else {
+                console.info(`Given up after ${variantsStr} variant(s)`)
+            }
         } else if (variantsFound > 0) {
             console.info(`${variantsStr} variant(s) found in ${durationStr}ms`)
         } else {
             console.error(`No variants found in ${durationStr}ms`)
         }
+        console.groupEnd()
     } // solveLine
 
+    private getNumberOfCombinations(lineIndex: number) {
+        const hintSum = this.hints[lineIndex].reduce((prev, curr) => prev + curr.hint, 0)
+        const hintCount = this.hints[lineIndex].length
+        const emptyCells = this.getBoardLength() - hintSum - hintCount + 1
+        return combinations(hintCount + emptyCells, hintCount)
+    }
 } // class Hints
 
 
