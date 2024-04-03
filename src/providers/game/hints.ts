@@ -1,16 +1,14 @@
 import { Point, BoardSide, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game.interface'
-import { combinations } from './game.utils'
 import { GameProvider } from './game'
-import { HintCell, VariantPiece } from './hints.interface'
-
-const MAX_SOLVE_TIME_MSEC = 300_000 // 5 minutes
-const MAX_COMBINATIONS = 10_000_000
+import { HintCell } from './hints.interface'
+import { LineSolver } from './solver'
 
 export abstract class Hints {
 
     hints: HintCell[][] = []
     matching: boolean[] = []
-    private lastLineIndex?: number
+
+    private readonly solver = new LineSolver()
 
     constructor(protected game: GameProvider) {}
 
@@ -32,7 +30,7 @@ export abstract class Hints {
 
     reset() {
         this.matching = new Array<boolean>(this.hints.length)
-        this.lastLineIndex = undefined
+        this.solver.reset()
     }
 
     protected getLongestLineLength(): number {
@@ -51,14 +49,14 @@ export abstract class Hints {
     board indexInLine. For the column hints lineIndex should map to the board
     <x> and indexInLine should map to <y>. For the row hints - vice versa.
     */
-    protected abstract getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL
+    abstract getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL
 
     /*
     Should set the game board cell to the given value. The cell should be
     located via the hint lineIndex and the board indexInLine, which should be
     mapped to the board <x,y> exactly as in getBoardDataValue().
     */
-    protected abstract setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL)
+    abstract setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL)
 
     getMaxIndexInLine(): number {
         const maxIndexInLine = Math.floor((this.getBoardLength() + 1) / 2)
@@ -112,205 +110,8 @@ export abstract class Hints {
     abstract getHintXY(x: number, y: number, side: BoardSide): string
     abstract setHintXY(x: number, y: number, side: BoardSide, value: string | null): Point
 
-    // try to solve the board line based on the hint values
     solveLine(lineIndex: number) {
-        console.group(`Solving ${this.constructor.name}[${lineIndex}]`)
-        const self = this
-        const dataLength = this.getBoardLength() // height
-        const hintLength = self.hints[lineIndex].length
-        const numberOfCombinations = this.getNumberOfCombinations(lineIndex)
-        const tooManyCombinations = numberOfCombinations > MAX_COMBINATIONS && this.lastLineIndex !== lineIndex
-        this.lastLineIndex = lineIndex
-
-        if (tooManyCombinations) {
-            console.warn(`${numberOfCombinations.toLocaleString()} possible variants. Are you sure?`)
-            console.groupEnd()
-            return
-        } else {
-            console.info(`${numberOfCombinations.toLocaleString()} possible variants`)
-        }
-        /*
-        This variable holds one particular variant of all pieces that can be
-        allocated in column "x" according to its hint. The variable represents
-        an array of pairs: { piece start index; piece end index }.
-        When building various variants this variable gets initially populated
-        with the first variant and then gets updated to match the next variant.
-        */
-        const variant = Array<VariantPiece>(hintLength)
-
-        /*
-        This variable holds the common result after applying all variants.
-        All cells that stay on or off across all variants will be on or off
-        in the solution.
-        */
-        const solution = Array<BOARD_CELL>(dataLength)
-
-        /*
-        This variable holds a copy of the target board line
-        */
-        const boardLine = Array<BOARD_CELL>(dataLength)
-
-        /*
-        Copies the target board line to a local array to achieve better lookup
-        performance (33% faster)
-        */
-        function createBoardLine() {
-            for (let indexInLine = 0; indexInLine < dataLength; indexInLine++) {
-                boardLine[indexInLine] = self.getBoardDataValue(lineIndex, indexInLine)
-            }
-        }
-
-        /*
-        Tries to build a valid variant by starting with the hint [startIndex]
-        and placing the first piece into the column at [offset]. Then places
-        all remaining pieces according to the next hints to the next possible
-        places.
-        Returns "true" if could build a valid variant and "false" if not.
-        buildVariant(0, 0) builds the first possible variant for all hints.
-        */
-        function buildVariant(startIndex: number, offset: number): boolean {
-            for (let indexInLine = startIndex; indexInLine < hintLength; indexInLine++) {
-                const pieceEnd = offset + self.hints[lineIndex][indexInLine].hint - 1
-
-                // if the piece goes beyond column limit, the building is not possible
-                if (pieceEnd >= dataLength) { return false }
-
-                variant[indexInLine] = {
-                    start: offset,
-                    end: pieceEnd
-                }
-                // next piece should start by skipping 1 cell after this one
-                offset = pieceEnd + 2
-            }
-            // all pieces are built successfully
-            return true
-        }
-
-        /*
-        Tries to build the next variant based on the current state of <variant>
-        variable. Tries to shift the last piece forward, then second last and
-        so on as long as the variant remains valid.
-        If <variant> variable is not initialized, tries to build the first one.
-        Returns "true" if could build a valid variant and "false" if not.
-        */
-        function buildNextVariant(): boolean {
-            // if not initialized, build the first variant
-            if (variant[0] == null) {
-                return buildVariant(0, 0)
-            }
-            // try to shift a piece one cell forward starting with the last one
-            for (let startIndex = hintLength - 1; startIndex >= 0; startIndex--) {
-                if (buildVariant(startIndex, variant[startIndex].start + 1)) { return true }
-            }
-            // all pieces are shifted to their last position - cannot build a new variant
-            return false
-        }
-
-        /*
-        Checks if <variant> conflicts with any column cells set to on/off.
-        Returns "true" if conflict found and "false" if not.
-        */
-        function variantConflictsWithBoard(): boolean {
-            let variantIndex = 0, conflict = false
-            for (let indexInLine = 0; indexInLine < dataLength && !conflict; indexInLine++) {
-                if (variantIndex >= hintLength || indexInLine < variant[variantIndex].start) {
-                    // check conflict with cells outside of variant pieces
-                    conflict = (boardLine[indexInLine] === BOARD_CELL.ON)
-                } else if (indexInLine <= variant[variantIndex].end) {
-                    // check conflict with cells inside the variant pieces
-                    conflict = (boardLine[indexInLine] === BOARD_CELL.OFF)
-                    // moving to the next piece
-                    if (indexInLine === variant[variantIndex].end) {
-                        variantIndex++
-                    }
-                }
-            }
-            //console.log(`${variant.map(item => { return `${item.start}:${item.end}` })} - ${conflict ? 'conflict' : 'OK'}`)
-            return conflict
-        }
-
-        /*
-        Applies <variant> to <solution>. All cells that stay on or off across
-        all variants will be set to on or off in the solution.
-        Returns "true" if the solution has any cells set to on or off,
-        i.e. if the solution is applicable.
-        */
-        function applyVariantToSolution(): boolean {
-            let variantIndex = 0
-            let solutionApplicable = false
-            for (let solutionIndex = 0; solutionIndex < dataLength; solutionIndex++) {
-                let value = solution[solutionIndex]
-                if (variantIndex >= hintLength || solutionIndex < variant[variantIndex].start) {
-                    // apply to cells outside of variant pieces
-                    value = (value === undefined || value === BOARD_CELL.OFF) ? BOARD_CELL.OFF : BOARD_CELL.NIL
-                } else if (solutionIndex <= variant[variantIndex].end) {
-                    // apply to cells inside the variant pieces
-                    value = (value === undefined || value === BOARD_CELL.ON) ? BOARD_CELL.ON : BOARD_CELL.NIL
-                    // moving to the next piece
-                    if (solutionIndex === variant[variantIndex].end) {
-                        variantIndex++
-                    }
-                }
-                solution[solutionIndex] = value
-                // if at least one cell is set or unset, the solution is applicable
-                solutionApplicable = solutionApplicable || (value !== BOARD_CELL.NIL)
-            }
-            //console.log(`Solution: ${solution}`)
-            return solutionApplicable
-        }
-
-        /*
-        Applies <solution> to the board column.
-        Copies only the cells set to on or off.
-        */
-        function applySolutionToBoard() {
-            for (let solutionIndex = 0; solutionIndex < dataLength; solutionIndex++) {
-                const value = solution[solutionIndex]
-                if (value === BOARD_CELL.OFF || value === BOARD_CELL.ON) {
-                    self.setBoardDataValue(lineIndex, solutionIndex, value)
-                }
-            }
-        }
-
-        // main algorithm (self explanatory)
-        let variantsFound = 0
-        let givenUp = (hintLength === 0)
-        const startTime = performance.now()
-
-        createBoardLine()
-        while (!givenUp && buildNextVariant()) {
-            if (!variantConflictsWithBoard()) {
-                variantsFound++
-                givenUp = !applyVariantToSolution() || performance.now() - startTime >= MAX_SOLVE_TIME_MSEC
-            }
-        }
-        if (!givenUp) {
-            applySolutionToBoard()
-        }
-
-        // logging stats
-        const duration = performance.now() - startTime
-        const durationStr = duration.toLocaleString()
-        const variantsStr = variantsFound.toLocaleString()
-        if (givenUp) {
-            if (duration >= MAX_SOLVE_TIME_MSEC) {
-                console.warn(`Given up after ${variantsStr} variant(s) in ${durationStr}ms`)
-            } else {
-                console.info(`Given up after ${variantsStr} variant(s)`)
-            }
-        } else if (variantsFound > 0) {
-            console.info(`${variantsStr} variant(s) found in ${durationStr}ms`)
-        } else {
-            console.error(`No variants found in ${durationStr}ms`)
-        }
-        console.groupEnd()
-    } // solveLine
-
-    private getNumberOfCombinations(lineIndex: number) {
-        const hintSum = this.hints[lineIndex].reduce((prev, curr) => prev + curr.hint, 0)
-        const hintCount = this.hints[lineIndex].length
-        const emptyCells = this.getBoardLength() - hintSum - hintCount + 1
-        return combinations(hintCount + emptyCells, hintCount)
+        this.solver.solveLine(this, lineIndex)
     }
 } // class Hints
 
@@ -321,11 +122,11 @@ export class ColumnHints extends Hints  {
         return this.game.boardData.length
     }
 
-    protected getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL {
+    getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL {
         return this.game.boardData[indexInLine][lineIndex].value
     }
 
-    protected setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL) {
+    setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL) {
         this.game.setBoardData(indexInLine, lineIndex, value)
         this.game.rowHints.checkLine(indexInLine)
     }
@@ -371,18 +172,17 @@ export class ColumnHints extends Hints  {
 }
 
 
-
 export class RowHints extends Hints {
 
     getBoardLength(): number {
         return this.game.boardData[0]?.length
     }
 
-    protected getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL {
+    getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL {
         return this.game.boardData[lineIndex][indexInLine].value
     }
 
-    protected setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL) {
+    setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL) {
         this.game.setBoardData(lineIndex, indexInLine, value)
         this.game.columnHints.checkLine(indexInLine)
     }
@@ -424,5 +224,4 @@ export class RowHints extends Hints {
 
         return result
     }
-
 }
