@@ -164,7 +164,7 @@ module.exports = {
         "no-underscore-dangle": "error",
         "no-unreachable": "error",
         "no-unused-expressions": "error",
-        "no-unused-vars": "error",
+        "no-unused-vars": "off",
         "no-use-before-define": "off",
         "object-curly-spacing": [
             "error",
@@ -178,5 +178,24 @@ module.exports = {
         "require-atomic-updates": "error",
         "require-await": "error",
         "semi": "off"
-    }
+    },
+    "overrides": [
+        {
+            "files": ["*.spec.ts"],
+            "plugins": ["jest", "eslint-plugin-jest"],
+            "extends": [
+                "plugin:jest/recommended"
+            ],
+            "rules": {
+                "@typescript-eslint/no-unused-vars": [
+                    "error",
+                    {
+                        "args": "none"
+                    }
+                ],
+                "jest/expect-expect": "error",
+                "no-magic-numbers": "off"
+            }
+        }
+    ]
 }

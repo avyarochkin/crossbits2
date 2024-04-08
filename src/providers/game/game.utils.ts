@@ -1,9 +1,11 @@
 /**
  * product(a : b) = a * (a + 1) * (a + 2) * ... * b
  */
-export function product(a: number, b: number) {
-    if (a > b) { return 1 }
-    return a < b ? a * product(a + 1, b) : b
+export function product(startFactor: number, endFactor: number) {
+    if (startFactor > endFactor) { return 1 }
+    return startFactor < endFactor
+        ? startFactor * product(startFactor + 1, endFactor)
+        : endFactor
 }
 
 /**
@@ -11,9 +13,10 @@ export function product(a: number, b: number) {
  * C(n : k) = ------------- = -----------------
  *            m! * (n - k)!   product(1, n - k)
  */
-export function combinations(n: number, k: number) {
+export function combinations(itemsInSet: number, itemsInSubset: number) {
+    if (itemsInSubset > itemsInSet) { return 0 }
     // using min[k, n - k] to minimize number of product cycles
     // given that C(n : k) === C(n : n - k)
-    k = Math.min(k, n - k)
-    return Math.round(product(n - k + 1, n) / product(1, k))
+    const minItemsInSubset = Math.min(itemsInSubset, itemsInSet - itemsInSubset)
+    return Math.round(product(itemsInSet - minItemsInSubset + 1, itemsInSet) / product(1, minItemsInSubset))
 }
