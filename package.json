@@ -4,7 +4,6 @@
   "author": "Alexey Yarochkin",
   "homepage": "https://github.com/avyarochkin/crossbits2",
   "private": true,
-  "type": "module",
   "scripts": {
     "ng": "ng",
     "start": "ionic serve -c=dev",
