@@ -22,7 +22,7 @@
                         <span>{{ board.boardData[0].length }}&times;{{ board.boardData.length }}</span>
                         <ion-icon name="trophy-outline" class="board-flag" *ngIf="board.solved"></ion-icon>
                     </button>
-                    <button class="stage-board new" *ngIf="editing && i === allBoards.length - 1" (click)="createGame()">
+                    <button class="stage-board new" *ngIf="i === allBoards.length - 1" (click)="createGame()">
                         <ion-icon name="add"></ion-icon>
                     </button>
                 </div>

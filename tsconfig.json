@@ -18,9 +18,6 @@
     "strictFunctionTypes": true,
     "target": "es2022",
     "importHelpers": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
   },
   "compileOnSave": false,
   "angularCompilerOptions": {
