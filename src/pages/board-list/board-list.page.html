@@ -1,18 +1,37 @@
+<ion-header mode="ios">
+    <ion-toolbar mode="ios" *ngIf="swiperRef.nativeElement.swiper as swiper">
+        <ion-buttons slot="start">
+            <ion-button class="prev-stage-button" fill="solid"
+                *ngIf="swiper.activeIndex > 0"
+                (click)="swiper.slidePrev()">
+                <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>
+            <h1 class="title-block">
+                {{ swiper.activeIndex < allBoards.length - 1 ? 'STAGE ' + (swiper.activeIndex + 1): 'SAVED BOARDS' }}
+            </h1>
+        </ion-title>
+        <ion-buttons slot="end">
+            <ion-button class="next-stage-button" fill="solid"
+                *ngIf="swiper.activeIndex < allBoards.length - 1"
+                (click)="swiper.slideNext()">
+                <ion-icon slot="icon-only" name="chevron-forward"></ion-icon>
+            </ion-button>
+            <ion-button class="editing-button" fill="solid"
+                *ngIf="swiper.activeIndex === allBoards.length - 1"
+                (click)="editing = !editing">
+                {{ editing ? 'DONE' : 'EDIT' }}
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
 <ion-content [forceOverscroll]="false">
     <swiper-container #swiper [pagination]="true" class="stage-slides">
         <swiper-slide class="stage-slide"
             *ngFor="let stageBoards of allBoards; let i = index">
             <div class="stage-slide-container">
-                <h3 *ngIf="i < allBoards.length-1; else savedBoardsTitle">STAGE {{ i + 1 }}</h3>
-                <ng-template #savedBoardsTitle>
-                    <h3>
-                        SAVED BOARDS
-                        <ion-button class="editing-button" fill="clear" (click)="editing = !editing">
-                            {{ editing ? 'DONE' : 'EDIT' }}
-                        </ion-button>
-                    </h3>
-                </ng-template>
-
                 <div class="stage" [class.editing]="editing">
                     <button class="stage-board"
                         [class.editable]="!board.static"

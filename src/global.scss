@@ -31,23 +31,35 @@ ion-content {
     --background: var(--ion-color-dark);
 }
 :root {
-    ion-footer {
+    ion-header, ion-footer {
         position: absolute;
-        bottom: 0;
         pointer-events: none;
         &::before { background: none; }
         ion-toolbar {
             --background: transparent;
-            &:first-of-type { --border-width: 0; }
+            &:first-of-type, &:last-of-type { --border-width: 0; }
+            ion-title {
+                --color: var(--ion-color-ultra-light);
+                padding-inline-start: 4rem;
+                padding-inline-end: 4rem;
+                .title-block {
+                    margin: 0;
+                    display: inline-flex;
+                    font-size: 1.4rem;
+                    background: rgba(var(--ion-color-semi-dark-rgb), 0.5);
+                    padding: 0.2rem 1rem;
+                    border-radius: 1rem;
+                }
+            }
             ion-button.button-solid {
                 min-height: 2rem;
                 pointer-events: auto !important;
                 --color: var(--ion-color-ultra-light);
-                --background: rgba(var(--ion-color-medium-rgb), 0.2);
+                --background: rgba(var(--ion-color-semi-dark-rgb), 0.5);
                 --border-radius: 64px;
                 --background-hover: none;
                 &:hover:not(.button-disabled) {
-                    --background-hover: rgba(var(--ion-color-medium-rgb), 0.3);
+                    --background-hover: rgba(var(--ion-color-semi-dark-rgb), 0.6);
                 }
                 --padding-top: 0.25rem;
                 --padding-bottom: 0.25rem;
@@ -60,6 +72,8 @@ ion-content {
             }
         }
     }
+    ion-header { top: 0; }
+    ion-footer { bottom: 0; }
 
     ion-picker {
         .picker-button {
