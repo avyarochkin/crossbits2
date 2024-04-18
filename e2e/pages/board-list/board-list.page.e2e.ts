@@ -19,24 +19,38 @@ describe('Board List', () => {
         await expect((await getUrl()).pathname).toBe('/board')
     })
 
+    it('should navigate to next stage', async () => {
+        await BoardList.nextStageButton.click()
+        await BoardList.nextStageButton.click()
+        const title = await BoardList.pageTitle
+        expect(await title.getText()).toBe('STAGE 3')
+    })
+
+    it('should navigate to previous stage', async () => {
+        await BoardList.nextStageButton.click()
+        await BoardList.nextStageButton.click()
+        await BoardList.prevStageButton.click()
+        const title = await BoardList.pageTitle
+        expect(await title.getText()).toBe('STAGE 2')
+    })
+
     describe('Last Stage', () => {
         beforeEach(async () => {
-            await BoardList.swiper.swipeLeft()
-            await BoardList.swiper.swipeLeft()
-            await BoardList.swiper.swipeLeft()
-            await BoardList.swiper.swipeLeft()
+            await BoardList.goToLastStage()
         })
 
         it('should open new board page', async () => {
-            await BoardList.newBoardButton.click()
-            await pause(500)
+            await BoardList.openNewBoard()
             await expect((await getUrl()).pathname).toBe('/board')
         })
 
         it('should switch to edit mode', async () => {
+            const editButton = await BoardList.editButton
+            await expect(await editButton.getText()).toBe('EDIT')
             await BoardList.editButton.click()
             await pause(500)
-            await expect((await BoardList.editButton).getElementText).toBe('EDIT')
+            const doneButton = await BoardList.editButton
+            await expect(await doneButton.getText()).toBe('DONE')
         })
     })
 })

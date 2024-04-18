@@ -1,18 +1,13 @@
 import type { RectReturn } from '@wdio/protocols/build/types.js'
 import { Gestures } from '../gestures.js'
+import { Component } from './component.js'
 
-export class Swiper {
+export class Swiper extends Component {
     rects?: RectReturn
-
-    get $() {
-        return $(this.selector)
-    }
 
     get slides() {
         return this.$.$$('swiper-slide')
     }
-
-    constructor(public selector: string) { }
 
     /**
      * Swipe the Swiper to the LEFT (from right to left)
