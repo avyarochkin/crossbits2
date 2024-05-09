@@ -7,9 +7,9 @@ export enum BOARD_CELL {
     ON = 1
 }
 export enum GAME_STATUS {
-    SETUP,
-    GAME,
-    OVER
+    SETUP = 'setup',
+    GAME = 'game',
+    OVER = 'over'
 }
 
 export type BoardSide = 'L' | 'R' | 'T' | 'B'
@@ -17,11 +17,11 @@ export type BoardSide = 'L' | 'R' | 'T' | 'B'
 export const CELL_SIZE = 25
 export const CELLS_IN_GROUP = 5
 
-export const BOARD_SIDE = {
-    LEFT: <BoardSide> 'L',
-    RIGHT: <BoardSide> 'R',
-    TOP: <BoardSide> 'T',
-    BOTTOM: <BoardSide> 'B'
+export const BOARD_SIDE: Record<string, BoardSide> = {
+    LEFT: 'L',
+    RIGHT: 'R',
+    TOP: 'T',
+    BOTTOM: 'B'
 }
 export const BOARD_PART = {
     HINT_TOP: 'top-hint',

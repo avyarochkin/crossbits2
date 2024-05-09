@@ -1,0 +1,85 @@
+.board-canvas {
+    width: fit-content;
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-areas:
+        ". column-hints-top ."
+        "row-hints-left board row-hints-right"
+        ". column-hints-bottom .";
+}
+
+.board { grid-area: board; }
+.row-hints {
+    &.first { grid-area: row-hints-left; }
+    &.last { grid-area: row-hints-right; }
+}
+.column-hints {
+    &.first { grid-area: column-hints-top; }
+    &.last { grid-area: column-hints-bottom; }
+}
+
+.board {
+    display: flex;
+    flex-direction: column;
+    > .board-line {
+        display: flex;
+        flex-direction: row;
+        > .board-cell {
+            background-color: var(--ion-color-medium);
+            border-color: var(--ion-color-dark);
+            &.on { background-color: var(--ion-color-light); }
+            &.off { background-color: var(--ion-color-dark); }
+            &:nth-child(5n) { border-right-width: 2px; }
+        }
+        &:nth-child(5n) > .board-cell { border-bottom-width: 2px; }
+    }
+}
+
+.column-hints, .row-hints {
+    display: flex;
+    flex-direction: row;
+    > .hint-line {
+        display: flex;
+        flex-direction: column;
+        > .hint-cell {
+            color: var(--ion-color-light);
+            background-color: var(--ion-color-semi-dark);
+            border-color: var(--ion-color-dark);
+        }
+    }
+    &.first > .hint-line { justify-content: flex-end; }
+}
+
+.row-hints {
+    flex-direction: column;
+    > .hint-line {
+        flex-direction: row;
+    }
+}
+
+.column-hints > .hint-line:nth-child(5n) > .hint-cell { border-right-width: 2px; }
+.row-hints > .hint-line:nth-child(5n) > .hint-cell { border-bottom-width: 2px; }
+
+.board-cell, .hint-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 25px;
+    height: 25px;
+    border-width: 0 1px 1px 0;
+    border-style: solid;
+    font-size: 1rem;
+    cursor: pointer;
+}
+.board-canvas.over {
+    .board > .board-line > .board-cell,
+    .hint-line > .hint-cell {
+        border-width: 0;
+        cursor: default;
+    }
+
+}
+.board-canvas.game .hint-line:hover > .hint-cell {
+    color: var(--ion-color-ultra-light);
+    opacity: 0.75;
+}

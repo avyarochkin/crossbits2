@@ -1,9 +1,9 @@
 <ion-content [forceOverscroll]="true" [scrollX]="true" [scrollY]="true">
 
-    <div #scroll class="board-scroll"
-        zoomable
+    <div #scroll class="board-scroll" zoomable
         [scale]="zoom"
         [minScale]="minZoom">
+        <!-- <board-grid #boardCanvas></board-grid> -->
         <board-canvas #boardCanvas class="board-canvas" *ngIf="!isSetup(); else setupCanvas"
             (statusChange)="statusChange($event)">
         </board-canvas>

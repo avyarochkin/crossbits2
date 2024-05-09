@@ -1,0 +1,46 @@
+<div #canvas class="board-canvas"
+    [ngClass]="game.boardStatus">
+    <div class="column-hints first">
+        <ng-container *ngTemplateOutlet="columnHints; context: { side: 'first' }"></ng-container>
+    </div>
+    <div class="row-hints first">
+        <ng-container *ngTemplateOutlet="rowHints; context: { side: 'first' }"></ng-container>
+    </div>
+    <div class="board">
+        <ng-container *ngTemplateOutlet="board"></ng-container>
+    </div>
+    <div class="row-hints last">
+        <ng-container *ngTemplateOutlet="rowHints; context: { side: 'last' }"></ng-container>
+    </div>
+    <div class="column-hints last">
+        <ng-container *ngTemplateOutlet="columnHints; context: { side: 'last' }"></ng-container>
+    </div>
+</div>
+
+<ng-template #board>
+    <div class="board-line" *ngFor="let boardLine of game.boardData">
+        <div class="board-cell" *ngFor="let boardDataItem of boardLine"
+            [ngClass]="boardCell[boardDataItem.value]">
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #columnHints let-side="side">
+    <div class="hint-line" *ngFor="let hintLine of game.columnHints.hints">
+        <div class="hint-cell" *ngIf="side === 'first' && game.boardStatus === 'setup'"></div>
+        <div class="hint-cell" *ngFor="let hintCell of hintLine">
+            {{ hintCell.hint }}
+        </div>
+        <div class="hint-cell" *ngIf="side === 'last' && game.boardStatus === 'setup'"></div>
+    </div>
+</ng-template>
+
+<ng-template #rowHints let-side="side">
+    <div class="hint-line" *ngFor="let hintLine of game.rowHints.hints">
+        <div class="hint-cell" *ngIf="side === 'first' && game.boardStatus === 'setup'"></div>
+        <div class="hint-cell" *ngFor="let hintCell of hintLine">
+            {{ hintCell.hint }}
+        </div>
+        <div class="hint-cell" *ngIf="side === 'last' && game.boardStatus === 'setup'"></div>
+    </div>
+</ng-template>

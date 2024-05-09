@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common'
 import { GameBoardCanvasComponent } from 'src/components/board-canvas/game-board-canvas'
 import { ZoomableDirective } from 'src/directives/zoomable/zoomable'
 import { SetupBoardCanvasComponent } from 'src/components/board-canvas/setup-board-canvas'
+import { BoardGridComponent } from 'src/components/board-grid/board-grid'
 
 @NgModule({
     imports: [
@@ -18,6 +19,7 @@ import { SetupBoardCanvasComponent } from 'src/components/board-canvas/setup-boa
         BoardPage,
         GameBoardCanvasComponent,
         SetupBoardCanvasComponent,
+        BoardGridComponent,
         ZoomableDirective
     ],
     exports: [RouterModule]
