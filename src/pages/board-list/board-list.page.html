@@ -18,11 +18,16 @@
                 (click)="swiper.slideNext()">
                 <ion-icon slot="icon-only" name="chevron-forward"></ion-icon>
             </ion-button>
-            <ion-button class="editing-button" fill="solid"
-                *ngIf="swiper.activeIndex === allBoards.length - 1"
-                (click)="editing = !editing">
-                {{ editing ? 'DONE' : 'EDIT' }}
-            </ion-button>
+        <ion-button class="editing-button" fill="solid"
+            *ngIf="swiper.activeIndex === allBoards.length - 1"
+            (click)="editing = !editing">
+            <ion-icon slot="icon-only" [name]="editing ? 'checkmark-done-outline' : 'construct-outline'"></ion-icon>
+        </ion-button>
+        <ion-button class="options-button" fill="solid"
+            *ngIf="swiper.activeIndex === allBoards.length - 1"
+            (click)="showSettings()">
+            <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+        </ion-button>
         </ion-buttons>
     </ion-toolbar>
 </ion-header>
@@ -49,3 +54,5 @@
         </swiper-slide>
     </swiper-container>
 </ion-content>
+
+<a download id="downloadAnchor"></a>

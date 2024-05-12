@@ -54,6 +54,22 @@ export class GameProvider {
         this.allBoards.push(this.savedBoards as Board[])
     }
 
+    boardDataToObject(): object {
+        const result = {}
+        STATIC_BOARDS.forEach(stage =>
+            stage
+                .map(board => ({
+                    nr: board.nr,
+                    savedData: this.localStorage.getObject(SOLVED_KEY.concat(board.nr)) as SavedBoardData
+                }))
+                .filter(({ savedData }) => savedData != null)
+                .forEach(({ nr, savedData }) => {
+                    result[nr] = savedData
+                })
+        )
+        return result
+    }
+
     initAllBoards(): Board[][] {
         return STATIC_BOARDS.map((stage) => {
             return stage.map((board) => {
