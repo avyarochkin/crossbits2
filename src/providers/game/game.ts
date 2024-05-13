@@ -18,14 +18,14 @@ export class GameProvider {
     undoStack: UndoStack
 
     constructor(
-        public localStorage: LocalStorageProvider) {
-
+        public localStorage: LocalStorageProvider
+    ) {
         this.columnHints = new ColumnHints(this)
         this.rowHints = new RowHints(this)
         this.undoStack = new UndoStack(this)
 
         // initialize all static boards
-        this.allBoards = this.initAllBoards()
+        this.initAllBoards()
         // append saved boards to static boards
         this.loadSavedBoards()
     }
@@ -54,7 +54,7 @@ export class GameProvider {
         this.allBoards.push(this.savedBoards as Board[])
     }
 
-    boardDataToObject(): object {
+    boardDataToObject(): Record<string, SavedBoardData> {
         const result = {}
         STATIC_BOARDS.forEach(stage =>
             stage
@@ -70,8 +70,8 @@ export class GameProvider {
         return result
     }
 
-    initAllBoards(): Board[][] {
-        return STATIC_BOARDS.map((stage) => {
+    initAllBoards() {
+        this.allBoards = STATIC_BOARDS.map((stage) => {
             return stage.map((board) => {
                 let boardData: BoardData = []
                 let boardSolved = false
@@ -171,6 +171,10 @@ export class GameProvider {
             boardData: this.sourceBoard.boardData,
             solved: this.sourceBoard.solved
         })
+    }
+
+    saveBoardData(nr: string, data: SavedBoardData) {
+        this.localStorage.setObject(SOLVED_KEY.concat(nr), data)
     }
 
     resetBoard(width?: number, height?: number) {
