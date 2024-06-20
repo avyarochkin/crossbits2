@@ -41,9 +41,14 @@ export class BoardListPage {
         // void this.swiperRef.nativeElement.swiper.update()
     }
 
+    changeSlide() {
+        this.editing = false
+    }
+
     async loadGame(board: Board) {
         this.game.initFromSaved(board, this.editing ? GAME_STATUS.SETUP : GAME_STATUS.GAME)
         await this.navCtrl.navigateForward('/board')
+        this.editing = false
     }
 
     async createGame() {
@@ -51,11 +56,11 @@ export class BoardListPage {
             columns: [{
                 name: 'x',
                 selectedIndex: DEF_BOARD_SIZE - MIN_BOARD_SIZE,
-                options: getPickerCOlumnOptions()
+                options: getPickerColumnOptions()
             }, {
                 name: 'y',
                 selectedIndex: DEF_BOARD_SIZE - MIN_BOARD_SIZE,
-                options: getPickerCOlumnOptions()
+                options: getPickerColumnOptions()
             }],
             buttons: [
                 { role: 'cancel', text: 'CANCEL' },
@@ -67,6 +72,7 @@ export class BoardListPage {
                 this.game.initWithSize(data!.x.value as number, data!.y.value as number, GAME_STATUS.SETUP)
                 // game will be initialized on the next page
                 await this.navCtrl.navigateForward('/board')
+                this.editing = false
             }
         })
         await picker.present()
@@ -147,7 +153,7 @@ export class BoardListPage {
 }
 
 
-function getPickerCOlumnOptions() {
+function getPickerColumnOptions() {
     return Array.from(
         { length: MAX_BOARD_SIZE - MIN_BOARD_SIZE },
         (el, index) => ({

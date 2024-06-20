@@ -21,9 +21,9 @@
         <ion-button class="editing-button" fill="solid"
             *ngIf="swiper.activeIndex === allBoards.length - 1"
             (click)="editing = !editing">
-            <ion-icon slot="icon-only" [name]="editing ? 'checkmark-done-outline' : 'construct-outline'"></ion-icon>
+            <ion-icon slot="icon-only" [name]="editing ? 'checkmark-done-outline' : 'create-outline'"></ion-icon>
         </ion-button>
-        <ion-button class="options-button" fill="solid"
+        <ion-button class="options-button" fill="solid" [disabled]="editing"
             *ngIf="swiper.activeIndex === allBoards.length - 1"
             (click)="showSettings()">
             <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
@@ -33,7 +33,8 @@
 </ion-header>
 
 <ion-content [forceOverscroll]="false">
-    <swiper-container #swiper [pagination]="true" class="stage-slides">
+    <swiper-container #swiper class="stage-slides" [pagination]="true"
+        (slidechange)="changeSlide()">
         <swiper-slide class="stage-slide"
             *ngFor="let stageBoards of allBoards; let i = index">
             <div class="stage-slide-container">
@@ -46,7 +47,7 @@
                         <span>{{ board.boardData[0].length }}&times;{{ board.boardData.length }}</span>
                         <ion-icon name="trophy-outline" class="board-flag" *ngIf="board.solved"></ion-icon>
                     </button>
-                    <button class="stage-board new" *ngIf="i === allBoards.length - 1" (click)="createGame()">
+                    <button class="stage-board new editable" [class.editing]="editing" *ngIf="i === allBoards.length - 1 && editing" (click)="createGame()">
                         <ion-icon name="add"></ion-icon>
                     </button>
                 </div>

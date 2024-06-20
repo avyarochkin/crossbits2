@@ -109,6 +109,8 @@ export abstract class Hints {
 
     abstract getHintXY(x: number, y: number, side: BoardSide): string
     abstract setHintXY(x: number, y: number, side: BoardSide, value: string | null): Point
+    abstract getHintLineXY(x: number, y: number): HintCell[]
+
 
     solveLine(lineIndex: number) {
         this.solver.solveLine(this, lineIndex)
@@ -169,6 +171,9 @@ export class ColumnHints extends Hints  {
         return result
     }
 
+    getHintLineXY(x: number): HintCell[] {
+        return this.hints[x]
+    }
 }
 
 
@@ -223,5 +228,9 @@ export class RowHints extends Hints {
         this.game.setBoardSize()
 
         return result
+    }
+
+    getHintLineXY(x: number, y: number): HintCell[] {
+        return this.hints[y]
     }
 }

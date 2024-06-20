@@ -1,0 +1,21 @@
+:host {
+    display: block;
+    padding: 1rem 0.5rem;
+    margin-bottom: var(--ion-safe-area-bottom);
+    height: auto;
+    background: var(--ion-color-semi-dark);
+}
+:host .hint-button {
+    margin: 0.5rem 0.5%;
+    width: 9%;
+    min-height: auto;
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0.5rem;
+    --padding-bottom: 0.5rem;
+    --background: var(--ion-color-medium);
+    &.selected {
+        --color: var(--ion-color-dark);
+        --background: var(--ion-color-light);
+    }
+}

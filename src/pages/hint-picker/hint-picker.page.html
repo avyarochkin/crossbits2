@@ -1,0 +1,6 @@
+<ion-button class="hint-button" shape="round"
+    *ngFor="let index of buttonIndexes"
+    [class.selected]="index === selectedHint"
+    (click)="selectHint(index)">
+    {{ index }}
+</ion-button>

@@ -76,14 +76,24 @@ ion-content {
     ion-footer { bottom: 0; }
 
     ion-picker {
+        --background: var(--ion-color-semi-dark);
+        --border-color: var(--ion-color-medium);
+        --border-radius: 1rem 1rem 0 0;
+        .picker-toolbar { padding: 0 1rem; }
+        .picker-above-highlight, .picker-below-highlight { background: none; }
         .picker-button {
-            color: var(--ion-color-medium);
+            color: var(--ion-color-light);
         }
         .picker-opt {
-            color: var(--ion-color-dark);
+            color: var(--ion-color-medium);
             &.picker-opt-selected {
-                color: var(--ion-color-light);
+                color: var(--ion-color-ultra-light);
             }
+        }
+    }
+    ion-modal {
+        &.auto-height {
+            --height: auto;
         }
     }
 }
