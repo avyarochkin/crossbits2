@@ -1,6 +1,6 @@
 import { Point, BoardSide, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game.interface'
 import { GameProvider } from './game'
-import { HintCell } from './hints.interface'
+import { HintCell, HintPoint } from './hints.interface'
 import { LineSolver } from './solver'
 
 export abstract class Hints {
@@ -58,12 +58,49 @@ export abstract class Hints {
     */
     abstract setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL)
 
+    /*
+    Should return the highest index in the selected hint line, which value can
+    be edited. Usually this is the index of the first zero-value element in this
+    hint line or index of he last element if all elements have non-zero values.
+    */
+    getMaxEditableIndexAt(lineIndex: number): number {
+        return Math.min(
+            this.hints[lineIndex].length,
+            this.getMaxIndexInLine() - 1
+        )
+    }
+
     getMaxIndexInLine(): number {
         const maxIndexInLine = Math.floor((this.getBoardLength() + 1) / 2)
         return Math.min(
             this.getLongestLineLength() + ((this.game.boardStatus === GAME_STATUS.SETUP) ? 1 : 0),
             maxIndexInLine
         )
+    }
+
+    /*
+    Should return a numeric hint value at the given position.
+    */
+    getValueAtHintPos(pos: HintPoint): number {
+        const { x, y, side } = pos
+        const hintStr = this.getHintXY(x, y, side)
+        return (hintStr) ? parseInt(hintStr, 10) : 0
+    }
+
+    /*
+    Should return the number of "free" board cells along the given hint line
+    at the given position. The free cells are the cells not reserved by all
+    hint values along this line.
+    */
+    getHintLineLeftTotal(pos: HintPoint): number {
+        const { x, y } = pos
+        const hintLine = this.getHintLineXY(x, y)
+        const selectedValue = this.getValueAtHintPos(pos)
+        const usedTotal = hintLine
+            .reduce((prev, curr) => prev + curr.hint, 0)
+            + hintLine.length
+            - (selectedValue > 0 ? selectedValue + 1 : 0)
+        return Math.max(this.getBoardLength() - usedTotal, 0)
     }
 
     checkLine(lineIndex: number) {
@@ -111,6 +148,8 @@ export abstract class Hints {
     abstract setHintXY(x: number, y: number, side: BoardSide, value: string | null): Point
     abstract getHintLineXY(x: number, y: number): HintCell[]
 
+    abstract nextEditableHintPos(pos: HintPoint): Point
+    abstract previousEditableHintPos(pos: HintPoint): Point
 
     solveLine(lineIndex: number) {
         this.solver.solveLine(this, lineIndex)
@@ -174,6 +213,64 @@ export class ColumnHints extends Hints  {
     getHintLineXY(x: number): HintCell[] {
         return this.hints[x]
     }
+
+    nextEditableHintPos(pos: HintPoint): Point {
+        const { x, y } = pos
+        const minIndex = 0
+        const maxIndex = this.getMaxIndexInLine() - 1
+        const hintsWidth = this.hints.length
+        switch (pos.side) {
+            case BOARD_SIDE.BOTTOM:
+                if (y < this.getMaxEditableIndexAt(x)) {
+                    return { x, y: y + 1 }
+                } else if (x < hintsWidth - 1) {
+                    return { x: x + 1, y: minIndex }
+                } else {
+                    return { x: 0, y: minIndex }
+                }
+
+            case BOARD_SIDE.TOP:
+                if (y > maxIndex - this.getMaxEditableIndexAt(x)) {
+                    return { x, y: y - 1 }
+                } else if (x < hintsWidth - 1) {
+                    return { x: x + 1, y: maxIndex }
+                } else {
+                    return { x: 0, y: maxIndex }
+                }
+
+            default:
+                return pos
+        }
+    }
+
+    previousEditableHintPos(pos: HintPoint): Point {
+        const { x, y } = pos
+        const minIndex = 0
+        const maxIndex = this.getMaxIndexInLine() - 1
+        const hintsWidth = this.hints.length
+        switch (pos.side) {
+            case BOARD_SIDE.BOTTOM:
+                if (y > minIndex) {
+                    return { x, y: y - 1 }
+                } else if (x > 0) {
+                    return { x: x - 1, y: this.getMaxEditableIndexAt(x - 1) }
+                } else {
+                    return { x: hintsWidth - 1, y: this.getMaxEditableIndexAt(hintsWidth - 1) }
+                }
+
+            case BOARD_SIDE.TOP:
+                if (y < maxIndex) {
+                    return { x, y: y + 1 }
+                } else if (x > 0) {
+                    return { x: x - 1, y: maxIndex - this.getMaxEditableIndexAt(x - 1) }
+                } else {
+                    return { x: hintsWidth - 1, y: maxIndex - this.getMaxEditableIndexAt(hintsWidth - 1) }
+                }
+
+            default:
+                return pos
+        }
+    }
 }
 
 
@@ -232,5 +329,63 @@ export class RowHints extends Hints {
 
     getHintLineXY(x: number, y: number): HintCell[] {
         return this.hints[y]
+    }
+
+    nextEditableHintPos(pos: HintPoint): Point {
+        const { x, y } = pos
+        const minIndex = 0
+        const maxIndex = this.getMaxIndexInLine() - 1
+        const hintsWidth = this.hints.length
+        switch (pos.side) {
+            case BOARD_SIDE.RIGHT:
+                if (x < this.getMaxEditableIndexAt(y)) {
+                    return { x: x + 1, y }
+                } else if (y < hintsWidth - 1) {
+                    return { x: minIndex, y: y + 1 }
+                } else {
+                    return { x: minIndex, y: 0 }
+                }
+
+            case BOARD_SIDE.LEFT:
+                if (x > maxIndex - this.getMaxEditableIndexAt(y)) {
+                    return { x: x - 1, y }
+                } else if (y < hintsWidth - 1) {
+                    return { x: maxIndex, y: y + 1 }
+                } else {
+                    return { x: maxIndex, y: 0 }
+                }
+
+            default:
+                return pos
+        }
+    }
+
+    previousEditableHintPos(pos: HintPoint): Point {
+        const { x, y } = pos
+        const minIndex = 0
+        const maxIndex = this.getMaxIndexInLine() - 1
+        const hintsWidth = this.hints.length
+        switch (pos.side) {
+            case BOARD_SIDE.RIGHT:
+                if (x > minIndex) {
+                    return { x: x - 1, y }
+                } else if (y > 0) {
+                    return { x: this.getMaxEditableIndexAt(y - 1), y: y - 1 }
+                } else {
+                    return { x: this.getMaxEditableIndexAt(hintsWidth - 1), y: hintsWidth - 1 }
+                }
+
+            case BOARD_SIDE.LEFT:
+                if (x < maxIndex) {
+                    return { x: x + 1, y }
+                } else if (y > 0) {
+                    return { x: maxIndex - this.getMaxEditableIndexAt(y - 1), y: y - 1 }
+                } else {
+                    return { x: maxIndex - this.getMaxEditableIndexAt(hintsWidth - 1), y: hintsWidth - 1 }
+                }
+
+            default:
+                return pos
+        }
     }
 }

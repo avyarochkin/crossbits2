@@ -5,6 +5,7 @@ import { GameProvider } from 'src/providers/game/game'
 import {
     BOARD_CELL, BOARD_PART, BOARD_SIDE, BoardSide, CELLS_IN_GROUP, CELL_SIZE, GAME_STATUS
 } from 'src/providers/game/game.interface'
+import { HintPoint } from 'src/providers/game/hints.interface'
 
 const PRESS_TIME_MSEC = 500
 
@@ -15,12 +16,6 @@ interface SolvePos {
     x?: number
     y?: number
     kind: string
-}
-
-interface HintPoint {
-    x: number
-    y: number
-    side: BoardSide
 }
 
 @Component({

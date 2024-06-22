@@ -4,6 +4,7 @@ import { GestureController, GestureDetail, ModalController } from '@ionic/angula
 import { BOARD_PART, BOARD_SIDE, BoardSide } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
 import { Hints } from 'src/providers/game/hints'
+import { HintPoint } from 'src/providers/game/hints.interface'
 import { HintPickerPage } from 'src/pages/hint-picker/hint-picker.page'
 import { BoardCanvasComponent } from './board-canvas'
 
@@ -55,30 +56,21 @@ export class SetupBoardCanvasComponent extends BoardCanvasComponent {
         this.hintPos = { x: x, y: y, side: side }
         this.paint()
 
-        const hintStr = hints.getHintXY(x, y, side)
-        const selectedValue = (hintStr) ? parseInt(hintStr, 10) : 0
-        const hintLine = hints.getHintLineXY(x, y)
-        const usedTotal = hintLine
-            .reduce((prev, curr) => prev + curr.hint, 0)
-            + hintLine.length
-            - (selectedValue > 0 ? selectedValue + 1 : 0)
-        const leftTotal = Math.max(hints.getBoardLength() - usedTotal, 0)
-
         const modal = await this.modalCtrl.create({
             component: HintPickerPage,
             breakpoints: [0, 1],
             initialBreakpoint: 1,
             cssClass: 'auto-height',
             componentProps: {
-                selectedHint: selectedValue,
-                hintCount: leftTotal
+                hints,
+                hintPos: this.hintPos,
+                onChange: (hintPos: HintPoint) => {
+                    this.hintPos = hintPos
+                    this.paint()
+                }
             }
         })
-        void modal.onWillDismiss().then(detail => {
-            if (detail.role === 'select') {
-                const value = detail.data! as number
-                hints.setHintXY(x, y, side, value > 0 ? value.toString() : null)
-            }
+        void modal.onWillDismiss().then(() => {
             this.hintPos = null
             this.paint()
         })

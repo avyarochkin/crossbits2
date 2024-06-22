@@ -4,6 +4,22 @@
     margin-bottom: var(--ion-safe-area-bottom);
     height: auto;
     background: var(--ion-color-semi-dark);
+    ion-toolbar {
+        --background: transparent;
+        --ion-toolbar-color: var(--ion-color-medium);
+        --padding-top: 0;
+        --padding-bottom: 1rem;
+        --padding-start: 0;
+        --padding-end: 0;
+        padding: 0;
+        ion-button {
+            --border-width: 1px;
+            &.activated {
+                --background: var(--ion-color-medium);
+                --ion-toolbar-color: var(--ion-color-lightest);
+            }
+        }
+    }
 }
 :host .hint-button {
     margin: 0.5rem 0.5%;
