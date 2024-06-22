@@ -42,7 +42,7 @@ export class HintPickerPage implements OnInit {
     protected async selectHint(value: number) {
         const valueStr = value > 0 ? value.toString() : null
         const { x, y, side } = this.hintPos
-        this.updateHintPos(this.hints.setHintXY(x, y, side, valueStr))
+        this.updateHintPos(this.hints.setHintAt({ x, y, side }, valueStr))
 
         if (this.autoAdvance) {
             this.nextHintPos()
@@ -66,9 +66,9 @@ export class HintPickerPage implements OnInit {
     }
 
     private updatePage() {
-        this.selectedHint = this.hints.getValueAtHintPos(this.hintPos)
+        this.selectedHint = this.hints.getHintValueAt(this.hintPos)
 
-        const hintLineLeftTotal = this.hints.getHintLineLeftTotal(this.hintPos)
+        const hintLineLeftTotal = this.hints.getHintLineLeftTotalAt(this.hintPos)
         this.buttonIndexes = Array.from(
             { length: hintLineLeftTotal + 1 },
             (el, index) => index

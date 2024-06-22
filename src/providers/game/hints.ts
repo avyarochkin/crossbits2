@@ -1,4 +1,4 @@
-import { Point, BoardSide, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game.interface'
+import { Point, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game.interface'
 import { GameProvider } from './game'
 import { HintCell, HintPoint } from './hints.interface'
 import { LineSolver } from './solver'
@@ -81,9 +81,8 @@ export abstract class Hints {
     /*
     Should return a numeric hint value at the given position.
     */
-    getValueAtHintPos(pos: HintPoint): number {
-        const { x, y, side } = pos
-        const hintStr = this.getHintXY(x, y, side)
+    getHintValueAt(pos: HintPoint): number {
+        const hintStr = this.getHintAt(pos)
         return (hintStr) ? parseInt(hintStr, 10) : 0
     }
 
@@ -92,10 +91,9 @@ export abstract class Hints {
     at the given position. The free cells are the cells not reserved by all
     hint values along this line.
     */
-    getHintLineLeftTotal(pos: HintPoint): number {
-        const { x, y } = pos
-        const hintLine = this.getHintLineXY(x, y)
-        const selectedValue = this.getValueAtHintPos(pos)
+    getHintLineLeftTotalAt(pos: HintPoint): number {
+        const hintLine = this.getHintLineAt(pos)
+        const selectedValue = this.getHintValueAt(pos)
         const usedTotal = hintLine
             .reduce((prev, curr) => prev + curr.hint, 0)
             + hintLine.length
@@ -144,9 +142,9 @@ export abstract class Hints {
         return this.hints
     }
 
-    abstract getHintXY(x: number, y: number, side: BoardSide): string
-    abstract setHintXY(x: number, y: number, side: BoardSide, value: string | null): Point
-    abstract getHintLineXY(x: number, y: number): HintCell[]
+    abstract getHintAt(pos: HintPoint): string
+    abstract setHintAt(pos: HintPoint, value: string | null): Point
+    abstract getHintLineAt(pos: Point): HintCell[]
 
     abstract nextEditableHintPos(pos: HintPoint): Point
     abstract previousEditableHintPos(pos: HintPoint): Point
@@ -172,32 +170,35 @@ export class ColumnHints extends Hints  {
         this.game.rowHints.checkLine(indexInLine)
     }
 
-    getHintXY(x: number, y: number, side: BoardSide): string {
-        if (side === BOARD_SIDE.TOP) {
-            y -= this.getMaxIndexInLine() - this.hints[x].length
+    getHintAt(pos: HintPoint): string {
+        let y = pos.y
+        if (pos.side === BOARD_SIDE.TOP) {
+            y -= this.getMaxIndexInLine() - this.hints[pos.x].length
         }
-        return this.getHint(x, y)
+        return this.getHint(pos.x, y)
     }
 
-    setHintXY(x: number, y: number, side: BoardSide, value: string): Point {
-        const result = { x: x, y: y }
+    setHintAt(pos: HintPoint, value: string): Point {
+        const x = pos.x
+        let y = pos.y
+        const newPos = { x, y }
         let last = false
 
-        if (side === BOARD_SIDE.TOP) {
+        if (pos.side === BOARD_SIDE.TOP) {
             y -= this.getMaxIndexInLine() - this.hints[x].length
             if (y < 0) {
                 this.hints[x].splice(0, 0, { hint: 0 })
                 y = 0
             }
             last = (!y)
-            result.y = y + this.getMaxIndexInLine() - this.hints[x].length
+            newPos.y = y + this.getMaxIndexInLine() - this.hints[x].length
         } else {
             if (y >= this.hints[x].length) {
                 this.hints[x].push({ hint: 0 })
                 y = this.hints[x].length - 1
             }
             last = (y === this.hints[x].length - 1)
-            result.y = y
+            newPos.y = y
         }
 
         if (value) {
@@ -207,11 +208,11 @@ export class ColumnHints extends Hints  {
         }
         this.game.setBoardSize()
 
-        return result
+        return newPos
     }
 
-    getHintLineXY(x: number): HintCell[] {
-        return this.hints[x]
+    getHintLineAt(pos: Point): HintCell[] {
+        return this.hints[pos.x]
     }
 
     nextEditableHintPos(pos: HintPoint): Point {
@@ -289,32 +290,35 @@ export class RowHints extends Hints {
         this.game.columnHints.checkLine(indexInLine)
     }
 
-    getHintXY(x: number, y: number, side: BoardSide): string {
-        if (side === BOARD_SIDE.LEFT) {
-            x -= this.getMaxIndexInLine() - this.hints[y].length
+    getHintAt(pos: HintPoint): string {
+        let x = pos.x
+        if (pos.side === BOARD_SIDE.LEFT) {
+            x -= this.getMaxIndexInLine() - this.hints[pos.y].length
         }
-        return this.getHint(y, x)
+        return this.getHint(pos.y, x)
     }
 
-    setHintXY(x: number, y: number, side: BoardSide, value: string): Point {
-        const result = { x: x, y: y }
+    setHintAt(pos: HintPoint, value: string): Point {
+        let x = pos.x
+        const y = pos.y
+        const newPos = { x, y }
         let last = false
 
-        if (side === BOARD_SIDE.LEFT) {
+        if (pos.side === BOARD_SIDE.LEFT) {
             x -= this.getMaxIndexInLine() - this.hints[y].length
             if (x < 0) {
                 this.hints[y].splice(0, 0, { hint: 0 })
                 x = 0
             }
             last = (!x)
-            result.x = x + this.getMaxIndexInLine() - this.hints[y].length
+            newPos.x = x + this.getMaxIndexInLine() - this.hints[y].length
         } else {
             if (x >= this.hints[y].length) {
                 this.hints[y].push({ hint: 0 })
                 x = this.hints[y].length - 1
             }
             last = (x === this.hints[y].length - 1)
-            result.x = x
+            newPos.x = x
         }
 
         if (value) {
@@ -324,11 +328,11 @@ export class RowHints extends Hints {
         }
         this.game.setBoardSize()
 
-        return result
+        return newPos
     }
 
-    getHintLineXY(x: number, y: number): HintCell[] {
-        return this.hints[y]
+    getHintLineAt(pos: Point): HintCell[] {
+        return this.hints[pos.y]
     }
 
     nextEditableHintPos(pos: HintPoint): Point {

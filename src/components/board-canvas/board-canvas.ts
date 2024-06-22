@@ -238,7 +238,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
                 ctx.fillStyle = this.game.columnHints.matching[x] ? this.colors.lightest : this.colors.ultraLight
                 // cell text
-                const topHint = this.game.columnHints.getHintXY(x, y, BOARD_SIDE.TOP)
+                const topHint = this.game.columnHints.getHintAt({ x, y, side: BOARD_SIDE.TOP })
                 if (topHint) {
                     ctx.fillText(
                         topHint,
@@ -246,7 +246,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
                         y * CELL_SIZE + halfCellSize
                     )
                 }
-                const bottomHint = this.game.columnHints.getHintXY(x, y, BOARD_SIDE.BOTTOM)
+                const bottomHint = this.game.columnHints.getHintAt({ x, y, side: BOARD_SIDE.BOTTOM })
                 if (bottomHint) {
                     ctx.fillText(
                         bottomHint,
@@ -322,7 +322,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
                 ctx.fillStyle = this.game.rowHints.matching[y] ? this.colors.lightest : this.colors.ultraLight
                 // cell text
-                const leftHint = this.game.rowHints.getHintXY(x, y, BOARD_SIDE.LEFT)
+                const leftHint = this.game.rowHints.getHintAt({ x, y, side: BOARD_SIDE.LEFT })
                 if (leftHint) {
                     ctx.fillText(
                         leftHint,
@@ -330,7 +330,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
                         pxColHintHeight + y * CELL_SIZE + halfCellSize
                     )
                 }
-                const rightHint = this.game.rowHints.getHintXY(x, y, BOARD_SIDE.RIGHT)
+                const rightHint = this.game.rowHints.getHintAt({ x, y, side: BOARD_SIDE.RIGHT })
                 if (rightHint) {
                     ctx.fillText(
                         rightHint,

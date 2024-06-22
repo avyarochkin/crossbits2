@@ -101,12 +101,12 @@ describe('Hints', () => {
         })
 
         it('should get hint string for top side', () => {
-            const hintXY = columnHints.getHintXY(0, 0, BOARD_SIDE.TOP)
+            const hintXY = columnHints.getHintAt({ x: 0, y: 0, side: BOARD_SIDE.TOP })
             expect(hintXY).toEqual('1')
         })
 
         it('should get hint string for bottom side', () => {
-            const hintXY = columnHints.getHintXY(0, 1, BOARD_SIDE.BOTTOM)
+            const hintXY = columnHints.getHintAt({ x: 0, y: 1, side: BOARD_SIDE.BOTTOM })
             expect(hintXY).toEqual('2')
         })
     })
@@ -142,12 +142,12 @@ describe('Hints', () => {
         })
 
         it('should get hint string for left side', () => {
-            const hintXY = rowHints.getHintXY(0, 0, BOARD_SIDE.LEFT)
+            const hintXY = rowHints.getHintAt({ x: 0, y: 0, side: BOARD_SIDE.LEFT })
             expect(hintXY).toEqual('1')
         })
 
         it('should get hint string for right side', () => {
-            const hintXY = rowHints.getHintXY(0, 1, BOARD_SIDE.RIGHT)
+            const hintXY = rowHints.getHintAt({ x: 0, y: 1, side: BOARD_SIDE.RIGHT })
             expect(hintXY).toEqual('2')
         })
     })
