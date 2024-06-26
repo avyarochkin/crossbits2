@@ -44,7 +44,7 @@
                         *ngFor="let board of stageBoards"
                         (click)="loadGame(board)">
                         <div class="board-num">{{ board.nr }}</div>
-                        <span>{{ board.boardData[0].length }}&times;{{ board.boardData.length }}</span>
+                        <span>{{ board.columnHints.hints.length }}&times;{{ board.rowHints.hints.length }}</span>
                         <ion-icon name="trophy-outline" class="board-flag" *ngIf="board.solved"></ion-icon>
                     </button>
                     <button class="stage-board new editable" [class.editing]="editing" *ngIf="i === allBoards.length - 1 && editing" (click)="createGame()">

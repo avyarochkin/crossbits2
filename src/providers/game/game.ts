@@ -3,7 +3,7 @@ import { LocalStorageProvider } from '../local-storage/local-storage'
 import { STATIC_BOARDS } from './data'
 import {
     BOARD_CELL, BOARD_KEY, Board, BoardData, BoardDataItem, CELLS_IN_GROUP, CELL_SIZE,
-    GAME_STATUS, Point, SOLVED_KEY, SavedBoardData, SerializedBoard
+    GAME_STATUS, Point, SOLVED_KEY, SerializedBoardData, SerializedBoard
 } from './game.interface'
 import { ColumnHints, RowHints } from './hints'
 import { UndoStack } from './undo-stack'
@@ -25,7 +25,7 @@ export class GameProvider {
         this.undoStack = new UndoStack(this)
 
         // initialize all static boards
-        this.initAllBoards()
+        this.initAllStaticBoards()
         // append saved boards to static boards
         this.loadSavedBoards()
     }
@@ -35,32 +35,43 @@ export class GameProvider {
 
     sourceBoard?: Board
     savedBoardIndex = 0
+    savedBoardNr: string
     boardStatus: GAME_STATUS = GAME_STATUS.OVER
     boardSize: Point = { x: 0, y: 0 }
 
     boardData: BoardData = []
 
+    /**
+     * Loads the data of custom boards at the time of initialization
+     */
     loadSavedBoards() {
-        let index = 0
-        while (true) {
-            const board = this.localStorage.getObject(BOARD_KEY.concat(index.toString())) as SerializedBoard
+        let outOfBoards = false
+        for (let index = 0; !outOfBoards; index++) {
+            const board = this.localStorage.getObject<Board>(this.getBoardNameKey(index))
             if (board != null) {
+                const savedData = this.localStorage.getObject<SerializedBoardData>(this.getBoardDataKey(board.nr))
+                if (savedData != null) {
+                    board.boardData = savedData.boardData
+                    board.solved = savedData.solved
+                }
                 this.savedBoards.push(board)
-                index++
             } else {
-                break
+                outOfBoards = true
             }
         }
         this.allBoards.push(this.savedBoards as Board[])
     }
 
-    boardDataToObject(): Record<string, SavedBoardData> {
+    /**
+     * Loads board solutions for the backup to a file
+     */
+    boardDataToObject(): Record<string, SerializedBoardData> {
         const result = {}
         STATIC_BOARDS.forEach(stage =>
             stage
                 .map(board => ({
                     nr: board.nr,
-                    savedData: this.localStorage.getObject(SOLVED_KEY.concat(board.nr)) as SavedBoardData
+                    savedData: this.localStorage.getObject<SerializedBoardData>(this.getBoardDataKey(board.nr))
                 }))
                 .filter(({ savedData }) => savedData != null)
                 .forEach(({ nr, savedData }) => {
@@ -70,26 +81,19 @@ export class GameProvider {
         return result
     }
 
-    initAllBoards() {
+    initAllStaticBoards() {
         this.allBoards = STATIC_BOARDS.map((stage) => {
             return stage.map((board) => {
                 let boardData: BoardData = []
                 let boardSolved = false
-                const width = board.columnHintData.length
-                const height = board.rowHintData.length
 
-                const savedData = this.localStorage.getObject(SOLVED_KEY.concat(board.nr)) as SavedBoardData
+                const savedData = this.localStorage.getObject<SerializedBoardData>(this.getBoardDataKey(board.nr))
 
                 if (savedData != null) {
                     boardData = savedData.boardData
                     boardSolved = savedData.solved
                 } else {
-                    for (let y = 0; y < height; y++) {
-                        boardData.push(new Array<BoardDataItem>())
-                        for (let x = 0; x < width; x++) {
-                            boardData[y].push({ value: BOARD_CELL.NIL })
-                        }
-                    }
+                    this.initBoardData(boardData, board.columnHintData.length, board.rowHintData.length)
                 }
 
                 const columnHints = new ColumnHints(this)
@@ -104,9 +108,9 @@ export class GameProvider {
 
                 return {
                     nr: board.nr,
-                    boardData: boardData,
-                    columnHints: columnHints,
-                    rowHints: rowHints,
+                    boardData,
+                    columnHints,
+                    rowHints,
                     static: true,
                     solved: boardSolved
                 }
@@ -167,14 +171,14 @@ export class GameProvider {
 
     saveBoard() {
         if (this.sourceBoard == null) { return }
-        this.localStorage.setObject(SOLVED_KEY.concat(this.sourceBoard.nr), {
+        this.localStorage.setObject(this.getBoardDataKey(this.sourceBoard.nr, this.savedBoardIndex), {
             boardData: this.sourceBoard.boardData,
             solved: this.sourceBoard.solved
         })
     }
 
-    saveBoardData(nr: string, data: SavedBoardData) {
-        this.localStorage.setObject(SOLVED_KEY.concat(nr), data)
+    saveBoardData(nr: string, data: SerializedBoardData) {
+        this.localStorage.setObject(this.getBoardDataKey(nr), data)
     }
 
     resetBoard(width?: number, height?: number) {
@@ -182,12 +186,7 @@ export class GameProvider {
         const boardHeight = height ?? this.boardData.length
 
         this.boardData.splice(0, this.boardData.length)
-        for (let y = 0; y < boardHeight; y++) {
-            this.boardData.push(new Array<BoardDataItem>())
-            for (let x = 0; x < boardWidth; x++) {
-                this.boardData[y].push({ value: BOARD_CELL.NIL })
-            }
-        }
+        this.initBoardData(this.boardData, boardWidth, boardHeight)
         this.columnHints.reset()
         this.rowHints.reset()
         this.undoStack.reset()
@@ -203,6 +202,7 @@ export class GameProvider {
         this.sourceBoard = undefined
         this.boardData = []
         this.savedBoardIndex = this.savedBoards.length
+        this.savedBoardNr = this.newSavedBoardNr()
         this.boardStatus = status
         this.columnHints.init(width)
         this.rowHints.init(height)
@@ -212,8 +212,14 @@ export class GameProvider {
 
     initFromSaved(board: Board, status: GAME_STATUS) {
         this.sourceBoard = board
-        this.boardData = board.boardData
+        if (board.boardData.length === 0) {
+            const boardWidth = board.columnHints.hints.length
+            const boardHeight = board.rowHints.hints.length
+            this.initBoardData(this.sourceBoard.boardData, boardWidth, boardHeight)
+        }
+        this.boardData = this.sourceBoard.boardData
         this.savedBoardIndex = this.savedBoards.indexOf(board)
+        this.savedBoardNr = board.nr
         this.boardStatus = status
         // TODO should go to ColumnHints and RowHints
         this.columnHints.assign(board.columnHints)
@@ -243,27 +249,48 @@ export class GameProvider {
 
     saveCurrentBoard() {
         const board: SerializedBoard = {
-            boardData: this.boardData,
+            nr: this.savedBoardNr,
+            boardData: [],
             columnHints: { hints: this.columnHints.getHints() },
             rowHints: { hints: this.rowHints.getHints() },
             static: false
         }
-        this.localStorage.setObject(`${BOARD_KEY}${this.savedBoardIndex}`, board)
-        if (this.savedBoardIndex < this.savedBoards.length) {
-            this.savedBoards[this.savedBoardIndex] = board
-        } else {
-            this.savedBoards.push(board)
-        }
+        this.localStorage.setObject(this.getBoardNameKey(this.savedBoardIndex), board)
+        this.savedBoards[this.savedBoardIndex] = board
     }
 
     deleteCurrentBoard() {
         for (let i = this.savedBoardIndex + 1; i < this.savedBoards.length; i++) {
             if (!this.savedBoards[i].static) {
-                this.localStorage.setObject(`${BOARD_KEY}${i - 1}`, this.savedBoards[i])
+                this.localStorage.setObject(this.getBoardNameKey(i - 1), this.savedBoards[i])
             }
         }
-        this.localStorage.delete(`${BOARD_KEY}${this.savedBoards.length - 1}`)
+        this.localStorage.delete(this.getBoardNameKey(this.savedBoards.length - 1))
         this.savedBoards.splice(this.savedBoardIndex, 1)
+    }
+
+    private getBoardDataKey(nr: string, index?: number) {
+        return nr != null ? `${SOLVED_KEY}${nr}` : `${SOLVED_KEY}0.${index}`
+    }
+
+    private getBoardNameKey(index: number) {
+        return `${BOARD_KEY}${index}`
+    }
+
+    private newSavedBoardNr() {
+        const maxMinorNumber = this.savedBoards
+            .map(board => Number(board.nr?.replace('0.', '')))
+            .reduce((prev, curr) => Math.max(prev, curr), 0)
+        return `0.${maxMinorNumber + 1}`
+    }
+
+    private initBoardData(boardData: BoardData, width: number, height: number) {
+        for (let y = 0; y < height; y++) {
+            boardData.push(new Array<BoardDataItem>())
+            for (let x = 0; x < width; x++) {
+                boardData[y].push({ value: BOARD_CELL.NIL })
+            }
+        }
     }
 }
 

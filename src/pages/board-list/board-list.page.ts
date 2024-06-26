@@ -3,7 +3,7 @@ import {
     NavController, PickerController, PickerColumnOption, ActionSheetController, AlertController, AlertOptions
 } from '@ionic/angular'
 
-import { GAME_STATUS, Board, SavedBoardData } from 'src/providers/game/game.interface'
+import { GAME_STATUS, Board, SerializedBoardData } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
 import { OverlayEventDetail } from '@ionic/core'
 
@@ -138,7 +138,7 @@ export class BoardListPage {
 
     private saveBoardDataFromTextFile(data: string) {
         if (data == null) { return }
-        const dataObject = JSON.parse(data) as Record<string, SavedBoardData>
+        const dataObject = JSON.parse(data) as Record<string, SerializedBoardData>
         Object.entries(dataObject)
             .forEach(([key, value]) => this.game.saveBoardData(key, value))
         window.location.reload()

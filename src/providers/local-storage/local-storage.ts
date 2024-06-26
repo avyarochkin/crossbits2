@@ -11,16 +11,17 @@ export class LocalStorageProvider {
         window.localStorage[key] = value
     }
 
-    setObject(key: string, value: object) {
+    setObject<T extends object = object>(key: string, value: T) {
         window.localStorage[key] = JSON.stringify(value)
     }
 
-    getObject(key: string): object | null {
+    getObject<T extends object = object>(key: string): T | null {
         const str = window.localStorage[key] as string
         return (str !== undefined)
-            ? JSON.parse(str) as object
+            ? JSON.parse(str) as T
             : null
     }
+
     delete(key: string) {
         window.localStorage.removeItem(key)
     }

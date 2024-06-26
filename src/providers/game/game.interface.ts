@@ -52,12 +52,13 @@ export interface Board {
     solved?: boolean
 }
 
-export interface SavedBoardData {
+export interface SerializedBoardData {
     boardData: BoardData
     solved: boolean
 }
 
 export interface SerializedBoard {
+    nr: string
     boardData: BoardData
     columnHints: {
         hints: HintCell[][]
