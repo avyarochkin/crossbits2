@@ -10,6 +10,14 @@ import { OverlayEventDetail } from '@ionic/core'
 const MIN_BOARD_SIZE = 2
 const DEF_BOARD_SIZE = 5
 const MAX_BOARD_SIZE = 50
+const ROLES = {
+    APPLY: 'apply',
+    CONFIRM: 'confirm',
+    CANCEL: 'cancel',
+    BACKUP_DATA: 'backup-data',
+    RESTORE_DATA: 'restore-data',
+    BACKUP_CUSTOM_BOARDS: 'backup-custom-boards'
+}
 
 @Component({
     selector: 'page-board-list',
@@ -63,12 +71,12 @@ export class BoardListPage {
                 options: getPickerColumnOptions()
             }],
             buttons: [
-                { role: 'cancel', text: 'CANCEL' },
-                { role: 'apply', text: 'OK' }
+                { role: ROLES.CANCEL, text: 'CANCEL' },
+                { role: ROLES.APPLY, text: 'OK' }
             ]
         })
         void picker.onDidDismiss<{ x: PickerColumnOption; y: PickerColumnOption }>().then(async ({ role, data }) => {
-            if (role === 'apply') {
+            if (role === ROLES.APPLY) {
                 this.game.initWithSize(data!.x.value as number, data!.y.value as number, GAME_STATUS.SETUP)
                 // game will be initialized on the next page
                 await this.navCtrl.navigateForward('/board')
@@ -82,17 +90,21 @@ export class BoardListPage {
         const actionSheet = await this.actionSheetCtrl.create({
             header: 'Settings',
             buttons: [
-                { role: 'backup', text: 'Backup data' },
-                { role: 'restore', text: 'Restore data' }
+                { role: ROLES.BACKUP_DATA, text: 'Backup data' },
+                { role: ROLES.RESTORE_DATA, text: 'Restore data' },
+                { role: ROLES.BACKUP_CUSTOM_BOARDS, text: 'Backup custom boards' }
             ]
         })
         void actionSheet.onDidDismiss().then(({ role }) => {
             switch (role) {
-                case 'backup':
+                case ROLES.BACKUP_DATA:
                     this.backupData()
                     break
-                case 'restore':
+                case ROLES.RESTORE_DATA:
                     this.restoreData()
+                    break
+                case ROLES.BACKUP_CUSTOM_BOARDS:
+                    this.backupSavedBoards()
                     break
                 default:
             }
@@ -101,12 +113,13 @@ export class BoardListPage {
     }
 
     backupData() {
-        const downloadAnchor = document.getElementById('downloadAnchor') as HTMLAnchorElement
         const data = JSON.stringify(this.game.boardDataToObject(), null, 2)
-        const file = new Blob([data], { type: 'text/plain' })
-        downloadAnchor.href = URL.createObjectURL(file)
-        downloadAnchor.download = 'crossbits.json'
-        downloadAnchor.click()
+        this.saveToFile(data, 'crossbits.json')
+    }
+
+    backupSavedBoards() {
+        const data = JSON.stringify(this.game.savedBoards, null, 2)
+        this.saveToFile(data, 'custom-boards.json')
     }
 
     restoreData() {
@@ -117,11 +130,11 @@ export class BoardListPage {
                 header: 'Are you sure?',
                 subHeader: 'This operation will overwrite all saved data',
                 buttons: [
-                    { role: 'confirm', text: 'YES' },
-                    { role: 'cancel', text: 'NO' }
+                    { role: ROLES.CONFIRM, text: 'YES' },
+                    { role: ROLES.CANCEL, text: 'NO' }
                 ]
             })
-            if (response.role === 'confirm') {
+            if (response.role === ROLES.CONFIRM) {
                 this.doRestoreData((event.target as HTMLInputElement)?.files?.[0])
             }
         }
@@ -134,6 +147,14 @@ export class BoardListPage {
         reader.onload = (event) => this.saveBoardDataFromTextFile(event.target?.result as string)
         reader.readAsText(file)
 
+    }
+
+    private saveToFile(data: string, name: string) {
+        const downloadAnchor = document.getElementById('downloadAnchor') as HTMLAnchorElement
+        const file = new Blob([data], { type: 'text/plain' })
+        downloadAnchor.href = URL.createObjectURL(file)
+        downloadAnchor.download = name
+        downloadAnchor.click()
     }
 
     private saveBoardDataFromTextFile(data: string) {

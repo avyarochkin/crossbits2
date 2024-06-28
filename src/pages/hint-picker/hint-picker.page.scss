@@ -34,4 +34,9 @@
         --color: var(--ion-color-dark);
         --background: var(--ion-color-light);
     }
+    &.button-disabled {
+        --background: var(--ion-color-medium);
+        --color: var(--ion-color-semi-dark);
+        opacity: 0.25;
+    }
 }

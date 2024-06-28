@@ -20,7 +20,7 @@ export class HintPickerPage implements OnInit {
 
     protected selectedHint: number
 
-    protected buttonIndexes: number[]
+    protected enabledButtons: boolean[]
 
     protected autoAdvance = false
 
@@ -69,9 +69,10 @@ export class HintPickerPage implements OnInit {
         this.selectedHint = this.hints.getHintValueAt(this.hintPos)
 
         const hintLineLeftTotal = this.hints.getHintLineLeftTotalAt(this.hintPos)
-        this.buttonIndexes = Array.from(
-            { length: hintLineLeftTotal + 1 },
-            (el, index) => index
+        const hintLineTotal = this.hints.getBoardLength()
+        this.enabledButtons = Array.from(
+            { length: hintLineTotal + 1 },
+            (el, index) => index <= hintLineLeftTotal
         )
 
         if (this.onChange != null) {

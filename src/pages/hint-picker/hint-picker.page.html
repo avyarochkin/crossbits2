@@ -23,8 +23,9 @@
     </ion-toolbar>
 
     <ion-button class="hint-button" shape="round"
-        *ngFor="let index of buttonIndexes"
+        *ngFor="let enabled of enabledButtons; let index = index"
         [class.selected]="index === selectedHint"
+        [disabled]="!enabled"
         (click)="selectHint(index)">
         {{ index }}
     </ion-button>
