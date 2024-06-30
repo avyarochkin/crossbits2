@@ -1,4 +1,4 @@
-import { LineSolver } from './solver'
+import { LineSolver } from './line-solver'
 import { Hints, RowHints } from './hints'
 import { GameProvider } from './game'
 import { HintCell } from './hints.interface'

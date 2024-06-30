@@ -20,6 +20,7 @@ export class BoardPage {
 
     zoom = 1
     minZoom = 1
+    solvingBoard = false
 
     constructor(
         public navCtrl: NavController,
@@ -36,7 +37,6 @@ export class BoardPage {
         const initZoomY = window.innerHeight / this.board.canvasRef.nativeElement.clientHeight
         this.zoom = Math.min(initZoomX, initZoomY, 1)
         this.minZoom = this.zoom
-        console.log(`Initial zoom: ${this.zoom}`)
     }
 
     async back() {
@@ -131,5 +131,14 @@ export class BoardPage {
             })
             await toast.present()
         }
+    }
+
+    async solveBoard() {
+        this.solvingBoard = true
+        await this.game.solveGame(() => {
+            this.board.update()
+        })
+        this.board.checkGameStatus()
+        this.solvingBoard = false
     }
 }

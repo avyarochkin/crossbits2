@@ -1,7 +1,7 @@
 import { Point, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game.interface'
 import { GameProvider } from './game'
 import { HintCell, HintPoint } from './hints.interface'
-import { LineSolver } from './solver'
+import { LineSolver } from './line-solver'
 
 export abstract class Hints {
 
@@ -55,8 +55,9 @@ export abstract class Hints {
     Should set the game board cell to the given value. The cell should be
     located via the hint lineIndex and the board indexInLine, which should be
     mapped to the board <x,y> exactly as in getBoardDataValue().
+    Should return **true** if the value got really changed
     */
-    abstract setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL)
+    abstract setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL): boolean
 
     /*
     Should return the highest index in the selected hint line, which value can
@@ -149,8 +150,8 @@ export abstract class Hints {
     abstract nextEditableHintPos(pos: HintPoint): Point
     abstract previousEditableHintPos(pos: HintPoint): Point
 
-    solveLine(lineIndex: number) {
-        this.solver.solveLine(this, lineIndex)
+    solveLine(lineIndex: number): number[] {
+        return this.solver.solveLine(this, lineIndex)
     }
 } // class Hints
 
@@ -165,9 +166,12 @@ export class ColumnHints extends Hints  {
         return this.game.boardData[indexInLine][lineIndex].value
     }
 
-    setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL) {
-        this.game.setBoardData(indexInLine, lineIndex, value)
-        this.game.rowHints.checkLine(indexInLine)
+    setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL): boolean {
+        const changedValue = this.game.setBoardData(indexInLine, lineIndex, value)
+        if (changedValue != null) {
+            this.game.rowHints.checkLine(indexInLine)
+        }
+        return changedValue != null
     }
 
     getHintAt(pos: HintPoint): string {
@@ -285,9 +289,12 @@ export class RowHints extends Hints {
         return this.game.boardData[lineIndex][indexInLine].value
     }
 
-    setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL) {
-        this.game.setBoardData(lineIndex, indexInLine, value)
-        this.game.columnHints.checkLine(indexInLine)
+    setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL): boolean {
+        const changedValue = this.game.setBoardData(lineIndex, indexInLine, value)
+        if (changedValue != null) {
+            this.game.columnHints.checkLine(indexInLine)
+        }
+        return changedValue != null
     }
 
     getHintAt(pos: HintPoint): string {

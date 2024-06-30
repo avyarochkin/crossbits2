@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core'
 import { Gesture, GestureController, GestureDetail } from '@ionic/angular'
 
 import { GameProvider } from 'src/providers/game/game'
@@ -23,6 +23,7 @@ interface SolvePos {
 })
 export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
+    @Output() readonly statusChange = new EventEmitter<GAME_STATUS>()
     @ViewChild('canvas', { static: true }) canvasRef: ElementRef<HTMLCanvasElement>
 
     solvePos: SolvePos | null
@@ -83,6 +84,19 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
     clear() {
         this.game.resetBoard()
         this.paint()
+    }
+
+    update() {
+        this.paint()
+    }
+
+    checkGameStatus() {
+        if (this.game.boardStatus === GAME_STATUS.OVER) {
+            this.game.finishBoard()
+            this.paint()
+            this.statusChange.emit(this.game.boardStatus)
+        }
+        this.game.saveBoard()
     }
 
     protected enableScroll(enable: boolean) {
@@ -175,7 +189,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // COLUMN HINTS
 
-        ctx.fillStyle = this.isSetup() ? this.colors.medium : this.colors.semiDark
+        ctx.fillStyle = this.isSetup() ? this.colors.light : this.colors.semiDark
         // common top and bottom rectangle
         ctx.fillRect(
             pxRowHintWidth,
@@ -217,7 +231,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             // add text and focus highlight for top and bottom hint cells in one common loop
             for (let y = 0; y < maxColHintY; y++) {
 
-                ctx.fillStyle = this.colors.light
+                ctx.fillStyle = this.colors.lightest
                 // focus highlights
                 if (this.hintPadAt(x, y, BOARD_SIDE.TOP)) {
                     ctx.fillRect(
@@ -236,7 +250,9 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
                     )
                 }
 
-                ctx.fillStyle = this.game.columnHints.matching[x] ? this.colors.lightest : this.colors.ultraLight
+                ctx.fillStyle = this.isSetup()
+                    ? this.colors.dark
+                    : this.game.columnHints.matching[x] ? this.colors.lightest : this.colors.ultraLight
                 // cell text
                 const topHint = this.game.columnHints.getHintAt({ x, y, side: BOARD_SIDE.TOP })
                 if (topHint) {
@@ -259,7 +275,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // ROW HINTS
 
-        ctx.fillStyle = this.isSetup() ? this.colors.medium : this.colors.semiDark
+        ctx.fillStyle = this.isSetup() ? this.colors.light : this.colors.semiDark
         // common left and right rectangle
         ctx.fillRect(
             0,
@@ -301,7 +317,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             // add text and focus highlight for left and right hint cells in one common loop
             for (let x = 0; x < maxRowHintX; x++) {
 
-                ctx.fillStyle = this.colors.light
+                ctx.fillStyle = this.colors.lightest
                 // focus highlights
                 if (this.hintPadAt(x, y, BOARD_SIDE.LEFT)) {
                     ctx.fillRect(
@@ -320,7 +336,9 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
                     )
                 }
 
-                ctx.fillStyle = this.game.rowHints.matching[y] ? this.colors.lightest : this.colors.ultraLight
+                ctx.fillStyle = this.isSetup()
+                    ? this.colors.dark
+                    : this.game.columnHints.matching[x] ? this.colors.lightest : this.colors.ultraLight
                 // cell text
                 const leftHint = this.game.rowHints.getHintAt({ x, y, side: BOARD_SIDE.LEFT })
                 if (leftHint) {
@@ -357,7 +375,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             for (let x = 0; x < this.game.boardData[y].length; x++) {
                 switch (this.game.boardData[y][x].value) {
                     case BOARD_CELL.ON:
-                        ctx.fillStyle = this.colors.light
+                        ctx.fillStyle = this.colors.ultraLight
                         break
                     case BOARD_CELL.OFF:
                         ctx.fillStyle = this.colors.dark

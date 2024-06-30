@@ -7,6 +7,7 @@ import {
 } from './game.interface'
 import { ColumnHints, RowHints } from './hints'
 import { UndoStack } from './undo-stack'
+import { GameSolver } from './game-solver'
 
 
 
@@ -132,6 +133,7 @@ export class GameProvider {
     }
 
     setBoardData(y: number, x: number, value: BOARD_CELL) {
+        if (this.boardData[y][x].value === value) { return null }
         this.undoStack.addItem({
             y: y,
             x: x,
@@ -154,6 +156,14 @@ export class GameProvider {
         this.rowHints.solveLine(y)
         this.undoStack.endBlock()
         this.rowHints.checkLine(y)
+        this.checkGame(false)
+    }
+
+    async solveGame(updateBoard: () => void) {
+        const gameSolver = new GameSolver(this.columnHints, this.rowHints)
+        this.undoStack.startBlock()
+        await gameSolver.solveGame(updateBoard)
+        this.undoStack.endBlock()
         this.checkGame(false)
     }
 

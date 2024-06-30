@@ -12,6 +12,7 @@ export enum GAME_STATUS {
     OVER = 'over'
 }
 
+export type BoardAxis = 'V' | 'H'
 export type BoardSide = 'L' | 'R' | 'T' | 'B'
 
 export const CELL_SIZE = 25
@@ -32,6 +33,11 @@ export const BOARD_PART = {
 }
 export const BOARD_KEY = 'board'
 export const SOLVED_KEY= 'solved'
+
+export const BOARD_AXIS: Record<string, BoardAxis> = {
+    COLUMN: 'V',
+    ROW: 'H'
+}
 
 export interface Point {
     x: number
@@ -67,4 +73,9 @@ export interface SerializedBoard {
         hints: HintCell[][]
     }
     static: boolean
+}
+
+export interface SolutionQueueItem {
+    axis: BoardAxis
+    index: number
 }

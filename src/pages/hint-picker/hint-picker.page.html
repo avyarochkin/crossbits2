@@ -1,5 +1,9 @@
     <ion-toolbar>
         <ion-buttons slot="start">
+            <ion-button fill="outline" shape="round" [class.activated]="autoAdvance"
+                (click)="toggleAutoAdvance()">
+                AUTO
+            </ion-button>
             <ion-button [disabled]="!autoAdvance"
                 (click)="previousHintPos()">
                 <ion-icon name="chevron-back"></ion-icon>
@@ -9,10 +13,6 @@
                 (click)="nextHintPos()">
                 ADVANCE
                 <ion-icon name="chevron-forward"></ion-icon>
-            </ion-button>
-            <ion-button fill="outline" shape="round" [class.activated]="autoAdvance"
-                (click)="toggleAutoAdvance()">
-                AUTO
             </ion-button>
         </ion-buttons>
         <ion-buttons slot="end">

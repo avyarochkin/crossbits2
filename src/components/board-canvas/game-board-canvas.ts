@@ -1,7 +1,7 @@
-import { Component, Output, EventEmitter } from '@angular/core'
+import { Component } from '@angular/core'
 import { GestureController, GestureDetail } from '@ionic/angular'
 
-import { BOARD_CELL, BOARD_PART, GAME_STATUS, Point } from 'src/providers/game/game.interface'
+import { BOARD_CELL, BOARD_PART, Point } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
 import { BoardCanvasComponent } from './board-canvas'
 
@@ -24,8 +24,6 @@ interface PanData {
     `]
 })
 export class GameBoardCanvasComponent extends BoardCanvasComponent {
-
-    @Output() readonly statusChange = new EventEmitter<GAME_STATUS>()
 
     private panData: PanData | null
 
@@ -165,15 +163,6 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
             this.checkGameStatus()
             this.paint()
         }
-    }
-
-    private checkGameStatus() {
-        if (this.game.boardStatus === GAME_STATUS.OVER) {
-            this.game.finishBoard()
-            this.paint()
-            this.statusChange.emit(this.game.boardStatus)
-        }
-        this.game.saveBoard()
     }
 
     private solveCol(x: number, kind: string) {

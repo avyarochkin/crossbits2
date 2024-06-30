@@ -5,7 +5,7 @@ import { combinations } from './game.utils'
 import { Hints } from './hints'
 
 const MAX_SOLVE_TIME_MSEC = 300_000 // 5 minutes
-const MAX_COMBINATIONS = 10_000_000
+const MAX_COMBINATIONS = 100_000_000
 
 export class LineSolver {
     private lineIndex: number
@@ -34,7 +34,7 @@ export class LineSolver {
      */
     private boardLine: BOARD_CELL[]
 
-    solveLine(ctx: Hints, lineIndex: number) {
+    solveLine(ctx: Hints, lineIndex: number): number[] {
         console.group(`Solving ${this.constructor.name}[${lineIndex}]`)
         this.lineIndex = lineIndex
         this.dataLength = ctx.getBoardLength() // height
@@ -46,7 +46,7 @@ export class LineSolver {
         if (tooManyCombinations) {
             console.warn(`${numberOfCombinations.toLocaleString()} possible variants. Are you sure?`)
             console.groupEnd()
-            return
+            return []
         } else {
             console.info(`${numberOfCombinations.toLocaleString()} possible variants`)
         }
@@ -68,8 +68,9 @@ export class LineSolver {
                     || performance.now() - startTime >= MAX_SOLVE_TIME_MSEC
             }
         }
+        let appliedIndexes: number[] = []
         if (!givenUp) {
-            this.applySolutionToBoard(ctx)
+            appliedIndexes = this.applySolutionToBoard(ctx)
         }
 
         // logging stats
@@ -88,6 +89,7 @@ export class LineSolver {
             console.error(`No variants found in ${durationStr}ms`)
         }
         console.groupEnd()
+        return appliedIndexes
     }
 
     reset() {
@@ -209,16 +211,23 @@ export class LineSolver {
     }
 
     /**
-     * Applies **solution** to the board column.
+     * Applies **solution** to the board line.
      * Copies only the cells set to on or off.
+     *
+     * @returns array of line indexes, where the value changes took place
      */
-    private applySolutionToBoard(ctx: Hints) {
+    private applySolutionToBoard(ctx: Hints): number[] {
+        const valueChangeIndexes: number[] = []
         for (let solutionIndex = 0; solutionIndex < this.dataLength; solutionIndex++) {
             const value = this.solution[solutionIndex]
             if (value === BOARD_CELL.OFF || value === BOARD_CELL.ON) {
-                ctx.setBoardDataValue(this.lineIndex, solutionIndex, value)
+                const valueChanged = ctx.setBoardDataValue(this.lineIndex, solutionIndex, value)
+                if (valueChanged) {
+                    valueChangeIndexes.push(solutionIndex)
+                }
             }
         }
+        return valueChangeIndexes
     }
 
     private getNumberOfCombinations(ctx: Hints) {
