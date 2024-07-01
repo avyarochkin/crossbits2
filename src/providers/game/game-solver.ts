@@ -46,12 +46,12 @@ export class GameSolver {
             switch (axis) {
                 case BOARD_AXIS.COLUMN:
                     const impactedRowIndexes = this.columnHints.solveLine(index)
-                    this.columnHints.checkLine(index)
+                    this.columnHints.checkLine(index, true)
                     this.prioritizeImpactedItems(BOARD_AXIS.ROW, impactedRowIndexes)
                     break
                 case BOARD_AXIS.ROW:
                     const impactedColumnIndexes = this.rowHints.solveLine(index)
-                    this.rowHints.checkLine(index)
+                    this.rowHints.checkLine(index, true)
                     this.prioritizeImpactedItems(BOARD_AXIS.COLUMN, impactedColumnIndexes)
                     break
                 default:
@@ -78,13 +78,13 @@ export class GameSolver {
                 { length: this.columnHints.hints.length },
                 (el, index) => this.getLineQueueItem(BOARD_AXIS.COLUMN, index)
             )
-            .filter((item, index) => !this.columnHints.matching[index])
+            .filter((item, index) => !this.columnHints.checkLine(index, true))
         const rowItems = Array
             .from(
                 { length: this.rowHints.hints.length },
                 (el, index) => this.getLineQueueItem(BOARD_AXIS.ROW, index)
             )
-            .filter((item, index) => !this.rowHints.matching[index])
+            .filter((item, index) => !this.rowHints.checkLine(index, true))
 
         this.lineQueue = [...rowItems, ...columnItems]
         this.sortQueueByLessCombinations()

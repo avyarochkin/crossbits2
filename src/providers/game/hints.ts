@@ -110,12 +110,18 @@ export abstract class Hints {
         return combinations(hintCount + emptyCells, hintCount)
     }
 
-    checkLine(lineIndex: number) {
-        let chainLength = 0, hintIndex = 0, match = true
-        const boardLength = this.getBoardLength(), hintLine = this.hints[lineIndex]
+    checkLine(lineIndex: number, strict = false): boolean {
+        let chainLength = 0
+        let hintIndex = 0
+        let match = true
+        const boardLength = this.getBoardLength()
+        const hintLine = this.hints[lineIndex]
 
         for (let indexInLine = 0; match && indexInLine < boardLength; indexInLine++) {
-            if (this.getBoardDataValue(lineIndex, indexInLine) === BOARD_CELL.ON) {
+            const currentValue = this.getBoardDataValue(lineIndex, indexInLine)
+            if (strict && currentValue === BOARD_CELL.NIL) {
+                match = false
+            } else if (currentValue === BOARD_CELL.ON) {
                 chainLength++
                 if (indexInLine === boardLength - 1
                     || this.getBoardDataValue(lineIndex, indexInLine + 1) !== BOARD_CELL.ON
@@ -128,6 +134,7 @@ export abstract class Hints {
             }
         }
         this.matching[lineIndex] = match && (hintIndex === hintLine.length)
+        return this.matching[lineIndex]
     }
 
     allLinesMatch(enforceChecks: boolean): boolean {
