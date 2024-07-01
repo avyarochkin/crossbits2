@@ -2,6 +2,7 @@ import { Point, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game.interface'
 import { GameProvider } from './game'
 import { HintCell, HintPoint } from './hints.interface'
 import { LineSolver } from './line-solver'
+import { combinations } from './game.utils'
 
 export abstract class Hints {
 
@@ -100,6 +101,13 @@ export abstract class Hints {
             + hintLine.length
             - (selectedValue > 0 ? selectedValue + 1 : 0)
         return Math.max(this.getBoardLength() - usedTotal, 0)
+    }
+
+    getNumberOfCombinations(lineIndex: number) {
+        const hintSum = this.hints[lineIndex].reduce((prev, curr) => prev + curr.hint, 0)
+        const hintCount = this.hints[lineIndex].length
+        const emptyCells = this.getBoardLength() - hintSum - hintCount + 1
+        return combinations(hintCount + emptyCells, hintCount)
     }
 
     checkLine(lineIndex: number) {

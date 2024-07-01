@@ -74,8 +74,3 @@ export interface SerializedBoard {
     }
     static: boolean
 }
-
-export interface SolutionQueueItem {
-    axis: BoardAxis
-    index: number
-}

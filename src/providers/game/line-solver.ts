@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import { BOARD_CELL } from './game.interface'
 import { VariantPiece } from './hints.interface'
-import { combinations } from './game.utils'
 import { Hints } from './hints'
 
 const MAX_SOLVE_TIME_MSEC = 300_000 // 5 minutes
@@ -35,11 +34,11 @@ export class LineSolver {
     private boardLine: BOARD_CELL[]
 
     solveLine(ctx: Hints, lineIndex: number): number[] {
-        console.group(`Solving ${this.constructor.name}[${lineIndex}]`)
+        console.group(`Solving ${ctx.constructor.name}[${lineIndex}]`)
         this.lineIndex = lineIndex
         this.dataLength = ctx.getBoardLength() // height
         this.hintLength = ctx.hints[lineIndex].length
-        const numberOfCombinations = this.getNumberOfCombinations(ctx)
+        const numberOfCombinations = ctx.getNumberOfCombinations(this.lineIndex)
         const tooManyCombinations = numberOfCombinations > MAX_COMBINATIONS && this.lastLineIndex !== lineIndex
         this.lastLineIndex = lineIndex
 
@@ -88,6 +87,7 @@ export class LineSolver {
         } else {
             console.error(`No variants found in ${durationStr}ms`)
         }
+        console.info(`${appliedIndexes.length} changes applied to line ${lineIndex}`)
         console.groupEnd()
         return appliedIndexes
     }
@@ -228,12 +228,5 @@ export class LineSolver {
             }
         }
         return valueChangeIndexes
-    }
-
-    private getNumberOfCombinations(ctx: Hints) {
-        const hintSum = ctx.hints[this.lineIndex].reduce((prev, curr) => prev + curr.hint, 0)
-        const hintCount = ctx.hints[this.lineIndex].length
-        const emptyCells = ctx.getBoardLength() - hintSum - hintCount + 1
-        return combinations(hintCount + emptyCells, hintCount)
     }
 }
