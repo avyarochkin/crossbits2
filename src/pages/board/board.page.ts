@@ -54,6 +54,7 @@ export class BoardPage {
     async save() {
         this.game.saveCurrentBoard()
         const toast = await this.toastCtrl.create({
+            icon: 'checkmark-circle',
             message: 'Saved',
             position: 'top',
             animated: true,
@@ -124,6 +125,7 @@ export class BoardPage {
         if (status === GAME_STATUS.OVER) {
             this.zoom = this.minZoom
             const toast = await this.toastCtrl.create({
+                icon: 'trophy',
                 message: 'Solved!',
                 position: 'top',
                 animated: true,

@@ -9,7 +9,7 @@ import { OverlayEventDetail } from '@ionic/core'
 
 const MIN_BOARD_SIZE = 2
 const DEF_BOARD_SIZE = 5
-const MAX_BOARD_SIZE = 50
+const MAX_BOARD_SIZE = 75
 const ROLES = {
     APPLY: 'apply',
     CONFIRM: 'confirm',
@@ -176,7 +176,7 @@ export class BoardListPage {
 
 function getPickerColumnOptions() {
     return Array.from(
-        { length: MAX_BOARD_SIZE - MIN_BOARD_SIZE },
+        { length: MAX_BOARD_SIZE - MIN_BOARD_SIZE + 1 },
         (el, index) => ({
             text: (index + MIN_BOARD_SIZE).toString(),
             value: index + MIN_BOARD_SIZE

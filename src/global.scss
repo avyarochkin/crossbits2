@@ -97,4 +97,14 @@ ion-content {
             --height: auto;
         }
     }
+    ion-toast {
+        font-weight: 400;
+        font-size: 1.25rem;
+        --background: var(--ion-color-semi-dark);
+        --color: var(--ion-color-lightest);
+        --max-width: 400px;
+        --border-style: solid;
+        --border-width: 2px;
+        --border-color: var(--ion-color-light);
+    }
 }
