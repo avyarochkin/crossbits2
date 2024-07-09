@@ -82,6 +82,18 @@ export class GameProvider {
         return result
     }
 
+    savedBoardsToObject() {
+        return this.savedBoards.map(board => ({
+            nr: board.nr,
+            columnHintData: board.columnHints.hints.map(hintLine =>
+                hintLine.map(hint => hint.hint)
+            ),
+            rowHintData: board.rowHints.hints.map(hintLine =>
+                hintLine.map(hint => hint.hint)
+            )
+        }))
+    }
+
     initAllStaticBoards() {
         this.allBoards = STATIC_BOARDS.map((stage) => {
             return stage.map((board) => {

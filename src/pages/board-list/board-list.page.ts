@@ -118,7 +118,7 @@ export class BoardListPage {
     }
 
     backupSavedBoards() {
-        const data = JSON.stringify(this.game.savedBoards, null, 2)
+        const data = JSON.stringify(this.game.savedBoardsToObject(), null, 2)
         this.saveToFile(data, 'custom-boards.json')
     }
 
