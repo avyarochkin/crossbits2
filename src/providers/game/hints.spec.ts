@@ -3,10 +3,10 @@ import { GameProvider } from './game'
 import { BOARD_SIDE, GAME_STATUS } from './game.interface'
 import { ColumnHints, RowHints } from './hints'
 import { HintCell } from './hints.interface'
-import { LineSolver } from './solver'
+import { LineSolver } from './line-solver'
 
 jest.mock('./game')
-jest.mock('./solver')
+jest.mock('./line-solver')
 
 describe('Hints', () => {
     let columnHints: ColumnHints
@@ -21,7 +21,7 @@ describe('Hints', () => {
         columnHints: {
             checkLine: (lineIndex) => { }
         },
-        setBoardData: (y, x, value) => { },
+        setBoardData: (y, x, value) => value,
         setBoardSize: () => { }
     }) as GameProvider)
 

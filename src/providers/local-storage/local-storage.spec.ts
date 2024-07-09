@@ -6,6 +6,17 @@ describe('LocalStorageProvider', () => {
     beforeEach(() => {
         localStorage = new LocalStorageProvider()
         window.localStorage['object-key'] = '{ "key": "value" }'
+        window.localStorage['value-key'] = '42'
+    })
+
+    it('should get value from local storage', () => {
+        const result = localStorage.getValue('value-key')
+        expect(result).toBe('42')
+    })
+
+    it('should set value in local storage', () => {
+        localStorage.setValue('value-key', '66')
+        expect(window.localStorage['value-key']).toBe('66')
     })
 
     it('should set object in local storage as a string', () => {

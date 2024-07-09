@@ -20,7 +20,8 @@ describe('LineSolver', () => {
         getBoardDataValue: (lineIndex: number, indexInLine: number) => BOARD_CELL.NIL,
         setBoardDataValue: (lineIndex: number, indexInLine: number, value: BOARD_CELL) => {
             boardData[indexInLine] = value
-        }
+        },
+        getNumberOfCombinations: (lineIndex: number) => 1
     } as Hints))
 
     beforeEach(() => {
