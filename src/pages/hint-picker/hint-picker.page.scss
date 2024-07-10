@@ -1,3 +1,7 @@
+::ng-deep ion-modal::part(content) {
+    background: var(--ion-color-semi-dark);
+}
+
 :host {
     display: block;
     padding: 1rem 0.5rem;

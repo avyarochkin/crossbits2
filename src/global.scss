@@ -100,11 +100,16 @@ ion-content {
     ion-toast {
         font-weight: 400;
         font-size: 1.25rem;
-        --background: var(--ion-color-semi-dark);
-        --color: var(--ion-color-lightest);
+        --background: var(--ion-color-light);
+        --color: var(--ion-color-semi-dark);
         --max-width: 400px;
-        --border-style: solid;
-        --border-width: 2px;
-        --border-color: var(--ion-color-light);
+        --border-radius: 1rem;
+        &::part(container) {
+            border-radius: var(--border-radius);
+            box-shadow: 0 0 3rem -1rem var(--ion-color-dark);
+        }
+        &::part(icon) {
+            color: var(--ion-color-medium);
+        }
     }
 }

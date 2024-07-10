@@ -41,11 +41,12 @@
                 <div class="stage" [class.editing]="editing">
                     <button class="stage-board"
                         [class.editable]="!board.static"
+                        [class.solved]="board.solved"
                         *ngFor="let board of stageBoards"
                         (click)="loadGame(board)">
                         <div class="board-num">{{ board.nr }}</div>
-                        <span>{{ board.columnHints.hints.length }}&times;{{ board.rowHints.hints.length }}</span>
-                        <ion-icon name="trophy-outline" class="board-flag" *ngIf="board.solved"></ion-icon>
+                        <ion-icon name="trophy" class="board-flag" *ngIf="board.solved"></ion-icon>
+                        <span class="board-size">{{ board.columnHints.hints.length }}&times;{{ board.rowHints.hints.length }}</span>
                     </button>
                     <button class="stage-board new editable" [class.editing]="editing" *ngIf="i === allBoards.length - 1 && editing" (click)="createGame()">
                         <ion-icon name="add"></ion-icon>
