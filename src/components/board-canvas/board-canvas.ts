@@ -90,11 +90,13 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
         this.paint()
     }
 
-    checkGameStatus() {
+    checkGameStatus(emit = true) {
         if (this.game.boardStatus === GAME_STATUS.OVER) {
             this.game.finishBoard()
             this.paint()
-            this.statusChange.emit(this.game.boardStatus)
+            if (emit) {
+                this.statusChange.emit(this.game.boardStatus)
+            }
         }
         this.game.saveBoard()
     }

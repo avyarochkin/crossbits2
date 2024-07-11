@@ -1,5 +1,6 @@
-import { BOARD_AXIS, BoardAxis } from './game.interface'
+import { BOARD_AXIS, BoardAxis, SOLUTION_STATUS } from './game.interface'
 import { Hints } from './hints'
+import { HintLineIndexes } from './hints.interface'
 
 export interface LineQueueItem {
     axis: BoardAxis
@@ -26,7 +27,7 @@ export class GameSolver {
      * **lineQueue** sorted by the number of combinations of solutions (lowest last).
      *
      * While the queue is not empty, takes the next line index from the tail of the
-     * queue and attempts to solves this line. If the line solve brought back some
+     * queue and attempts to solve this line. If the line solve brought back some
      * impacted lines from the orthogonal axis, adds their indexes to the queue and
      * re-sorts it again by the number of combinations of solutions.
      * Stops when the queue is empty.
@@ -37,26 +38,35 @@ export class GameSolver {
      *
      * @param updateBoard this function will be called by the solver every time when
      * it wants to update the board on the UI
+     *
+     * @returns solution status (@see SOLUTION_STATUS)
      */
-    async solveGame(updateBoard: () => void) {
+    async solveGame(updateBoard: () => void): Promise<SOLUTION_STATUS>  {
         this.initLineQueue()
+        let solutionStatus = SOLUTION_STATUS.UNFINISHED
 
         while (this.lineQueue.length > 0) {
             const { axis, index } = this.lineQueue.pop()!
+            let impactedIndexes: HintLineIndexes = undefined
             switch (axis) {
                 case BOARD_AXIS.COLUMN:
-                    const impactedRowIndexes = this.columnHints.solveLine(index)
+                    impactedIndexes = this.columnHints.solveLine(index)
                     this.columnHints.checkLine(index, true)
-                    this.prioritizeImpactedItems(BOARD_AXIS.ROW, impactedRowIndexes)
+                    this.prioritizeImpactedItems(BOARD_AXIS.ROW, impactedIndexes ?? null)
                     break
                 case BOARD_AXIS.ROW:
-                    const impactedColumnIndexes = this.rowHints.solveLine(index)
+                    impactedIndexes = this.rowHints.solveLine(index)
                     this.rowHints.checkLine(index, true)
-                    this.prioritizeImpactedItems(BOARD_AXIS.COLUMN, impactedColumnIndexes)
+                    this.prioritizeImpactedItems(BOARD_AXIS.COLUMN, impactedIndexes)
                     break
                 default:
             }
-            console.info(`GameSolver line queue: ${this.lineQueue.length} left`)
+            if (impactedIndexes == null) {
+                solutionStatus = impactedIndexes === null
+                    ? SOLUTION_STATUS.NO_SOLUTION
+                    : SOLUTION_STATUS.GAVE_UP
+            }
+            // console.info(`GameSolver line queue: ${this.lineQueue.length} left`)
             await new Promise<void>(resolve =>
                 setTimeout(() => {
                     updateBoard()
@@ -64,6 +74,7 @@ export class GameSolver {
                 }, 0)
             )
         }
+        return solutionStatus
     }
 
     /**
@@ -98,7 +109,8 @@ export class GameSolver {
      * @param impactedAxis impacted axis (**V** or **H**)
      * @param impactedIndexes array of impacted indexes in this axis
      */
-    private prioritizeImpactedItems(impactedAxis: BoardAxis, impactedIndexes: number[]) {
+    private prioritizeImpactedItems(impactedAxis: BoardAxis, impactedIndexes: HintLineIndexes) {
+        if (impactedIndexes == null) { return }
         for (const impactedIndex of impactedIndexes) {
             const item = this.lineQueue.find(({ axis, index }) =>
                 axis === impactedAxis && index === impactedIndex

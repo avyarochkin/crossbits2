@@ -12,3 +12,5 @@ export interface VariantPiece {
 export interface HintPoint extends Point {
     side: BoardSide
 }
+
+export type HintLineIndexes = number[] | null | undefined

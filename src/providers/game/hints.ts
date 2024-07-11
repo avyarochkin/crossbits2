@@ -1,6 +1,6 @@
 import { Point, BOARD_SIDE, BOARD_CELL, GAME_STATUS } from './game.interface'
 import { GameProvider } from './game'
-import { HintCell, HintPoint } from './hints.interface'
+import { HintCell, HintLineIndexes, HintPoint } from './hints.interface'
 import { LineSolver } from './line-solver'
 import { combinations } from './game.utils'
 
@@ -38,33 +38,33 @@ export abstract class Hints {
         return this.hints.reduce((prev, line) => Math.max(prev, line.length), 0)
     }
 
-    /*
-    Should return the length of each board row or column that each hint line
-    will be linked to. For the column hints it should return the board height,
-    for the row hints - the board width.
-    */
+    /**
+     * @returns the length of each board row or column that each hint line
+     * will be linked to. For the column hints it returns the board height,
+     * for the row hints - the board width.
+     */
     abstract getBoardLength(): number
 
-    /*
-    Should return the cell value from the game board for the hint lineIndex and
-    board indexInLine. For the column hints lineIndex should map to the board
-    <x> and indexInLine should map to <y>. For the row hints - vice versa.
-    */
+    /**
+     * @returns the cell value from the game board for the hint lineIndex and
+     * board indexInLine. For the column hints lineIndex maps to the board
+     * <x> and indexInLine maps to <y>. For the row hints - vice versa.
+     */
     abstract getBoardDataValue(lineIndex: number, indexInLine: number): BOARD_CELL
 
-    /*
-    Should set the game board cell to the given value. The cell should be
-    located via the hint lineIndex and the board indexInLine, which should be
-    mapped to the board <x,y> exactly as in getBoardDataValue().
-    Should return **true** if the value got really changed
-    */
+    /**
+     * Sets the game board cell to the given value. The cell is
+     * located via the hint lineIndex and the board indexInLine, which is
+     * mapped to the board <x,y> exactly as in getBoardDataValue().
+     * @returns **true** if the value got really changed
+     */
     abstract setBoardDataValue(lineIndex: number, indexInLine: number, value: BOARD_CELL): boolean
 
-    /*
-    Should return the highest index in the selected hint line, which value can
-    be edited. Usually this is the index of the first zero-value element in this
-    hint line or index of he last element if all elements have non-zero values.
-    */
+    /**
+     * @returns the highest index in the selected hint line, which value can
+     * be edited. Usually this is the index of the first zero-value element in this
+     * hint line or index of he last element if all elements have non-zero values.
+     */
     getMaxEditableIndexAt(lineIndex: number): number {
         return Math.min(
             this.hints[lineIndex].length,
@@ -80,19 +80,19 @@ export abstract class Hints {
         )
     }
 
-    /*
-    Should return a numeric hint value at the given position.
-    */
+    /**
+     * @returns a numeric hint value at the given position.
+     */
     getHintValueAt(pos: HintPoint): number {
         const hintStr = this.getHintAt(pos)
         return (hintStr) ? parseInt(hintStr, 10) : 0
     }
 
-    /*
-    Should return the number of "free" board cells along the given hint line
-    at the given position. The free cells are the cells not reserved by all
-    hint values along this line.
-    */
+    /**
+     * @returns the number of "free" board cells along the given hint line
+     * at the given position. The free cells are the cells not reserved by all
+     * hint values along this line.
+     */
     getHintLineLeftTotalAt(pos: HintPoint): number {
         const hintLine = this.getHintLineAt(pos)
         const selectedValue = this.getHintValueAt(pos)
@@ -165,7 +165,7 @@ export abstract class Hints {
     abstract nextEditableHintPos(pos: HintPoint): Point
     abstract previousEditableHintPos(pos: HintPoint): Point
 
-    solveLine(lineIndex: number): number[] {
+    solveLine(lineIndex: number): HintLineIndexes {
         return this.solver.solveLine(this, lineIndex)
     }
 } // class Hints

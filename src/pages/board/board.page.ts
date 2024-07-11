@@ -1,10 +1,16 @@
 import { Component, ElementRef, ViewChild } from '@angular/core'
 import { NavController, AlertController, ToastController } from '@ionic/angular'
-import { Point, BoardData, GAME_STATUS } from 'src/providers/game/game.interface'
+import { Point, BoardData, GAME_STATUS, SOLUTION_STATUS } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
 import { BoardCanvasComponent } from 'src/components/board-canvas/board-canvas'
 
 const ZOOM_FACTOR = 1.2
+const TOAST_DATA = {
+    [SOLUTION_STATUS.FINISHED]: { icon: 'trophy', message: 'Solved!' },
+    [SOLUTION_STATUS.UNFINISHED]: { icon: 'hand-left', message: 'Cannot solve automatically' },
+    [SOLUTION_STATUS.GAVE_UP]: { icon: 'sad', message: 'Gave up. Finish manually' },
+    [SOLUTION_STATUS.NO_SOLUTION]: { icon: 'skull', message: 'No solution. Fix the hints' }
+}
 
 @Component({
     selector: 'page-board',
@@ -124,23 +130,29 @@ export class BoardPage {
     async statusChange(status: GAME_STATUS) {
         if (status === GAME_STATUS.OVER) {
             this.zoom = this.minZoom
-            const toast = await this.toastCtrl.create({
-                icon: 'trophy',
-                message: 'Solved!',
-                position: 'top',
-                animated: true,
-                duration: 1000
-            })
-            await toast.present()
+            await this.showSolutionToast(SOLUTION_STATUS.FINISHED)
         }
     }
 
     async solveBoard() {
         this.solvingBoard = true
-        await this.game.solveGame(() => {
+        const result = await this.game.solveGame(() => {
             this.board.update()
         })
-        this.board.checkGameStatus()
+        this.board.checkGameStatus(false)
         this.solvingBoard = false
+        await this.showSolutionToast(result)
+    }
+
+    private async showSolutionToast(result: SOLUTION_STATUS) {
+        const toast = await this.toastCtrl.create({
+            icon: TOAST_DATA[result].icon,
+            message: TOAST_DATA[result].message,
+            position: 'top',
+            animated: true,
+            duration: 2000
+        })
+        await toast.present()
+
     }
 }

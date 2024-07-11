@@ -3,7 +3,8 @@ import { LocalStorageProvider } from '../local-storage/local-storage'
 import { STATIC_BOARDS } from './data'
 import {
     BOARD_CELL, BOARD_KEY, Board, BoardData, BoardDataItem, CELLS_IN_GROUP, CELL_SIZE,
-    GAME_STATUS, Point, SOLVED_KEY, SerializedBoardData, SerializedBoard
+    GAME_STATUS, Point, SOLVED_KEY, SerializedBoardData, SerializedBoard,
+    SOLUTION_STATUS
 } from './game.interface'
 import { ColumnHints, RowHints } from './hints'
 import { UndoStack } from './undo-stack'
@@ -171,12 +172,16 @@ export class GameProvider {
         this.checkGame(false)
     }
 
-    async solveGame(updateBoard: () => void) {
+    async solveGame(updateBoard: () => void): Promise<SOLUTION_STATUS> {
         const gameSolver = new GameSolver(this.columnHints, this.rowHints)
         this.undoStack.startBlock()
-        await gameSolver.solveGame(updateBoard)
+        const solutionStatus = await gameSolver.solveGame(updateBoard)
         this.undoStack.endBlock()
         this.checkGame(false)
+        // GameSolver does not check the final game status therefore checking it here
+        return this.boardStatus === GAME_STATUS.OVER
+            ? SOLUTION_STATUS.FINISHED
+            : solutionStatus
     }
 
     checkGame(check: boolean) {

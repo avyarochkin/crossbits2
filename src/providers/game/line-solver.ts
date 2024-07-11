@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { BOARD_CELL } from './game.interface'
-import { VariantPiece } from './hints.interface'
+import { HintLineIndexes, VariantPiece } from './hints.interface'
 import { Hints } from './hints'
 
 const MAX_SOLVE_TIME_MSEC = 300_000 // 5 minutes
@@ -33,7 +33,18 @@ export class LineSolver {
      */
     private boardLine: BOARD_CELL[]
 
-    solveLine(ctx: Hints, lineIndex: number): number[] {
+    /**
+     * Attempts to solve a line in the context of provided hint.
+     * Computes the number of possible combinations for an unsolved line.
+     * If the number is greater than MAX_COMBINATIONS, continues only if
+     * the user has confirmed by selecting this line again.
+     * Gives up when cannot solve any new cells in an unsolved yet line,
+     * or when the solution process has exceeded MAX_SOLVE_TIME_MSEC.
+     * @returns the array of indexes in the line affected by this solve
+     * or **null** if cannot find any solution for an unsolved line
+     * or **undefined** if gave up solving.
+     */
+    solveLine(ctx: Hints, lineIndex: number): HintLineIndexes {
         console.group(`Solving ${ctx.constructor.name}[${lineIndex}]`)
         this.lineIndex = lineIndex
         this.dataLength = ctx.getBoardLength() // height
@@ -45,7 +56,7 @@ export class LineSolver {
         if (tooManyCombinations) {
             console.warn(`${numberOfCombinations.toLocaleString()} possible variants. Are you sure?`)
             console.groupEnd()
-            return []
+            return undefined
         } else {
             console.info(`${numberOfCombinations.toLocaleString()} possible variants`)
         }
@@ -67,7 +78,7 @@ export class LineSolver {
                     || performance.now() - startTime >= MAX_SOLVE_TIME_MSEC
             }
         }
-        let appliedIndexes: number[] = []
+        let appliedIndexes: HintLineIndexes = undefined
         if (!givenUp) {
             appliedIndexes = this.applySolutionToBoard(ctx)
         }
@@ -86,8 +97,9 @@ export class LineSolver {
             console.info(`${variantsStr} variant(s) found in ${durationStr}ms`)
         } else {
             console.error(`No variants found in ${durationStr}ms`)
+            appliedIndexes = null
         }
-        console.info(`${appliedIndexes.length} changes applied to line ${lineIndex}`)
+        console.info(`${appliedIndexes?.length} changes applied to line ${lineIndex}`)
         console.groupEnd()
         return appliedIndexes
     }
@@ -216,8 +228,8 @@ export class LineSolver {
      *
      * @returns array of line indexes, where the value changes took place
      */
-    private applySolutionToBoard(ctx: Hints): number[] {
-        const valueChangeIndexes: number[] = []
+    private applySolutionToBoard(ctx: Hints): HintLineIndexes {
+        const valueChangeIndexes: HintLineIndexes = []
         for (let solutionIndex = 0; solutionIndex < this.dataLength; solutionIndex++) {
             const value = this.solution[solutionIndex]
             if (value === BOARD_CELL.OFF || value === BOARD_CELL.ON) {

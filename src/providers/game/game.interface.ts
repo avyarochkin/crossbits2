@@ -12,6 +12,17 @@ export enum GAME_STATUS {
     OVER = 'over'
 }
 
+export enum SOLUTION_STATUS {
+    /** Solver cannot continue - all remaining unsolved lines cannot solve new cells */
+    UNFINISHED = 'unfinished',
+    /** Solver completed work - the board is fully solved */
+    FINISHED = 'finished',
+    /** Solver gave up as some unsolved lines have more than MAX_COMBINATIONS to check */
+    GAVE_UP = 'gave-up',
+    /** Solver cannot find any variants for some unsolved lines - bad board config */
+    NO_SOLUTION = 'no-solution'
+}
+
 export type BoardAxis = 'V' | 'H'
 export type BoardSide = 'L' | 'R' | 'T' | 'B'
 
