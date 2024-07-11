@@ -34,8 +34,11 @@
 
 <ion-content [forceOverscroll]="false">
     <swiper-container #swiper class="stage-slides" [pagination]="true"
+        (slidermove)="toggleSliding(true)"
+        (touchend)="toggleSliding(false)"
         (slidechange)="changeSlide()">
         <swiper-slide class="stage-slide"
+            [class.sliding]="sliding"
             *ngFor="let stageBoards of allBoards; let i = index">
             <div class="stage-slide-container">
                 <div class="stage" [class.editing]="editing">

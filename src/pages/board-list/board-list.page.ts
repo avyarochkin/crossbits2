@@ -29,6 +29,7 @@ export class BoardListPage {
     allBoards: Board[][]
 
     editing: boolean
+    sliding: boolean
 
     @ViewChild('swiper', { static: true }) swiperRef: ElementRef
 
@@ -47,6 +48,10 @@ export class BoardListPage {
         // console.log('ionViewWillEnter BoardListPage')
         // slides should update if orientation changed since last time
         // void this.swiperRef.nativeElement.swiper.update()
+    }
+
+    toggleSliding(active: boolean) {
+        this.sliding = active
     }
 
     changeSlide() {

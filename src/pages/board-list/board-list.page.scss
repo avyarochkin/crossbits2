@@ -10,6 +10,7 @@
         }
         .stage-slide {
             overflow-y: auto;
+            &.sliding { overflow-y: hidden; }
         }
         .stage-slide-container {
             height: 100%;
