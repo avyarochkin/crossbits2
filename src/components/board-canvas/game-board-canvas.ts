@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { GestureController, GestureDetail } from '@ionic/angular'
+import { GestureController } from '@ionic/angular'
 
 import { BOARD_CELL, BOARD_PART, Point } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
@@ -35,8 +35,8 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         super(gestureCtrl, game)
     }
 
-    protected handleTap(detail: GestureDetail) {
-        const boardPos = this.getBoardPos(detail)
+    protected handleTap(event: TouchEvent) {
+        const boardPos = this.getBoardPos(event)
         if (boardPos == null || this.isGameOver()) { return }
         // console.log('[tap event]')
 
@@ -56,13 +56,12 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         }
     }
 
-    protected handlePress(detail: GestureDetail) {
+    protected handlePress(event: TouchEvent) {
         // console.log('[press event]')
 
-        const boardPos = this.getBoardPos(detail)
-        const singleTouch = !(detail.event instanceof TouchEvent) || detail.event.touches.length === 1
+        const boardPos = this.getBoardPos(event)
 
-        if (this.isGame() && singleTouch && boardPos && boardPos.kind === BOARD_PART.DATA) {
+        if (this.isGame() && boardPos && boardPos.kind === BOARD_PART.DATA) {
             // console.log('(start panning)')
             this.panData = {
                 start: boardPos,
@@ -76,8 +75,8 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         }
     }
 
-    protected handlePanMove(detail: GestureDetail) {
-        const boardPos = this.getBoardPos(detail)
+    protected handlePanMove(event: TouchEvent) {
+        const boardPos = this.getBoardPos(event)
         if (boardPos == null || this.isGameOver() || this.panData == null) { return }
 
         if (boardPos.kind === BOARD_PART.DATA) {

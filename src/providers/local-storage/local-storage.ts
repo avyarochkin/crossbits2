@@ -13,7 +13,7 @@ export class LocalStorageProvider {
 
     setObject<T extends object = object>(key: string, value: T) {
         window.localStorage[key] = JSON.stringify(value)
-        console.info('SAVED', { key, value })
+        // console.info('SAVED', { key, value })
     }
 
     getObject<T extends object = object>(key: string): T | null {
@@ -21,7 +21,7 @@ export class LocalStorageProvider {
         const value = (str !== undefined)
             ? JSON.parse(str) as T
             : null
-        console.info('LOADED', { key, value })
+        // console.info('LOADED', { key, value })
         return value
     }
 

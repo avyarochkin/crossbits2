@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { GestureController, GestureDetail, ModalController } from '@ionic/angular'
+import { GestureController, ModalController } from '@ionic/angular'
 
 import { BOARD_PART, BOARD_SIDE, BoardSide } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
@@ -27,8 +27,8 @@ export class SetupBoardCanvasComponent extends BoardCanvasComponent {
         super(gestureCtrl, game)
     }
 
-    protected handleTap(detail: GestureDetail) {
-        const boardPos = this.getBoardPos(detail)
+    protected handleTap(event: TouchEvent) {
+        const boardPos = this.getBoardPos(event)
         if (boardPos == null || this.isGameOver()) { return }
 
         switch (boardPos.kind) {

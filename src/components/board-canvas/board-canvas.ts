@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core'
-import { Gesture, GestureController, GestureDetail } from '@ionic/angular'
+import { Gesture, GestureController } from '@ionic/angular'
 
 import { GameProvider } from 'src/providers/game/game'
 import {
@@ -46,10 +46,10 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             el: this.canvasRef.nativeElement,
             gestureName: 'toggle-cells',
             threshold: 0,
-            canStart: (detail) => this.isTouchEvent(detail.event as TouchEvent),
-            onStart: (detail) => { this.handleTouchStart(detail) },
-            onMove: (detail) => { this.handlePanMove(detail) },
-            onEnd: (detail) => { this.handleTouchEnd(detail) }
+            canStart: ({ event }) => this.isTouchEvent(event as TouchEvent),
+            onStart: ({ event }) => { this.handleTouchStart(event as TouchEvent) },
+            onMove: ({ event }) => { this.handlePanMove(event as TouchEvent) },
+            onEnd: ({ event }) => { this.handleTouchEnd(event as TouchEvent) }
         })
         this.gesture.enable(true)
         this.enableScroll(true)
@@ -108,13 +108,14 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
         }
     }
 
-    protected getBoardPos(detail: GestureDetail) {
+    protected getBoardPos(event: TouchEvent) {
         const target = this.canvasRef.nativeElement
+        const touch = event.changedTouches[0]
         const rect = target.getBoundingClientRect()
         const scaleX = rect.width / target.clientWidth
         const scaleY = rect.height / target.clientHeight
-        const offsetX = (detail.currentX - rect.left) / scaleX
-        const offsetY = (detail.currentY - rect.top) / scaleY
+        const offsetX = (touch.clientX - rect.left) / scaleX
+        const offsetY = (touch.clientY - rect.top) / scaleY
 
         const maxBoardX = this.game.boardData[0].length
         const maxBoardY = this.game.boardData.length
@@ -481,24 +482,24 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
         return event.changedTouches?.length === 1
     }
 
-    private handleTouchStart(detail: GestureDetail) {
+    private handleTouchStart(event: TouchEvent) {
         this.timeout = setTimeout(() => {
-            this.handlePress(detail)
+            this.handlePress(event)
             this.timeout = null
         }, PRESS_TIME_MSEC)
     }
 
-    private handleTouchEnd(detail: GestureDetail) {
+    private handleTouchEnd(event: TouchEvent) {
         if (this.timeout != null) {
             clearTimeout(this.timeout)
             this.timeout = null
-            this.handleTap(detail)
+            this.handleTap(event)
         }
         this.handlePanEnd()
     }
 
-    protected abstract handleTap(detail: GestureDetail)
-    protected abstract handlePress(detail: GestureDetail)
-    protected abstract handlePanMove(detail: GestureDetail)
+    protected abstract handleTap(event: TouchEvent)
+    protected abstract handlePress(event: TouchEvent)
+    protected abstract handlePanMove(event: TouchEvent)
     protected abstract handlePanEnd()
 }
