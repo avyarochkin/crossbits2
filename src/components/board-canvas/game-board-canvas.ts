@@ -18,8 +18,9 @@ interface PanData {
     selector: 'board-canvas',
     template: '<canvas #canvas></canvas>',
     styles: [`
-        :host {
+        :host, canvas {
             display: block;
+            width: fit-content;
         }
     `]
 })

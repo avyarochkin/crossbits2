@@ -26,6 +26,7 @@ export class BoardPage {
 
     zoom = 1
     minZoom = 1
+    maxZoom = 1
     solvingBoard = false
 
     constructor(
@@ -49,12 +50,24 @@ export class BoardPage {
         await this.navCtrl.pop()
     }
 
+    canZoomIn() {
+        return this.zoom < this.maxZoom
+    }
+
     zoomIn() {
-        this.zoom = this.zoom * ZOOM_FACTOR
+        this.zoom = Math.min(this.zoom * ZOOM_FACTOR, this.maxZoom)
+    }
+
+    canZoomOut() {
+        return this.zoom > this.minZoom
     }
 
     zoomOut() {
         this.zoom = Math.max(this.zoom / ZOOM_FACTOR, this.minZoom)
+    }
+
+    zoomChange(value: number) {
+        this.zoom = value
     }
 
     async save() {

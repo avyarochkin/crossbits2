@@ -46,6 +46,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             el: this.canvasRef.nativeElement,
             gestureName: 'toggle-cells',
             threshold: 0,
+            canStart: (detail) => this.isTouchEvent(detail.event as TouchEvent),
             onStart: (detail) => { this.handleTouchStart(detail) },
             onMove: (detail) => { this.handlePanMove(detail) },
             onEnd: (detail) => { this.handleTouchEnd(detail) }
@@ -474,6 +475,10 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             colorMap[color] = getComputedStyle(document.body).getPropertyValue(`--ion-color-${cssSuffix}`)
         })
         return colorMap
+    }
+
+    private isTouchEvent(event: TouchEvent) {
+        return event.changedTouches?.length === 1
     }
 
     private handleTouchStart(detail: GestureDetail) {
