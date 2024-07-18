@@ -13,8 +13,8 @@ const TOAST_DATA = {
 }
 
 const AUTO_SCROLL_AREA_WIDTH = 50
-const AUTO_SCROLL_SPEED_FACTOR = 200
-const AUTO_SCROLL_INTERVAL = 150
+const AUTO_SCROLL_SPEED_FACTOR = 100
+const AUTO_SCROLL_INTERVAL = 100
 
 @Component({
     selector: 'page-board',
