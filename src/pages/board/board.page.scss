@@ -2,5 +2,7 @@
     ion-content {
         --padding-top: var(--ion-safe-area-top, 0);
         --padding-bottom: var(--ion-safe-area-bottom, 0);
+        --overflow: hidden;
+        &.scroll-enabled { --overflow: auto; }
     }
 }

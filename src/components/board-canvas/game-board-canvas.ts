@@ -1,5 +1,6 @@
-import { Component } from '@angular/core'
+import { Component, EventEmitter, Output } from '@angular/core'
 import { GestureController } from '@ionic/angular'
+import { Haptics, ImpactStyle } from '@capacitor/haptics'
 
 import { BOARD_CELL, BOARD_PART, Point } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
@@ -25,6 +26,11 @@ interface PanData {
     `]
 })
 export class GameBoardCanvasComponent extends BoardCanvasComponent {
+
+    /** Emits `Touch` object during panning */
+    @Output() readonly panMove = new EventEmitter<Touch>
+    /** Emits at the end of panning */
+    @Output() readonly panEnd = new EventEmitter<void>
 
     private panData: PanData | null
 
@@ -61,7 +67,7 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
 
         const boardPos = this.getBoardPos(event)
 
-        if (this.isGame() && boardPos && boardPos.kind === BOARD_PART.DATA) {
+        if (this.isGame() && boardPos?.kind === BOARD_PART.DATA) {
             // console.log('(start panning)')
             this.panData = {
                 start: boardPos,
@@ -69,7 +75,8 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
                 value: this.toggledCellValue(this.game.boardData[boardPos.y][boardPos.x].value),
                 orientation: undefined // will be determined later
             }
-            this.enableScroll(false)
+            void Haptics.impact({ style: ImpactStyle.Medium })
+            this.scrollChange.emit({ enable: false })
         } else {
             this.panData = null
         }
@@ -77,6 +84,10 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
 
     protected handlePanMove(event: TouchEvent) {
         const boardPos = this.getBoardPos(event)
+        // cancels press press timer if use moved finger too early
+        if (this.panData == null) {
+            this.handleTouchEnd(event)
+        }
         if (boardPos == null || this.isGameOver() || this.panData == null) { return }
 
         if (boardPos.kind === BOARD_PART.DATA) {
@@ -105,6 +116,7 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
                 }
                 if (boardPos.x !== this.panData.start.x) {
                     this.setCellsAtoB(boardPos, this.panData.start, this.panData.value)
+                    this.panMove.emit(event.changedTouches[0])
                 } else {
                     this.panData.orientation = undefined
                 }
@@ -117,6 +129,7 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
                 }
                 if (boardPos.y !== this.panData.start.y) {
                     this.setCellsAtoB(boardPos, this.panData.start, this.panData.value)
+                    this.panMove.emit(event.changedTouches[0])
                 } else {
                     this.panData.orientation = undefined
                 }
@@ -128,8 +141,9 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         // console.log('(pan end event)')
         if (this.panData != null) {
             this.panData = null
-            this.enableScroll(true)
+            this.scrollChange.emit({ enable: true })
         }
+        this.panEnd.emit()
     }
 
     private toggleCell(x: number, y: number) {

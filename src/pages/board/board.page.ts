@@ -1,8 +1,8 @@
-import { Component, ElementRef, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
 import { NavController, AlertController, ToastController } from '@ionic/angular'
 import { Point, BoardData, GAME_STATUS, SOLUTION_STATUS } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
-import { BoardCanvasComponent } from 'src/components/board-canvas/board-canvas'
+import { BoardCanvasComponent, IScrollChangeEvent } from 'src/components/board-canvas/board-canvas'
 
 const ZOOM_FACTOR = 1.2
 const TOAST_DATA = {
@@ -12,13 +12,18 @@ const TOAST_DATA = {
     [SOLUTION_STATUS.NO_SOLUTION]: { icon: 'skull', message: 'No solution. Fix the hints' }
 }
 
+const AUTO_SCROLL_AREA_WIDTH = 50
+const AUTO_SCROLL_SPEED_FACTOR = 200
+const AUTO_SCROLL_INTERVAL = 150
+
 @Component({
     selector: 'page-board',
     templateUrl: 'board.page.html',
-    styleUrls: ['board.page.scss']
+    styleUrls: ['board.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BoardPage {
-    @ViewChild('scroll', { static: true }) scroller: ElementRef<HTMLElement>
+    @ViewChild('content', { static: true, read: ElementRef }) contentRef: ElementRef<HTMLIonContentElement>
     @ViewChild('boardCanvas', { static: false }) board: BoardCanvasComponent
 
     boardData: BoardData
@@ -28,22 +33,31 @@ export class BoardPage {
     minZoom = 1
     maxZoom = 1
     solvingBoard = false
+    scrollEnabled = true
+
+    private contentEl: HTMLIonContentElement
+    private scroller: HTMLElement
+    private scrollTimer: NodeJS.Timeout | undefined
 
     constructor(
-        public navCtrl: NavController,
-        public alertCtrl: AlertController,
-        public toastCtrl: ToastController,
-        public game: GameProvider
+        private readonly cdr: ChangeDetectorRef,
+        private readonly navCtrl: NavController,
+        private readonly alertCtrl: AlertController,
+        private readonly toastCtrl: ToastController,
+        private readonly game: GameProvider
     ) {
         this.boardData = this.game.boardData
         this.boardSize = this.game.boardSize
     }
 
-    ionViewWillEnter() {
+    async ionViewWillEnter() {
+        this.contentEl = this.contentRef.nativeElement
+        this.scroller = await this.contentEl.getScrollElement()
         const initZoomX = window.innerWidth / this.board.canvasRef.nativeElement.clientWidth
         const initZoomY = window.innerHeight / this.board.canvasRef.nativeElement.clientHeight
         this.zoom = Math.min(initZoomX, initZoomY, 1)
         this.minZoom = this.zoom
+        this.cdr.detectChanges()
     }
 
     async back() {
@@ -68,6 +82,7 @@ export class BoardPage {
 
     zoomChange(value: number) {
         this.zoom = value
+        this.cdr.detectChanges()
     }
 
     async save() {
@@ -134,26 +149,71 @@ export class BoardPage {
                 text: 'Yes',
                 handler: () => {
                     this.board.clear()
+                    this.cdr.detectChanges()
                 }
             }]
         })
         await confirm.present()
     }
 
-    async statusChange(status: GAME_STATUS) {
+    statusChange(status: GAME_STATUS) {
         if (status === GAME_STATUS.OVER) {
             this.zoom = this.minZoom
-            await this.showSolutionToast(SOLUTION_STATUS.FINISHED)
+            this.cdr.detectChanges()
+            void this.showSolutionToast(SOLUTION_STATUS.FINISHED)
         }
+    }
+
+    scrollChange(event: IScrollChangeEvent) {
+        if (event.enable != null) {
+            this.scrollEnabled = event.enable
+            this.cdr.detectChanges()
+        }
+    }
+
+    panMove(touch: Touch) {
+        // calculates horizontal scroll speed: positive if panning approaches
+        // right edge and negative if panning approaches left edge
+        const scrollSpeedX = scrollSpeed(this.contentEl.clientWidth - touch.clientX)
+            ?? scrollSpeed(-touch.clientX)
+            ?? 0
+        // calculates vertical scroll speed: positive if panning approaches
+        // bottom edge and negative if panning approaches top edge
+        const scrollSpeedY = scrollSpeed(this.contentEl.clientHeight - touch.clientY)
+            ?? scrollSpeed(-touch.clientY)
+            ?? 0
+
+        // check if auto-scroll should start with calculated scroll speed
+        if (scrollSpeedX !== 0 || scrollSpeedY !== 0) {
+            // stop previous auto-scroll as it may have an outdated speed
+            if (this.scrollTimer != null) {
+                clearInterval(this.scrollTimer)
+            }
+            // scroll repeatedly with fixed intervals
+            // and newly calculated speed until panning ends
+            this.scrollTimer = setInterval(() => {
+                this.scroller.scrollBy({ left: scrollSpeedX, top: scrollSpeedY, behavior: 'smooth' })
+            }, AUTO_SCROLL_INTERVAL)
+        } else {
+            // stop scrolling if calculated speed drops to 0
+            this.panEnd()
+        }
+    }
+
+    panEnd() {
+        clearInterval(this.scrollTimer)
+        this.scrollTimer = undefined
     }
 
     async solveBoard() {
         this.solvingBoard = true
+        this.cdr.detectChanges()
         const result = await this.game.solveGame(() => {
             this.board.update()
         })
         this.board.checkGameStatus(false)
         this.solvingBoard = false
+        this.cdr.detectChanges()
         await this.showSolutionToast(result)
     }
 
@@ -168,4 +228,17 @@ export class BoardPage {
         await toast.present()
 
     }
+}
+
+/**
+ * Calculates required scroll speed based on the distance to the edge.
+ * The shorter this distance, the higher the speed
+ * @param distance distance to board edge
+ * @returns calculated scroll speed
+ * (for negative distance returns negative scroll speed)
+ */
+function scrollSpeed(distance: number): number | null {
+    return distance < AUTO_SCROLL_AREA_WIDTH && distance > -AUTO_SCROLL_AREA_WIDTH
+        ? Math.round(AUTO_SCROLL_SPEED_FACTOR / distance)
+        : null
 }

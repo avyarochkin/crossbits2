@@ -18,18 +18,24 @@ interface SolvePos {
     kind: string
 }
 
+/** Interface event object emitted by `scrollChange` */
+export interface IScrollChangeEvent {
+    enable?: boolean
+}
+
 @Component({
     template: ''
 })
 export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
     @Output() readonly statusChange = new EventEmitter<GAME_STATUS>()
+    /** Emits when scrolling capability should change */
+    @Output() readonly scrollChange = new EventEmitter<IScrollChangeEvent>()
     @ViewChild('canvas', { static: true }) canvasRef: ElementRef<HTMLCanvasElement>
 
     solvePos: SolvePos | null
     hintPos: HintPoint | null
     private gesture: Gesture
-    private scrollingElement: HTMLElement
     private timeout: NodeJS.Timeout | null
     private readonly colors: ColorMap
 
@@ -41,7 +47,6 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.scrollingElement = this.canvasRef.nativeElement
         this.gesture = this.gestureCtrl.create({
             el: this.canvasRef.nativeElement,
             gestureName: 'toggle-cells',
@@ -52,7 +57,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             onEnd: ({ event }) => { this.handleTouchEnd(event as TouchEvent) }
         })
         this.gesture.enable(true)
-        this.enableScroll(true)
+        this.scrollChange.emit({ enable: true })
         this.paint()
     }
 
@@ -100,12 +105,6 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             }
         }
         this.game.saveBoard()
-    }
-
-    protected enableScroll(enable: boolean) {
-        if (this.scrollingElement != null) {
-            this.scrollingElement.style.overflow = enable ? 'scroll' : 'hidden'
-        }
     }
 
     protected getBoardPos(event: TouchEvent) {
@@ -478,22 +477,26 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
         return colorMap
     }
 
-    private isTouchEvent(event: TouchEvent) {
+    protected isTouchEvent(event: TouchEvent) {
         return event.changedTouches?.length === 1
     }
 
-    private handleTouchStart(event: TouchEvent) {
+    protected handleTouchStart(event: TouchEvent) {
         this.timeout = setTimeout(() => {
             this.handlePress(event)
             this.timeout = null
         }, PRESS_TIME_MSEC)
     }
 
-    private handleTouchEnd(event: TouchEvent) {
+    protected handleTouchEnd(event: TouchEvent) {
         if (this.timeout != null) {
             clearTimeout(this.timeout)
             this.timeout = null
-            this.handleTap(event)
+            // if touch event ended after moving. its type will be `touchmove`
+            // if touch event ended without moving, its type will be `touchend`
+            if (event.type === 'touchend') {
+                this.handleTap(event)
+            }
         }
         this.handlePanEnd()
     }
