@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core'
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2, ViewChild } from '@angular/core'
 import { Gesture, GestureController } from '@ionic/angular'
 
 import { GameProvider } from 'src/providers/game/game'
@@ -41,6 +41,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
     constructor(
         protected readonly gestureCtrl: GestureController,
+        protected readonly renderer: Renderer2,
         protected readonly game: GameProvider
     ) {
         this.colors = this.createColors()
@@ -438,14 +439,14 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             || 1
         const pxRatio = window.devicePixelRatio / backingStoreRatio
         // console.log(`pixel ratio: ${pxRatio}`)
-        const el = this.canvasRef.nativeElement
-        el.width = realWidth * pxRatio
-        el.height = realHeight * pxRatio
+        const canvasEl = this.canvasRef.nativeElement
+        canvasEl.width = Math.round(realWidth * pxRatio)
+        canvasEl.height = Math.round(realHeight * pxRatio)
 
         if (pxRatio !== 1) {
             ctx.imageSmoothingEnabled = false
-            el.style.width = `${realWidth}px`
-            el.style.height = `${realHeight}px`
+            this.renderer.setStyle(canvasEl, 'width', `${realWidth}px`)
+            this.renderer.setStyle(canvasEl, 'height', `${realHeight}px`)
             ctx.scale(pxRatio, pxRatio)
         }
     }

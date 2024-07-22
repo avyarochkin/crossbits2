@@ -1,4 +1,4 @@
-import { Directive, Input, ElementRef, OnInit, Output, EventEmitter } from '@angular/core'
+import { Directive, Input, ElementRef, OnInit, Output, EventEmitter, Renderer2 } from '@angular/core'
 import { Gesture, GestureController } from '@ionic/angular'
 import { Point } from 'src/providers/game/game.interface'
 
@@ -43,7 +43,8 @@ export class ZoomableDirective implements OnInit {
 
     constructor(
         private readonly hostRef: ElementRef<HTMLElement>,
-        private readonly gestureCtrl: GestureController
+        private readonly gestureCtrl: GestureController,
+        private readonly renderer: Renderer2
     ) { }
 
 
@@ -52,8 +53,9 @@ export class ZoomableDirective implements OnInit {
         this.scrollEl = this.hostRef.nativeElement.parentElement!
 
         this.zoomEl = this.hostRef.nativeElement
-        this.zoomEl.style.width = 'fit-content'
-        this.zoomEl.style.height = 'initial'
+        this.renderer.setStyle(this.zoomEl, 'width', 'fit-content')
+        this.renderer.setStyle(this.zoomEl, 'height', 'initial')
+        this.renderer.setStyle(this.zoomEl, 'will-change', 'scroll-position, transform')
 
         this.gesture = this.gestureCtrl.create({
             el: this.hostRef.nativeElement,
@@ -119,17 +121,16 @@ export class ZoomableDirective implements OnInit {
         if (this.zoomEl == null) { return }
         if (this.contentSize == null) {
             this.contentSize = {
-                x: this.zoomEl.clientWidth * this.currentScale,
-                y: this.zoomEl.clientHeight * this.currentScale
+                x: Math.round(this.zoomEl.clientWidth * this.currentScale),
+                y: Math.round(this.zoomEl.clientHeight * this.currentScale)
             }
         }
-
-        this.zoomEl.style.transformOrigin = '0 0'
-        this.zoomEl.style.transition = 'transform 150ms'
-        this.zoomEl.style.transform = `scale3d(${this.currentScale}, ${this.currentScale}, 1)`
-        this.zoomEl.style.width = `${this.contentSize.x}px`
-        this.zoomEl.style.height = `${this.contentSize.y}px`
-        this.adjustCenter()
+        this.renderer.setStyle(this.zoomEl, 'transformOrigin', '0 0')
+        // this.renderer.setStyle(this.zoomEl, 'transition', 'transform 150ms')
+        this.renderer.setStyle(this.zoomEl, 'transform', `scale3d(${this.currentScale}, ${this.currentScale}, 1)`)
+        this.renderer.setStyle(this.zoomEl, 'width', `${this.contentSize.x}px`)
+        this.renderer.setStyle(this.zoomEl, 'height', `${this.contentSize.y}px`)
+        // this.adjustCenter()
     }
 
     /** @todo fix calculation of the offset x/y */
@@ -140,8 +141,8 @@ export class ZoomableDirective implements OnInit {
         const x = Math.round(this.startPinchCenter.x * this.currentScale - this.pinchCenter.x)
         const y = Math.round(this.startPinchCenter.y * this.currentScale - this.pinchCenter.y)
 
-        this.zoomEl.style.left = `${ x > 0 ? 0 : -x }px`
-        this.zoomEl.style.top = `${ y > 0 ? 0 : -y }px`
+        this.renderer.setStyle(this.zoomEl, 'left', `${ x > 0 ? 0 : -x }px`)
+        this.renderer.setStyle(this.zoomEl, 'top', `${ y > 0 ? 0 : -y }px`)
 
         this.scrollEl.scrollLeft = x > 0 ? x : 0
         this.scrollEl.scrollTop = y > 0 ? y : 0

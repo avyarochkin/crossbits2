@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core'
+import { Component, EventEmitter, Output, Renderer2 } from '@angular/core'
 import { GestureController } from '@ionic/angular'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 
@@ -36,9 +36,10 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
 
     constructor(
         protected readonly gestureCtrl: GestureController,
+        protected readonly renderer: Renderer2,
         protected readonly game: GameProvider
     ) {
-        super(gestureCtrl, game)
+        super(gestureCtrl, renderer, game)
     }
 
     protected handleTap(event: TouchEvent) {
