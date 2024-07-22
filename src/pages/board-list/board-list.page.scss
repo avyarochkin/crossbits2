@@ -1,8 +1,11 @@
 :host {
     .stage-slides {
         height: 100%;
-        --swiper-pagination-color: var(--ion-color-ultra-light);
+        --swiper-pagination-color: var(--ion-color-lightest);
         --swiper-pagination-bullet-inactive-color: var(--ion-color-medium);
+        --swiper-pagination-bottom: calc(var(--ion-safe-area-bottom, 0) + 0.5rem);
+        --swiper-pagination-bullet-inactive-opacity: 0.75;
+        --swiper-pagination-bullet-size: 0.75rem;
         .slide-zoom {
             height: 100%;
             padding: 2rem 0;
@@ -35,7 +38,7 @@
         .stage {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-evenly;
+            justify-content: center;
 
             .stage-board {
                 position: relative;
@@ -49,7 +52,8 @@
                 justify-content: center;
                 align-items: center;
                 text-align: center;
-                font-size: 1.25rem;
+                font-size: 1.4rem;
+                font-weight: 200;
                 color: var(--ion-color-semi-dark);
                 &.new {
                     background-color: transparent;
@@ -64,16 +68,17 @@
                 }
                 .board-num {
                     position: absolute;
-                    top: -1.25rem;
+                    top: -1rem;
                     align-self: center;
-                    color: var(--ion-color-light);
-                    font-size: 1rem;
+                    color: var(--ion-color-medium);
+                    font-size: 0.8rem;
+                    font-weight: 400;
                 }
                 .board-flag {
                     position: absolute;
-                    font-size: 3rem;
+                    font-size: 4rem;
                     align-self: center;
-                    color: var(--ion-color-semi-dark);
+                    color: var(--ion-color-medium);
                     opacity: 0.25;
                 }
                 .board-size { position: relative; }
