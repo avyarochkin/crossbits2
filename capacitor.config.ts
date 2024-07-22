@@ -3,7 +3,7 @@ import { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
     appId: 'com.braintrain.crossbits2',
-    appName: 'crossbits2',
+    appName: 'CrossBits',
     webDir: 'www',
     server: {
         androidScheme: 'https'
