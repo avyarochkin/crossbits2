@@ -1,5 +1,4 @@
-import { Directive, Input, ElementRef, OnInit, Output, EventEmitter, Renderer2 } from '@angular/core'
-import { Gesture, GestureController } from '@ionic/angular'
+import { Directive, Input, ElementRef, OnInit, Output, EventEmitter, Renderer2, HostListener } from '@angular/core'
 import { Point } from 'src/providers/game/game.interface'
 
 /** Delta-factor of scale elasticity when it exceeds min limit */
@@ -32,18 +31,16 @@ export class ZoomableDirective implements OnInit {
 
     private scrollEl: HTMLElement
     private zoomEl: HTMLElement
-    private gesture: Gesture
     private contentSize: Point
     private currentScale = 1
     private pinchCenter: Point | null
 
     // values stored when the pinch/zoom operation starts
-    private startScale = 1
+    private startScale: number | null
     private startPinchCenter: Point | null
 
     constructor(
         private readonly hostRef: ElementRef<HTMLElement>,
-        private readonly gestureCtrl: GestureController,
         private readonly renderer: Renderer2
     ) { }
 
@@ -56,47 +53,39 @@ export class ZoomableDirective implements OnInit {
         this.renderer.setStyle(this.zoomEl, 'width', 'fit-content')
         this.renderer.setStyle(this.zoomEl, 'height', 'initial')
         this.renderer.setStyle(this.zoomEl, 'will-change', 'scroll-position, transform')
-
-        this.gesture = this.gestureCtrl.create({
-            el: this.hostRef.nativeElement,
-            gestureName: 'pinch-zoom',
-            threshold: 0,
-            // this gesture processes only pinch/zoom, i.e. events with 2 touches
-            canStart: ({ event }) => this.isPinchZoomEvent(event as TouchEvent),
-            onStart: ({ event }) => { this.handlePinchZoomStart(event as TouchEvent) },
-            onMove: ({ event }) => { this.handlePinchZoom(event as TouchEvent) },
-            onEnd: () => { this.handlePinchZoomEnd() }
-        })
-        this.gesture.enable(true)
     }
 
     private isPinchZoomEvent(event: TouchEvent) {
         return event.changedTouches?.length === 2
     }
 
-    private handlePinchZoomStart(event: TouchEvent) {
-        // console.log('[pinch start event]', event)
-        this.startScale = this.currentScale
-        this.startPinchCenter = this.getMidPoint(event.changedTouches)
-    }
-
-    private handlePinchZoom(event: TouchEvent) {
-        // console.log('[pinch event]', event)
+    @HostListener('touchmove', ['$event'])
+    handlePinchZoom(event: TouchEvent) {
+        if (!this.isPinchZoomEvent(event)) { return }
+        if (this.startScale == null) {
+            this.startScale = this.currentScale
+            this.startPinchCenter = this.getMidPoint(event.changedTouches)
+        }
         if ('scale' in event && typeof event.scale === 'number') {
-            let scale = this.startScale * event.scale
+            this.scale = this.adjustScale(event.scale)
             this.pinchCenter = this.getMidPoint(event.changedTouches)
-            // when new scale exceeds min/max limit it should resist the further it moves away
-            if (scale > this.maxScale) {
-                scale = this.maxScale + (1 - this.maxScale / scale) * MAX_SCALE_BOUNCE
-            } else if (scale < this.minScale) {
-                scale = this.minScale - (1 - scale / this.minScale) * MIN_SCALE_BOUNCE
-            }
-            this.scale = scale
         }
     }
 
-    private handlePinchZoomEnd() {
-        // console.log('[pinch end event]')
+    private adjustScale(value: number): number {
+        let scale = this.startScale! * value
+        // when new scale exceeds min/max limit it should resist the further it moves away
+        if (scale > this.maxScale) {
+            scale = this.maxScale + (1 - this.maxScale / scale) * MAX_SCALE_BOUNCE
+        } else if (scale < this.minScale) {
+            scale = this.minScale - (1 - scale / this.minScale) * MIN_SCALE_BOUNCE
+        }
+        return scale
+    }
+
+    @HostListener('touchend')
+    handlePinchZoomEnd() {
+        this.startScale = null
         // when final scale is outside of min/max boundaries, it should bounce back
         if (this.currentScale > this.maxScale) {
             this.animateScale(this.maxScale)
