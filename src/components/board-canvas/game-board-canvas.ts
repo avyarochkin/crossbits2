@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Output, Renderer2 } from '@angular/core'
-import { GestureController } from '@ionic/angular'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 
 import { BOARD_CELL, BOARD_PART, Point } from 'src/providers/game/game.interface'
@@ -35,11 +34,10 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
     private panData: PanData | null
 
     constructor(
-        protected readonly gestureCtrl: GestureController,
         protected readonly renderer: Renderer2,
         protected readonly game: GameProvider
     ) {
-        super(gestureCtrl, renderer, game)
+        super(renderer, game)
     }
 
     protected handleTap(event: TouchEvent) {
@@ -63,7 +61,7 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         }
     }
 
-    protected handlePress(event: TouchEvent) {
+    protected handleLongPress(event: TouchEvent) {
         // console.log('[press event]')
 
         const boardPos = this.getBoardPos(event)
@@ -84,11 +82,8 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
     }
 
     protected handlePanMove(event: TouchEvent) {
+        // console.log('[pan move event]')
         const boardPos = this.getBoardPos(event)
-        // cancels press press timer if use moved finger too early
-        if (this.panData == null) {
-            this.handleTouchEnd(event)
-        }
         if (boardPos == null || this.isGameOver() || this.panData == null) { return }
 
         if (boardPos.kind === BOARD_PART.DATA) {

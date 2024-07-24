@@ -1,5 +1,5 @@
 import { Component, Renderer2 } from '@angular/core'
-import { GestureController, ModalController } from '@ionic/angular'
+import { ModalController } from '@ionic/angular'
 
 import { BOARD_PART, BOARD_SIDE, BoardSide } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
@@ -20,12 +20,11 @@ import { BoardCanvasComponent } from './board-canvas'
 export class SetupBoardCanvasComponent extends BoardCanvasComponent {
 
     constructor(
-        protected readonly gestureCtrl: GestureController,
         private readonly modalCtrl: ModalController,
         protected readonly renderer: Renderer2,
         protected readonly game: GameProvider
     ) {
-        super(gestureCtrl, renderer, game)
+        super(renderer, game)
     }
 
     protected handleTap(event: TouchEvent) {
@@ -49,7 +48,7 @@ export class SetupBoardCanvasComponent extends BoardCanvasComponent {
         }
     }
 
-    protected handlePress() { }
+    protected handleLongPress() { }
     protected handlePanMove() { }
     protected handlePanEnd() { }
 

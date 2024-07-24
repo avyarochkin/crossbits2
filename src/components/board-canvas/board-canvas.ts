@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2, ViewChild } from '@angular/core'
-import { Gesture, GestureController } from '@ionic/angular'
+import { debounceTime, filter, fromEvent, Subject, takeUntil, tap } from 'rxjs'
 
 import { GameProvider } from 'src/providers/game/game'
 import {
@@ -35,12 +35,10 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
     solvePos: SolvePos | null
     hintPos: HintPoint | null
-    private gesture: Gesture
-    private timeout: NodeJS.Timeout | null
     private readonly colors: ColorMap
+    private readonly ngUnsubscribe = new Subject<void>()
 
     constructor(
-        protected readonly gestureCtrl: GestureController,
         protected readonly renderer: Renderer2,
         protected readonly game: GameProvider
     ) {
@@ -48,22 +46,14 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.gesture = this.gestureCtrl.create({
-            el: this.canvasRef.nativeElement,
-            gestureName: 'toggle-cells',
-            threshold: 0,
-            canStart: ({ event }) => this.isTouchEvent(event as TouchEvent),
-            onStart: ({ event }) => { this.handleTouchStart(event as TouchEvent) },
-            onMove: ({ event }) => { this.handlePanMove(event as TouchEvent) },
-            onEnd: ({ event }) => { this.handleTouchEnd(event as TouchEvent) }
-        })
-        this.gesture.enable(true)
+        this.setupTouchEvents()
         this.scrollChange.emit({ enable: true })
         this.paint()
     }
 
     ngOnDestroy() {
-        this.gesture.destroy()
+        this.ngUnsubscribe.next()
+        this.ngUnsubscribe.complete()
     }
 
     isGame(): boolean {
@@ -478,32 +468,43 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
         return colorMap
     }
 
-    protected isTouchEvent(event: TouchEvent) {
-        return event.changedTouches?.length === 1
+    protected setupTouchEvents() {
+        const canvasEl = this.canvasRef.nativeElement
+        // indicates that user touched and not moved / released finger
+        let tapping = false
+
+        fromEvent<TouchEvent>(canvasEl, 'touchstart')
+            .pipe(
+                tap(() => { tapping = true }),
+                debounceTime(PRESS_TIME_MSEC),
+                filter(() => tapping),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(event => {
+                tapping = false
+                this.handleLongPress(event)
+            })
+
+        fromEvent<TouchEvent>(canvasEl, 'touchmove')
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(event => {
+                tapping = false
+                this.handlePanMove(event)
+            })
+
+        fromEvent<TouchEvent>(canvasEl, 'touchend')
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(event => {
+                if (tapping) {
+                    this.handleTap(event)
+                    tapping = false
+                }
+                this.handlePanEnd()
+            })
     }
 
-    protected handleTouchStart(event: TouchEvent) {
-        this.timeout = setTimeout(() => {
-            this.handlePress(event)
-            this.timeout = null
-        }, PRESS_TIME_MSEC)
-    }
-
-    protected handleTouchEnd(event: TouchEvent) {
-        if (this.timeout != null) {
-            clearTimeout(this.timeout)
-            this.timeout = null
-            // if touch event ended after moving. its type will be `touchmove`
-            // if touch event ended without moving, its type will be `touchend`
-            if (event.type === 'touchend') {
-                this.handleTap(event)
-            }
-        }
-        this.handlePanEnd()
-    }
-
-    protected abstract handleTap(event: TouchEvent)
-    protected abstract handlePress(event: TouchEvent)
-    protected abstract handlePanMove(event: TouchEvent)
-    protected abstract handlePanEnd()
+    protected abstract handleTap(event: TouchEvent): void
+    protected abstract handleLongPress(event: TouchEvent): void
+    protected abstract handlePanMove(event: TouchEvent): void
+    protected abstract handlePanEnd(): void
 }
