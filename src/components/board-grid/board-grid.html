@@ -18,29 +18,43 @@
 </div>
 
 <ng-template #board>
-    <div class="board-line" *ngFor="let boardLine of game.boardData">
-        <div class="board-cell" *ngFor="let boardDataItem of boardLine"
-            [ngClass]="boardCell[boardDataItem.value]">
+    @for (boardLine of game.boardData; track $index) {
+        <div class="board-line">
+            @for (boardDataItem of boardLine; track $index) {
+                <div class="board-cell" [ngClass]="boardCell[boardDataItem.value]"></div>
+            }
         </div>
-    </div>
+    }
 </ng-template>
 
 <ng-template #columnHints let-side="side">
-    <div class="hint-line" *ngFor="let hintLine of game.columnHints.hints">
-        <div class="hint-cell" *ngIf="side === 'first' && game.boardStatus === 'setup'"></div>
-        <div class="hint-cell" *ngFor="let hintCell of hintLine">
-            {{ hintCell.hint }}
+    @for (hintLine of game.columnHints.hints; track $index) {
+        <div class="hint-line">
+            @if (side === 'first' && game.boardStatus === 'setup') {
+                <div class="hint-cell"></div>
+            }
+            @for (hintCell of hintLine; track $index) {
+                <div class="hint-cell">{{ hintCell.hint }}</div>
+            }
+            @if (side === 'last' && game.boardStatus === 'setup') {
+                <div class="hint-cell"></div>
+            }
         </div>
-        <div class="hint-cell" *ngIf="side === 'last' && game.boardStatus === 'setup'"></div>
-    </div>
+    }
 </ng-template>
 
 <ng-template #rowHints let-side="side">
-    <div class="hint-line" *ngFor="let hintLine of game.rowHints.hints">
-        <div class="hint-cell" *ngIf="side === 'first' && game.boardStatus === 'setup'"></div>
-        <div class="hint-cell" *ngFor="let hintCell of hintLine">
-            {{ hintCell.hint }}
+    @for (hintLine of game.rowHints.hints; track $index) {
+        <div class="hint-line">
+            @if (side === 'first' && game.boardStatus === 'setup') {
+                <div class="hint-cell"></div>
+            }
+            @for (hintCell of hintLine; track $index) {
+                <div class="hint-cell">{{ hintCell.hint }}</div>
+            }
+            @if (side === 'last' && game.boardStatus === 'setup') {
+                <div class="hint-cell"></div>
+            }
         </div>
-        <div class="hint-cell" *ngIf="side === 'last' && game.boardStatus === 'setup'"></div>
-    </div>
+    }
 </ng-template>

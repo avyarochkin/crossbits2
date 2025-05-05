@@ -1,31 +1,31 @@
-    <ion-toolbar>
-        <ion-buttons slot="start">
-            <ion-button fill="outline" shape="round" [class.activated]="autoAdvance"
-                (click)="toggleAutoAdvance()">
-                AUTO
-            </ion-button>
-            <ion-button [disabled]="!autoAdvance"
-                (click)="previousHintPos()">
-                <ion-icon name="chevron-back"></ion-icon>
-                RETREAT
-            </ion-button>
-            <ion-button [disabled]="!autoAdvance"
-                (click)="nextHintPos()">
-                ADVANCE
-                <ion-icon name="chevron-forward"></ion-icon>
-            </ion-button>
-        </ion-buttons>
-        <ion-buttons slot="end">
-            <ion-button fill="solid" shape="round" (click)="dismiss()">
-                <ion-icon name="close"></ion-icon>
-            </ion-button>
-        </ion-buttons>
-    </ion-toolbar>
-
+<ion-toolbar>
+    <ion-buttons slot="start">
+        <ion-button fill="outline" shape="round" [class.activated]="autoAdvance"
+            (click)="toggleAutoAdvance()">
+            AUTO
+        </ion-button>
+        <ion-button [disabled]="!autoAdvance"
+            (click)="previousHintPos()">
+            <ion-icon name="chevron-back"></ion-icon>
+            RETREAT
+        </ion-button>
+        <ion-button [disabled]="!autoAdvance"
+            (click)="nextHintPos()">
+            ADVANCE
+            <ion-icon name="chevron-forward"></ion-icon>
+        </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+        <ion-button fill="solid" shape="round" (click)="dismiss()">
+            <ion-icon name="close"></ion-icon>
+        </ion-button>
+    </ion-buttons>
+</ion-toolbar>
+@for (enabled of enabledButtons; track $index; let index = $index) {
     <ion-button class="hint-button" shape="round"
-        *ngFor="let enabled of enabledButtons; let index = index"
         [class.selected]="index === selectedHint"
         [disabled]="!enabled"
         (click)="selectHint(index)">
         {{ index }}
     </ion-button>
+}

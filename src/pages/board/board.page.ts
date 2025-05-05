@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
-import { NgClass, NgIf } from '@angular/common'
+import { NgClass } from '@angular/common'
 import {
     NavController, AlertController, ToastController, IonContent, IonButton, IonButtons, IonIcon, IonFooter,
     IonToolbar, IonSpinner
@@ -34,7 +34,7 @@ const AUTO_SCROLL_INTERVAL = 100
     styleUrls: ['board.page.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgClass, NgIf,
+        NgClass,
         IonFooter, IonToolbar, IonContent, IonButton, IonButtons, IonIcon, IonSpinner,
         GameBoardCanvasComponent, SetupBoardCanvasComponent, ZoomableDirective
     ]

@@ -1,35 +1,39 @@
 <ion-header mode="ios">
-    <ion-toolbar mode="ios" *ngIf="swiperRef.nativeElement.swiper as swiper">
-        <ion-buttons slot="start">
-            <ion-button class="prev-stage-button" fill="solid"
-                *ngIf="swiper.activeIndex > 0"
-                (click)="swiper.slidePrev()">
-                <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
-            </ion-button>
-        </ion-buttons>
-        <ion-title>
-            <h1 class="title-block">
-                {{ swiper.activeIndex < allBoards.length - 1 ? 'STAGE ' + (swiper.activeIndex + 1): 'SAVED BOARDS' }}
-            </h1>
-        </ion-title>
-        <ion-buttons slot="end">
-            <ion-button class="next-stage-button" fill="solid"
-                *ngIf="swiper.activeIndex < allBoards.length - 1"
-                (click)="swiper.slideNext()">
-                <ion-icon slot="icon-only" name="chevron-forward"></ion-icon>
-            </ion-button>
-        <ion-button class="editing-button" fill="solid"
-            *ngIf="swiper.activeIndex === allBoards.length - 1"
-            (click)="editing = !editing">
-            <ion-icon slot="icon-only" [name]="editing ? 'checkmark-done-outline' : 'create-outline'"></ion-icon>
-        </ion-button>
-        <ion-button class="options-button" fill="solid" [disabled]="editing"
-            *ngIf="swiper.activeIndex === allBoards.length - 1"
-            (click)="showSettings()">
-            <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
-        </ion-button>
-        </ion-buttons>
-    </ion-toolbar>
+    @if (swiperRef.nativeElement.swiper; as swiper) {
+        <ion-toolbar mode="ios">
+            <ion-buttons slot="start">
+                @if (swiper.activeIndex > 0) {
+                    <ion-button class="prev-stage-button" fill="solid"
+                        (click)="swiper.slidePrev()">
+                        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+                    </ion-button>
+                }
+            </ion-buttons>
+            <ion-title>
+                <h1 class="title-block">
+                    {{ swiper.activeIndex < allBoards.length - 1 ? 'STAGE ' + (swiper.activeIndex + 1): 'SAVED BOARDS' }}
+                </h1>
+            </ion-title>
+            <ion-buttons slot="end">
+                @if (swiper.activeIndex < allBoards.length - 1) {
+                    <ion-button class="next-stage-button" fill="solid"
+                        (click)="swiper.slideNext()">
+                        <ion-icon slot="icon-only" name="chevron-forward"></ion-icon>
+                    </ion-button>
+                }
+                @if (swiper.activeIndex === allBoards.length - 1) {
+                    <ion-button class="editing-button" fill="solid"
+                        (click)="editing = !editing">
+                        <ion-icon slot="icon-only" [name]="editing ? 'checkmark-done-outline' : 'create-outline'"></ion-icon>
+                    </ion-button>
+                    <ion-button class="options-button" fill="solid" [disabled]="editing"
+                        (click)="showSettings()">
+                        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+                    </ion-button>
+                }
+            </ion-buttons>
+        </ion-toolbar>
+    }
 </ion-header>
 
 <ion-content [forceOverscroll]="false">
@@ -37,26 +41,32 @@
         (slidermove)="toggleSliding(true)"
         (touchend)="toggleSliding(false)"
         (slidechange)="changeSlide()">
-        <swiper-slide class="stage-slide"
-            [class.sliding]="sliding"
-            *ngFor="let stageBoards of allBoards; let i = index">
-            <div class="stage-slide-container">
-                <div class="stage" [class.editing]="editing">
-                    <button class="stage-board"
-                        [class.editable]="!board.static"
-                        [class.solved]="board.solved"
-                        *ngFor="let board of stageBoards"
-                        (click)="loadGame(board)">
-                        <div class="board-num">{{ board.nr }}</div>
-                        <ion-icon name="trophy" class="board-flag" *ngIf="board.solved"></ion-icon>
-                        <span class="board-size">{{ board.columnHints.hints.length }}&times;{{ board.rowHints.hints.length }}</span>
-                    </button>
-                    <button class="stage-board new editable" [class.editing]="editing" *ngIf="i === allBoards.length - 1 && editing" (click)="createGame()">
-                        <ion-icon name="add"></ion-icon>
-                    </button>
+        @for (stageBoards of allBoards; track $index; let i = $index) {
+            <swiper-slide class="stage-slide"
+                [class.sliding]="sliding">
+                <div class="stage-slide-container">
+                    <div class="stage" [class.editing]="editing">
+                        @for (board of stageBoards; track $index) {
+                            <button class="stage-board"
+                                [class.editable]="!board.static"
+                                [class.solved]="board.solved"
+                                (click)="loadGame(board)">
+                                <div class="board-num">{{ board.nr }}</div>
+                                @if (board.solved) {
+                                    <ion-icon name="trophy" class="board-flag"></ion-icon>
+                                }
+                                <span class="board-size">{{ board.columnHints.hints.length }}&times;{{ board.rowHints.hints.length }}</span>
+                            </button>
+                        }
+                        @if (i === allBoards.length - 1 && editing) {
+                            <button class="stage-board new editable" [class.editing]="editing" (click)="createGame()">
+                                <ion-icon name="add"></ion-icon>
+                            </button>
+                        }
+                    </div>
                 </div>
-            </div>
-        </swiper-slide>
+            </swiper-slide>
+        }
     </swiper-container>
 </ion-content>
 

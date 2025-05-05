@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild } from '@angular/core'
-import { NgFor, NgIf } from '@angular/common'
 import { OverlayEventDetail } from '@ionic/core'
 import {
     NavController, PickerController, PickerColumnOption, ActionSheetController, AlertController, AlertOptions,
@@ -31,7 +30,6 @@ const ROLES = {
     templateUrl: 'board-list.page.html',
     styleUrls: ['board-list.page.scss'],
     imports: [
-        NgFor, NgIf,
         IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

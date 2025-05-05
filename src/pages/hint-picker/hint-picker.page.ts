@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core'
-import { NgFor } from '@angular/common'
 import { IonButton, IonButtons, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone'
 
 import { LocalStorageProvider } from 'src/providers/local-storage/local-storage'
@@ -15,7 +14,6 @@ const AUTO_ADVANCE = 'auto-advance'
     templateUrl: './hint-picker.page.html',
     styleUrls: ['./hint-picker.page.scss'],
     imports: [
-        NgFor,
         IonToolbar, IonButtons, IonButton, IonIcon
     ]
 })

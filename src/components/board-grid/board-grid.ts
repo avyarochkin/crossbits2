@@ -1,4 +1,4 @@
-import { NgClass, NgFor, NgIf } from '@angular/common'
+import { NgClass } from '@angular/common'
 import { Component, ElementRef, ViewChild } from '@angular/core'
 
 import { GameProvider } from 'src/providers/game/game'
@@ -7,13 +7,13 @@ import { GameProvider } from 'src/providers/game/game'
     selector: 'board-grid',
     templateUrl: 'board-grid.html',
     styleUrls: ['board-grid.scss'],
-    imports: [NgClass, NgIf, NgFor],
+    imports: [NgClass],
     standalone: true
 })
 export class BoardGridComponent {
     @ViewChild('canvas', { static: true }) canvasRef: ElementRef<HTMLElement>
 
-    readonly boardCell = { 0: 'off', 1: 'on' }
+    readonly boardCell = ['off', 'on']
 
     constructor(
         readonly game: GameProvider
