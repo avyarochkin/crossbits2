@@ -1,19 +1,19 @@
 <div #canvas class="board-canvas"
     [ngClass]="game.boardStatus">
     <div class="column-hints first">
-        <ng-container *ngTemplateOutlet="columnHints; context: { side: 'first' }"></ng-container>
+        <ng-container *ngTemplateOutlet="columnHints; context: { side: 'first' }"/>
     </div>
     <div class="row-hints first">
-        <ng-container *ngTemplateOutlet="rowHints; context: { side: 'first' }"></ng-container>
+        <ng-container *ngTemplateOutlet="rowHints; context: { side: 'first' }"/>
     </div>
     <div class="board">
-        <ng-container *ngTemplateOutlet="board"></ng-container>
+        <ng-container *ngTemplateOutlet="board"/>
     </div>
     <div class="row-hints last">
-        <ng-container *ngTemplateOutlet="rowHints; context: { side: 'last' }"></ng-container>
+        <ng-container *ngTemplateOutlet="rowHints; context: { side: 'last' }"/>
     </div>
     <div class="column-hints last">
-        <ng-container *ngTemplateOutlet="columnHints; context: { side: 'last' }"></ng-container>
+        <ng-container *ngTemplateOutlet="columnHints; context: { side: 'last' }"/>
     </div>
 </div>
 

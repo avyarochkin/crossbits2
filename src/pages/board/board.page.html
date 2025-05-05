@@ -15,10 +15,9 @@
                 (statusChange)="statusChange($event)"
                 (scrollChange)="scrollChange($event)"
                 (panMove)="panMove($event)"
-                (panEnd)="panEnd()">
-            </board-canvas>
+                (panEnd)="panEnd()"/>
          } @else {
-            <setup-board-canvas #boardCanvas class="board-canvas"></setup-board-canvas>
+            <setup-board-canvas #boardCanvas class="board-canvas"/>
          }
     </div>
 
@@ -34,34 +33,34 @@
 
         <ion-buttons slot="end">
             <ion-button class="zoon-in-button" fill="solid" title="Zoom In" (click)="zoomIn()" [disabled]="!canZoomIn()">
-                <ion-icon name="add-circle-outline" slot="icon-only"></ion-icon>
+                <ion-icon name="add-circle-outline" slot="icon-only"/>
             </ion-button>
             <ion-button class="zoom-out-button" fill="solid" title="Zoom Out" (click)="zoomOut()" [disabled]="!canZoomOut()">
-                <ion-icon name="remove-circle-outline" slot="icon-only"></ion-icon>
+                <ion-icon name="remove-circle-outline" slot="icon-only"/>
             </ion-button>
             @if (isGame()) {
                 <ion-button class="solve-board-button" fill="solid" title="Solve" (click)="solveBoard()">
                     @if (!solvingBoard) {
-                        <ion-icon name="bulb-outline" slot="icon-only"></ion-icon>
+                        <ion-icon name="bulb-outline" slot="icon-only"/>
                     } @else {
-                        <ion-spinner name="crescent" slot="icon-only"></ion-spinner>
+                        <ion-spinner name="crescent" slot="icon-only"/>
                     }
                 </ion-button>
             }
             @if (!isSetup()) {
                 <ion-button class="clear-board-button" fill="solid" title="Clear" (click)="clear()">
-                    <ion-icon name="ban-outline" slot="icon-only"></ion-icon>
+                    <ion-icon name="ban-outline" slot="icon-only"/>
                 </ion-button>
                 <ion-button class="undo-move-button" fill="solid" title="Undo" (click)="board.undo()" [disabled]="!canUndo()">
-                    <ion-icon name="arrow-undo-outline" slot="icon-only"></ion-icon>
+                    <ion-icon name="arrow-undo-outline" slot="icon-only"/>
                 </ion-button>
                 <ion-button class="redo-move-button" fill="solid" title="Redo" (click)="board.redo()" [disabled]="!canRedo()">
-                    <ion-icon name="arrow-redo-outline" slot="icon-only"></ion-icon>
+                    <ion-icon name="arrow-redo-outline" slot="icon-only"/>
                 </ion-button>
             } @else {
                 @if (!isNewBoard()) {
                     <ion-button class="delete-board-button" fill="solid" title="Delete" (click)="delete()">
-                        <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                        <ion-icon name="trash-outline" slot="icon-only"/>
                     </ion-button>
                 }
                 <ion-button class="save-board-button" fill="solid" (click)="save()">

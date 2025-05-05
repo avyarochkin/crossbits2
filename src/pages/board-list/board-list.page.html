@@ -5,7 +5,7 @@
                 @if (swiper.activeIndex > 0) {
                     <ion-button class="prev-stage-button" fill="solid"
                         (click)="swiper.slidePrev()">
-                        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+                        <ion-icon slot="icon-only" name="chevron-back"/>
                     </ion-button>
                 }
             </ion-buttons>
@@ -18,17 +18,17 @@
                 @if (swiper.activeIndex < allBoards.length - 1) {
                     <ion-button class="next-stage-button" fill="solid"
                         (click)="swiper.slideNext()">
-                        <ion-icon slot="icon-only" name="chevron-forward"></ion-icon>
+                        <ion-icon slot="icon-only" name="chevron-forward"/>
                     </ion-button>
                 }
                 @if (swiper.activeIndex === allBoards.length - 1) {
                     <ion-button class="editing-button" fill="solid"
                         (click)="editing = !editing">
-                        <ion-icon slot="icon-only" [name]="editing ? 'checkmark-done-outline' : 'create-outline'"></ion-icon>
+                        <ion-icon slot="icon-only" [name]="editing ? 'checkmark-done-outline' : 'create-outline'"/>
                     </ion-button>
                     <ion-button class="options-button" fill="solid" [disabled]="editing"
                         (click)="showSettings()">
-                        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+                        <ion-icon slot="icon-only" name="settings-outline"/>
                     </ion-button>
                 }
             </ion-buttons>
@@ -53,14 +53,14 @@
                                 (click)="loadGame(board)">
                                 <div class="board-num">{{ board.nr }}</div>
                                 @if (board.solved) {
-                                    <ion-icon name="trophy" class="board-flag"></ion-icon>
+                                    <ion-icon name="trophy" class="board-flag"/>
                                 }
                                 <span class="board-size">{{ board.columnHints.hints.length }}&times;{{ board.rowHints.hints.length }}</span>
                             </button>
                         }
                         @if (i === allBoards.length - 1 && editing) {
                             <button class="stage-board new editable" [class.editing]="editing" (click)="createGame()">
-                                <ion-icon name="add"></ion-icon>
+                                <ion-icon name="add"/>
                             </button>
                         }
                     </div>
