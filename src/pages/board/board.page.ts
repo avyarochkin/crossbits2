@@ -1,8 +1,20 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
-import { NavController, AlertController, ToastController } from '@ionic/angular'
+import { NgClass, NgIf } from '@angular/common'
+import {
+    NavController, AlertController, ToastController, IonContent, IonButton, IonButtons, IonIcon, IonFooter,
+    IonToolbar, IonSpinner
+} from '@ionic/angular/standalone'
+import { addIcons } from 'ionicons'
+import {
+    addCircleOutline, arrowRedoOutline, arrowUndoOutline, banOutline, bulbOutline, removeCircleOutline
+} from 'ionicons/icons'
+
 import { Point, BoardData, GAME_STATUS, SOLUTION_STATUS } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
 import { BoardCanvasComponent, IScrollChangeEvent } from 'src/components/board-canvas/board-canvas'
+import { SetupBoardCanvasComponent } from 'src/components/board-canvas/setup-board-canvas'
+import { GameBoardCanvasComponent } from 'src/components/board-canvas/game-board-canvas'
+import { ZoomableDirective } from 'src/directives/zoomable/zoomable'
 
 const ZOOM_FACTOR = 1.2
 const TOAST_DATA = {
@@ -21,7 +33,11 @@ const AUTO_SCROLL_INTERVAL = 100
     templateUrl: 'board.page.html',
     styleUrls: ['board.page.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+    imports: [
+        NgClass, NgIf,
+        IonFooter, IonToolbar, IonContent, IonButton, IonButtons, IonIcon, IonSpinner,
+        GameBoardCanvasComponent, SetupBoardCanvasComponent, ZoomableDirective
+    ]
 })
 export class BoardPage {
     @ViewChild('content', { static: true, read: ElementRef }) contentRef: ElementRef<HTMLIonContentElement>
@@ -49,6 +65,9 @@ export class BoardPage {
     ) {
         this.boardData = this.game.boardData
         this.boardSize = this.game.boardSize
+        addIcons({
+            addCircleOutline, removeCircleOutline, banOutline, arrowUndoOutline, arrowRedoOutline, bulbOutline
+        })
     }
 
     async ionViewWillEnter() {

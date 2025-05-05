@@ -1,11 +1,18 @@
-import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild } from '@angular/core'
+import { NgFor, NgIf } from '@angular/common'
+import { OverlayEventDetail } from '@ionic/core'
 import {
-    NavController, PickerController, PickerColumnOption, ActionSheetController, AlertController, AlertOptions
-} from '@ionic/angular'
+    NavController, PickerController, PickerColumnOption, ActionSheetController, AlertController, AlertOptions,
+    IonHeader, IonToolbar, IonIcon, IonButton, IonButtons, IonTitle,
+    IonContent
+} from '@ionic/angular/standalone'
+import { addIcons } from 'ionicons'
+import {
+    add, checkmarkDoneOutline, chevronBack, chevronForward, createOutline, settingsOutline, trophy
+} from 'ionicons/icons'
 
 import { GAME_STATUS, Board, SerializedBoardData } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
-import { OverlayEventDetail } from '@ionic/core'
 
 const MIN_BOARD_SIZE = 2
 const DEF_BOARD_SIZE = 5
@@ -23,7 +30,11 @@ const ROLES = {
     selector: 'page-board-list',
     templateUrl: 'board-list.page.html',
     styleUrls: ['board-list.page.scss'],
-    standalone: false
+    imports: [
+        NgFor, NgIf,
+        IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon
+    ],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class BoardListPage {
 
@@ -43,6 +54,7 @@ export class BoardListPage {
         public game: GameProvider
     ) {
         this.allBoards = this.game.allBoards
+        addIcons({ chevronBack, chevronForward, createOutline, settingsOutline, trophy, checkmarkDoneOutline, add })
     }
 
     ionViewWillEnter() {

@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core'
-import { ModalController } from '@ionic/angular'
+import { NgFor } from '@angular/common'
+import { IonButton, IonButtons, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone'
+
 import { LocalStorageProvider } from 'src/providers/local-storage/local-storage'
 import { HintPoint } from 'src/providers/game/hints.interface'
 import { Point } from 'src/providers/game/game.interface'
@@ -12,7 +14,10 @@ const AUTO_ADVANCE = 'auto-advance'
     selector: 'app-hint-picker',
     templateUrl: './hint-picker.page.html',
     styleUrls: ['./hint-picker.page.scss'],
-    standalone: false
+    imports: [
+        NgFor,
+        IonToolbar, IonButtons, IonButton, IonIcon
+    ]
 })
 export class HintPickerPage implements OnInit {
     @Input() hints: Hints

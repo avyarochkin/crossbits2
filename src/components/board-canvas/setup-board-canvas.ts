@@ -1,5 +1,5 @@
 import { Component, Renderer2 } from '@angular/core'
-import { ModalController } from '@ionic/angular'
+import { ModalController } from '@ionic/angular/standalone'
 
 import { BOARD_PART, BOARD_SIDE, BoardSide } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
@@ -15,8 +15,7 @@ import { BoardCanvasComponent } from './board-canvas'
         :host {
             display: block;
         }
-    `],
-    standalone: false
+    `]
 })
 export class SetupBoardCanvasComponent extends BoardCanvasComponent {
 
