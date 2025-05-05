@@ -11,7 +11,8 @@ const AUTO_ADVANCE = 'auto-advance'
 @Component({
     selector: 'app-hint-picker',
     templateUrl: './hint-picker.page.html',
-    styleUrls: ['./hint-picker.page.scss']
+    styleUrls: ['./hint-picker.page.scss'],
+    standalone: false
 })
 export class HintPickerPage implements OnInit {
     @Input() hints: Hints

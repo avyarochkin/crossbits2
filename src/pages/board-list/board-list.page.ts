@@ -22,7 +22,8 @@ const ROLES = {
 @Component({
     selector: 'page-board-list',
     templateUrl: 'board-list.page.html',
-    styleUrls: ['board-list.page.scss']
+    styleUrls: ['board-list.page.scss'],
+    standalone: false
 })
 export class BoardListPage {
 

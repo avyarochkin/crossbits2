@@ -24,7 +24,8 @@ export interface IScrollChangeEvent {
 }
 
 @Component({
-    template: ''
+    template: '',
+    standalone: false
 })
 export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 

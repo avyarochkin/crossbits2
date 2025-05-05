@@ -15,7 +15,8 @@ import { BoardCanvasComponent } from './board-canvas'
         :host {
             display: block;
         }
-    `]
+    `],
+    standalone: false
 })
 export class SetupBoardCanvasComponent extends BoardCanvasComponent {
 

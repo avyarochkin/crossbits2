@@ -22,7 +22,8 @@ interface PanData {
             display: block;
             width: fit-content;
         }
-    `]
+    `],
+    standalone: false
 })
 export class GameBoardCanvasComponent extends BoardCanvasComponent {
 

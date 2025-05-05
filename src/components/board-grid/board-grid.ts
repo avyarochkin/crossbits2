@@ -4,7 +4,8 @@ import { GameProvider } from 'src/providers/game/game';
 @Component({
     selector: 'board-grid',
     templateUrl: 'board-grid.html',
-    styleUrls: ['board-grid.scss']
+    styleUrls: ['board-grid.scss'],
+    standalone: false
 })
 export class BoardGridComponent {
     @ViewChild('canvas', { static: true }) canvasRef: ElementRef<HTMLElement>

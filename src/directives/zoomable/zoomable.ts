@@ -11,7 +11,8 @@ const SCALE_BOUNCE_BACK_SECTION = 0.2
 const SCALE_BOUNCE_BACK_ERROR = 0.01
 
 @Directive({
-    selector: '[zoomable]'
+    selector: '[zoomable]',
+    standalone: false
 })
 export class ZoomableDirective implements OnInit {
 

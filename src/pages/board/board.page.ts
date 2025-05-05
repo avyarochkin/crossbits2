@@ -20,7 +20,8 @@ const AUTO_SCROLL_INTERVAL = 100
     selector: 'page-board',
     templateUrl: 'board.page.html',
     styleUrls: ['board.page.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class BoardPage {
     @ViewChild('content', { static: true, read: ElementRef }) contentRef: ElementRef<HTMLIonContentElement>
