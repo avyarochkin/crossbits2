@@ -76,7 +76,7 @@ ion-content {
     ion-header { top: 0; }
     ion-footer { bottom: 0; }
 
-    ion-picker {
+    ion-picker, ion-picker-legacy {
         --background: var(--ion-color-ultra-light);
         --border-color: rgba(var(--ion-color-semi-dark-rgb), 0.25);
         --border-radius: 1rem 1rem 0 0;
