@@ -10,7 +10,7 @@ const SOLVE_DELAY_MSEC = 25
 interface PanData {
     orientation?: 'X' | 'Y'
     start: Point
-    current: Point
+    current: Point | null
     value: BOARD_CELL
 }
 
@@ -62,19 +62,19 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
     }
 
     protected handleLongPress(event: TouchEvent) {
-        // console.log('[press event]')
-
         const boardPos = this.getBoardPos(event)
-
         if (this.isGame() && boardPos?.kind === BOARD_PART.DATA) {
-            // console.log('(start panning)')
             this.panData = {
                 start: boardPos,
-                current: boardPos,
+                // initially unset to let the logic toggle a cell at start pos
+                current: null,
                 value: this.toggledCellValue(this.game.boardData[boardPos.y][boardPos.x].value),
-                orientation: undefined // will be determined later
+                orientation: 'X'
             }
+            // toggle first cell even before moving pointer
+            this.handlePanMove(event)
             void Haptics.impact({ style: ImpactStyle.Medium })
+            // lock scrolling when toggling lines of cells
             this.scrollChange.emit({ enable: false })
         } else {
             this.panData = null
@@ -82,59 +82,48 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
     }
 
     protected handlePanMove(event: TouchEvent) {
-        // console.log('[pan move event]')
         const boardPos = this.getBoardPos(event)
         if (boardPos == null || this.isGameOver() || this.panData == null) { return }
 
         if (boardPos.kind === BOARD_PART.DATA) {
-            // console.log('(panning)')
-
-            let firstPan = false
-
             // determine the panning orientation
-            if (!this.panData.orientation) {
-                if (boardPos.x !== this.panData.start.x) {
-                    this.panData.orientation = 'X'
-                    firstPan = true
-                } else if (boardPos.y !== this.panData.start.y) {
-                    this.panData.orientation = 'Y'
-                    firstPan = true
-                }
+            const dx = Math.abs(boardPos.x - this.panData.start.x)
+            const dy = Math.abs(boardPos.y - this.panData.start.y)
+            if (dx > dy) {
+                this.panData.orientation = 'X'
+            } else if (dy > dx) {
+                this.panData.orientation = 'Y'
+            } else {
+                // keeping orientation unchanged
             }
 
             // set all cells based on the 1st one according to the panning orientation
-            if (this.panData.orientation === 'X' && boardPos.x !== this.panData.current.x) {
+            if (this.panData.orientation === 'X' && boardPos.x !== this.panData.current?.x) {
                 // horizontal orientation - resetting y-coordinate
                 boardPos.y = this.panData.start.y
-                this.panData.current = boardPos
-                if (!firstPan) {
-                    this.game.undoStack.undo()
-                }
-                if (boardPos.x !== this.panData.start.x) {
-                    this.setCellsAtoB(boardPos, this.panData.start, this.panData.value)
-                    this.panMove.emit(event.changedTouches[0])
-                } else {
-                    this.panData.orientation = undefined
-                }
-            } else if (this.panData.orientation === 'Y' && boardPos.y !== this.panData.current.y) {
+                this.setPanningLine(this.panData, boardPos)
+                this.panMove.emit(event.changedTouches[0])
+            } else if (this.panData.orientation === 'Y' && boardPos.y !== this.panData.current?.y) {
                 // vertical orientation - resetting x-coordinate
                 boardPos.x = this.panData.start.x
-                this.panData.current = boardPos
-                if (!firstPan) {
-                    this.game.undoStack.undo()
-                }
-                if (boardPos.y !== this.panData.start.y) {
-                    this.setCellsAtoB(boardPos, this.panData.start, this.panData.value)
-                    this.panMove.emit(event.changedTouches[0])
-                } else {
-                    this.panData.orientation = undefined
-                }
+                this.setPanningLine(this.panData, boardPos)
+                this.panMove.emit(event.changedTouches[0])
+            } else {
+                // has not moved in the current orientation
             }
         }
     }
 
+    private setPanningLine(panData: PanData, boardPos: Point) {
+        // skip undo when setting cells first time during panning
+        if (panData.current != null) {
+            this.game.undoStack.undo()
+        }
+        panData.current = boardPos
+        this.setCellsAtoB(boardPos, panData.start, panData.value)
+    }
+
     protected handlePanEnd() {
-        // console.log('(pan end event)')
         if (this.panData != null) {
             this.panData = null
             this.scrollChange.emit({ enable: true })
@@ -160,19 +149,19 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
     private setCellsAtoB(pointA: Point, pointB: Point, value: BOARD_CELL) {
         const dx = Math.sign(pointB.x - pointA.x)
         const dy = Math.sign(pointB.y - pointA.y)
-        if (dx !== 0 || dy !== 0) {
-            this.game.undoStack.startBlock()
-            for (
-                let x = pointA.x, y = pointA.y;
-                (dx === 0 || x !== pointB.x + dx) && (dy === 0 || y !== pointB.y + dy);
-                x += dx, y += dy
-            ) {
-                this.game.setBoardXY(x, y, value)
-            }
-            this.game.undoStack.endBlock()
-            this.checkGameStatus()
-            this.paint()
+        this.game.undoStack.startBlock()
+        for (
+            let x = pointA.x, y = pointA.y;
+            (dx === 0 || x !== pointB.x + dx) && (dy === 0 || y !== pointB.y + dy);
+            x += dx, y += dy
+        ) {
+            this.game.setBoardXY(x, y, value)
+            // if pointA == pointB, exit after setting the first cell
+            if (dx === 0 && dy === 0) { break }
         }
+        this.game.undoStack.endBlock()
+        this.checkGameStatus()
+        this.paint()
     }
 
     private solveCol(x: number, kind: string) {
