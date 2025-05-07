@@ -4,21 +4,23 @@
     [scrollY]="true"
     [ngClass]="{ 'scroll-enabled': scrollEnabled }">
 
-    <div #scroll class="board-scroll" zoomable
-        [scale]="zoom"
-        [minScale]="minZoom"
-        [maxScale]="maxZoom"
-        (scaleChange)="zoomChange($event)">
-        <!-- <board-grid #boardCanvas></board-grid> -->
-         @if (!isSetup()) {
-            <board-canvas #boardCanvas class="board-canvas"
-                (statusChange)="statusChange($event)"
-                (scrollChange)="scrollChange($event)"
-                (panMove)="panMove($event)"
-                (panEnd)="panEnd()"/>
-         } @else {
-            <setup-board-canvas #boardCanvas class="board-canvas"/>
-         }
+    <div #scroll class="board-scroll">
+        <div zoomable
+            [scale]="zoom"
+            [minScale]="minZoom"
+            [maxScale]="maxZoom"
+            (scaleChange)="zoomChange($event)">
+            <!-- <board-grid #boardCanvas></board-grid> -->
+             @if (!isSetup()) {
+                <board-canvas #boardCanvas class="board-canvas"
+                    (statusChange)="statusChange($event)"
+                    (scrollChange)="scrollChange($event)"
+                    (panMove)="panMove($event)"
+                    (panEnd)="panEnd()"/>
+             } @else {
+                <setup-board-canvas #boardCanvas class="board-canvas"/>
+             }
+        </div>
     </div>
 
 </ion-content>

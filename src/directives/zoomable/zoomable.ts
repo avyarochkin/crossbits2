@@ -18,6 +18,10 @@ export class ZoomableDirective implements OnInit {
     @Input() set scale(value: number) {
         if (this.currentScale === value) { return }
         this.currentScale = value
+        this.contentSize = {
+            x: Math.round(this.zoomEl.clientWidth * value),
+            y: Math.round(this.zoomEl.clientHeight * value)
+        }
         this.applyScale()
         this.scaleChange.emit(value)
     }
@@ -107,18 +111,12 @@ export class ZoomableDirective implements OnInit {
     }
 
     private applyScale() {
-        if (this.zoomEl == null) { return }
-        if (this.contentSize == null) {
-            this.contentSize = {
-                x: Math.round(this.zoomEl.clientWidth * this.currentScale),
-                y: Math.round(this.zoomEl.clientHeight * this.currentScale)
-            }
-        }
+        if (this.zoomEl == null || this.scrollEl == null) { return }
         this.renderer.setStyle(this.zoomEl, 'transformOrigin', '0 0')
         // this.renderer.setStyle(this.zoomEl, 'transition', 'transform 150ms')
         this.renderer.setStyle(this.zoomEl, 'transform', `scale3d(${this.currentScale}, ${this.currentScale}, 1)`)
-        this.renderer.setStyle(this.zoomEl, 'width', `${this.contentSize.x}px`)
-        this.renderer.setStyle(this.zoomEl, 'height', `${this.contentSize.y}px`)
+        this.renderer.setStyle(this.scrollEl, 'width', `${this.contentSize.x}px`)
+        this.renderer.setStyle(this.scrollEl, 'height', `${this.contentSize.y}px`)
         // this.adjustCenter()
     }
 

@@ -475,10 +475,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
         fromEvent<TouchEvent>(canvasEl, 'touchstart')
             .pipe(
-                tap(event => {
-                    tapping = true
-                    event.preventDefault()
-                }),
+                tap(() => tapping = true),
                 debounceTime(PRESS_TIME_MSEC),
                 filter(() => tapping),
                 takeUntil(this.ngUnsubscribe)
