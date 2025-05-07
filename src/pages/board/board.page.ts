@@ -6,7 +6,8 @@ import {
 } from '@ionic/angular/standalone'
 import { addIcons } from 'ionicons'
 import {
-    addCircleOutline, arrowRedoOutline, arrowUndoOutline, banOutline, bulbOutline, removeCircleOutline
+    addCircleOutline, arrowRedoOutline, arrowUndoOutline, banOutline, bulbOutline, checkmarkCircle, handLeft,
+    removeCircleOutline, sad, skull, trashOutline, trophy
 } from 'ionicons/icons'
 
 import { Point, BoardData, GAME_STATUS, SOLUTION_STATUS } from 'src/providers/game/game.interface'
@@ -66,7 +67,8 @@ export class BoardPage {
         this.boardData = this.game.boardData
         this.boardSize = this.game.boardSize
         addIcons({
-            addCircleOutline, removeCircleOutline, banOutline, arrowUndoOutline, arrowRedoOutline, bulbOutline
+            addCircleOutline, removeCircleOutline, banOutline, arrowUndoOutline, arrowRedoOutline,
+            bulbOutline, checkmarkCircle, trashOutline, trophy, handLeft, sad, skull
         })
     }
 

@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { IonButton, IonButtons, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone'
+import { addIcons } from 'ionicons'
+import { close } from 'ionicons/icons'
 
 import { LocalStorageProvider } from 'src/providers/local-storage/local-storage'
 import { HintPoint } from 'src/providers/game/hints.interface'
@@ -31,7 +33,9 @@ export class HintPickerPage implements OnInit {
     constructor(
         private readonly localStorage: LocalStorageProvider,
         private readonly modalCtrl: ModalController
-    ) { }
+    ) {
+        addIcons({ close })
+    }
 
     ngOnInit(): void {
         this.autoAdvance = this.localStorage.getValue(AUTO_ADVANCE)

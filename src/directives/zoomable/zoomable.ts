@@ -89,6 +89,7 @@ export class ZoomableDirective implements OnInit {
 
     @HostListener('touchend')
     handlePinchZoomEnd() {
+        if (this.startScale == null) { return }
         this.startScale = null
         // when final scale is outside of min/max boundaries, it should bounce back
         if (this.currentScale > this.maxScale) {
