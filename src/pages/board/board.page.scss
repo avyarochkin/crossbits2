@@ -4,5 +4,7 @@
         --padding-bottom: var(--ion-safe-area-bottom, 0);
         --overflow: hidden;
         &.scroll-enabled { --overflow: auto; }
+        &::part(scroll) { display: flex; }
     }
+    .board-scroll { margin: auto; }
 }
