@@ -1,5 +1,7 @@
+import { isDevMode } from '@angular/core'
 import { bootstrapApplication } from '@angular/platform-browser'
 import { provideRouter, RouteReuseStrategy, Routes } from '@angular/router'
+import { provideServiceWorker } from '@angular/service-worker'
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone'
 
 import { MyApp } from './app/app.component'
@@ -34,6 +36,10 @@ bootstrapApplication(MyApp, {
         provideIonicAngular(),
         provideRouter(ROUTES),
         GameProvider,
+        provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+        }),
         LocalStorageProvider
     ],
 }).catch(err => console.error(err))

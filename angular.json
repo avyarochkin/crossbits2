@@ -32,7 +32,8 @@
                                 "glob": "**/*",
                                 "input": "src/assets",
                                 "output": "assets"
-                            }
+                            },
+                            "src/manifest.webmanifest"
                         ],
                         "styles": [
                             {
@@ -42,7 +43,9 @@
                                 "input": "src/theme/variables.scss"
                             }
                         ],
-                        "scripts": []
+                        "scripts": [],
+                        "serviceWorker": true,
+                        "ngswConfigPath": "ngsw-config.json"
                     },
                     "configurations": {
                         "production": {
