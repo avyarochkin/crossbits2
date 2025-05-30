@@ -27,7 +27,7 @@ export class SetupBoardCanvasComponent extends BoardCanvasComponent {
         super(renderer, game)
     }
 
-    protected handleTap(event: TouchEvent) {
+    protected handleTap(event: PointerEvent) {
         const boardPos = this.getBoardPos(event)
         if (boardPos == null || this.isGameOver()) { return }
 

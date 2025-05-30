@@ -98,14 +98,13 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
         this.game.saveBoard()
     }
 
-    protected getBoardPos(event: TouchEvent) {
+    protected getBoardPos(event: PointerEvent) {
         const target = this.canvasRef.nativeElement
-        const touch = event.changedTouches[0]
         const rect = target.getBoundingClientRect()
         const scaleX = rect.width / target.clientWidth
         const scaleY = rect.height / target.clientHeight
-        const offsetX = (touch.clientX - rect.left) / scaleX
-        const offsetY = (touch.clientY - rect.top) / scaleY
+        const offsetX = (event.clientX - rect.left) / scaleX
+        const offsetY = (event.clientY - rect.top) / scaleY
 
         const maxBoardX = this.game.boardData[0].length
         const maxBoardY = this.game.boardData.length
@@ -473,7 +472,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
         // indicates that user touched and not moved / released finger
         let tapping = false
 
-        fromEvent<TouchEvent>(canvasEl, 'touchstart')
+        fromEvent<PointerEvent>(canvasEl, 'pointerdown', { passive: false })
             .pipe(
                 tap(() => tapping = true),
                 debounceTime(PRESS_TIME_MSEC),
@@ -485,14 +484,14 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
                 this.handleLongPress(event)
             })
 
-        fromEvent<TouchEvent>(canvasEl, 'touchmove')
+        fromEvent<PointerEvent>(canvasEl, 'pointermove', { passive: false })
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(event => {
                 tapping = false
                 this.handlePanMove(event)
             })
 
-        fromEvent<TouchEvent>(canvasEl, 'touchend')
+        fromEvent<PointerEvent>(canvasEl, 'pointerup', { passive: false })
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(event => {
                 if (tapping) {
@@ -503,8 +502,8 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             })
     }
 
-    protected abstract handleTap(event: TouchEvent): void
-    protected abstract handleLongPress(event: TouchEvent): void
-    protected abstract handlePanMove(event: TouchEvent): void
+    protected abstract handleTap(event: PointerEvent): void
+    protected abstract handleLongPress(event: PointerEvent): void
+    protected abstract handlePanMove(event: PointerEvent): void
     protected abstract handlePanEnd(): void
 }

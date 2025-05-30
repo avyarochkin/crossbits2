@@ -26,8 +26,8 @@ interface PanData {
 })
 export class GameBoardCanvasComponent extends BoardCanvasComponent {
 
-    /** Emits `Touch` object during panning */
-    @Output() readonly panMove = new EventEmitter<Touch>
+    /** Emits `PointerEvent` during panning */
+    @Output() readonly panMove = new EventEmitter<PointerEvent>
     /** Emits at the end of panning */
     @Output() readonly panEnd = new EventEmitter<void>
 
@@ -40,7 +40,7 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         super(renderer, game)
     }
 
-    protected handleTap(event: TouchEvent) {
+    protected handleTap(event: PointerEvent) {
         const boardPos = this.getBoardPos(event)
         if (boardPos == null || this.isGameOver()) { return }
         // console.log('[tap event]')
@@ -61,7 +61,7 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         }
     }
 
-    protected handleLongPress(event: TouchEvent) {
+    protected handleLongPress(event: PointerEvent) {
         const boardPos = this.getBoardPos(event)
         if (this.isGame() && boardPos?.kind === BOARD_PART.DATA) {
             this.panData = {
@@ -81,7 +81,7 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         }
     }
 
-    protected handlePanMove(event: TouchEvent) {
+    protected handlePanMove(event: PointerEvent) {
         const boardPos = this.getBoardPos(event)
         if (boardPos == null || this.isGameOver() || this.panData == null) { return }
 
@@ -102,12 +102,12 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
                 // horizontal orientation - resetting y-coordinate
                 boardPos.y = this.panData.start.y
                 this.setPanningLine(this.panData, boardPos)
-                this.panMove.emit(event.changedTouches[0])
+                this.panMove.emit(event)
             } else if (this.panData.orientation === 'Y' && boardPos.y !== this.panData.current?.y) {
                 // vertical orientation - resetting x-coordinate
                 boardPos.x = this.panData.start.x
                 this.setPanningLine(this.panData, boardPos)
-                this.panMove.emit(event.changedTouches[0])
+                this.panMove.emit(event)
             } else {
                 // has not moved in the current orientation
             }

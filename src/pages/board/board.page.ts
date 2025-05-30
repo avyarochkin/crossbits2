@@ -193,16 +193,16 @@ export class BoardPage {
         }
     }
 
-    panMove(touch: Touch) {
+    panMove(event: PointerEvent) {
         // calculates horizontal scroll speed: positive if panning approaches
         // right edge and negative if panning approaches left edge
-        const scrollSpeedX = scrollSpeed(this.contentEl.clientWidth - touch.clientX)
-            ?? scrollSpeed(-touch.clientX)
+        const scrollSpeedX = scrollSpeed(this.contentEl.clientWidth - event.clientX)
+            ?? scrollSpeed(-event.clientX)
             ?? 0
         // calculates vertical scroll speed: positive if panning approaches
         // bottom edge and negative if panning approaches top edge
-        const scrollSpeedY = scrollSpeed(this.contentEl.clientHeight - touch.clientY)
-            ?? scrollSpeed(-touch.clientY)
+        const scrollSpeedY = scrollSpeed(this.contentEl.clientHeight - event.clientY)
+            ?? scrollSpeed(-event.clientY)
             ?? 0
 
         // check if auto-scroll should start with calculated scroll speed
