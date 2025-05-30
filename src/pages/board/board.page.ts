@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, View
 import { NgClass } from '@angular/common'
 import {
     NavController, AlertController, ToastController, IonContent, IonButton, IonButtons, IonIcon, IonFooter,
-    IonToolbar, IonSpinner
+    IonToolbar, IonSpinner,
+    ToastButton
 } from '@ionic/angular/standalone'
 import { addIcons } from 'ionicons'
 import {
-    addCircleOutline, arrowRedoOutline, arrowUndoOutline, banOutline, bulbOutline, checkmarkCircle, handLeft,
-    removeCircleOutline, sad, skull, trashOutline, trophy
+    addCircleOutline, arrowRedoOutline, arrowUndoOutline, banOutline, bulbOutline, checkmarkCircle, closeCircle,
+    handLeft, removeCircleOutline, sad, skull, trashOutline, trophy
 } from 'ionicons/icons'
 
 import { Point, BoardData, GAME_STATUS, SOLUTION_STATUS } from 'src/providers/game/game.interface'
@@ -20,9 +21,16 @@ import { ZoomableDirective } from 'src/directives/zoomable/zoomable'
 const ZOOM_FACTOR = 1.2
 const TOAST_DATA = {
     [SOLUTION_STATUS.FINISHED]: { icon: 'trophy', message: 'Solved!' },
-    [SOLUTION_STATUS.UNFINISHED]: { icon: 'hand-left', message: 'Cannot solve automatically' },
-    [SOLUTION_STATUS.GAVE_UP]: { icon: 'sad', message: 'Gave up. Finish manually' },
-    [SOLUTION_STATUS.NO_SOLUTION]: { icon: 'skull', message: 'No solution. Fix the hints' }
+    [SOLUTION_STATUS.UNFINISHED]: { icon: 'hand-left', message: 'Cannot solve automatically. Try yourself' },
+    [SOLUTION_STATUS.GAVE_UP]: { icon: 'sad', message: 'Gave up. Too many variants. Use your brain power' },
+    [SOLUTION_STATUS.NO_SOLUTION]: { icon: 'skull', message: 'No solution. Fix the board or check hints' }
+}
+const TOAST_BUTTONS: Record<string, ToastButton> = {
+    CANCEL: {
+        icon: 'close-circle',
+        role: 'cancel',
+        side: 'end'
+    }
 }
 
 const AUTO_SCROLL_AREA_WIDTH = 50
@@ -68,7 +76,7 @@ export class BoardPage {
         this.boardSize = this.game.boardSize
         addIcons({
             addCircleOutline, removeCircleOutline, banOutline, arrowUndoOutline, arrowRedoOutline,
-            bulbOutline, checkmarkCircle, trashOutline, trophy, handLeft, sad, skull
+            bulbOutline, checkmarkCircle, trashOutline, trophy, handLeft, sad, skull, closeCircle
         })
     }
 
@@ -112,9 +120,12 @@ export class BoardPage {
         const toast = await this.toastCtrl.create({
             icon: 'checkmark-circle',
             message: 'Saved',
-            position: 'top',
+            cssClass: 'success',
+            position: 'middle',
             animated: true,
-            duration: 1000
+            keyboardClose: true,
+            swipeGesture: 'vertical',
+            buttons: [TOAST_BUTTONS.CANCEL]
         })
         void toast.onDidDismiss().then(async () => {
             await this.navCtrl.navigateRoot('/')
@@ -243,9 +254,13 @@ export class BoardPage {
         const toast = await this.toastCtrl.create({
             icon: TOAST_DATA[result].icon,
             message: TOAST_DATA[result].message,
-            position: 'top',
+            cssClass: result,
+            position: 'middle',
             animated: true,
-            duration: 2000
+            duration: 5000,
+            keyboardClose: true,
+            swipeGesture: 'vertical',
+            buttons: [TOAST_BUTTONS.CANCEL]
         })
         await toast.present()
 

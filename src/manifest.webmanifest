@@ -1,8 +1,8 @@
 {
-    "name": "app",
-    "short_name": "app",
-    "theme_color": "#1976d2",
-    "background_color": "#fafafa",
+    "name": "CrossBits2",
+    "short_name": "CrossBits2",
+    "theme_color": "#262322",
+    "background_color": "#262322",
     "display": "standalone",
     "scope": "./",
     "start_url": "./",
