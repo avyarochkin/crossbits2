@@ -119,6 +119,7 @@ ion-content {
             font-size: 3rem;
         }
         &::part(button) {
+            color: var(--toast-color);
             opacity: 0.4;
         }
         &.gave-up,
