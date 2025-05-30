@@ -4,7 +4,8 @@ import { HintLineIndexes, VariantPiece } from './hints.interface'
 import { Hints } from './hints'
 
 const MAX_SOLVE_TIME_MSEC = 300_000 // 5 minutes
-const MAX_COMBINATIONS = 100_000_000
+const MANY_COMBINATIONS = 100_000_000
+const MAX_COMBINATIONS = 1_000_000_000
 
 export class LineSolver {
     private lineIndex: number
@@ -45,20 +46,33 @@ export class LineSolver {
      * or **undefined** if gave up solving.
      */
     solveLine(ctx: Hints, lineIndex: number): HintLineIndexes {
-        console.group(`Solving ${ctx.constructor.name}[${lineIndex}]`)
+        console.group(`Solving ${ctx.name} ${lineIndex}`)
         this.lineIndex = lineIndex
         this.dataLength = ctx.getBoardLength() // height
         this.hintLength = ctx.hints[lineIndex].length
         const numberOfCombinations = ctx.getNumberOfCombinations(this.lineIndex)
-        const tooManyCombinations = numberOfCombinations > MAX_COMBINATIONS && this.lastLineIndex !== lineIndex
+        const tooManyCombinations = numberOfCombinations > MANY_COMBINATIONS && this.lastLineIndex !== lineIndex
+        const overMaxCombinations = numberOfCombinations > MAX_COMBINATIONS
         this.lastLineIndex = lineIndex
 
-        if (tooManyCombinations) {
-            console.warn(`${numberOfCombinations.toLocaleString()} possible variants. Are you sure?`)
+        if (overMaxCombinations) {
+            console.info(
+                `%c${numberOfCombinations.toLocaleString()}`,
+                'color: #F66',
+                'possible variants. Solving blocked'
+            )
+            console.groupEnd()
+            return undefined
+        } else if (tooManyCombinations) {
+            console.info(
+                `%c${numberOfCombinations.toLocaleString()}`,
+                'color: #FF6',
+                `possible variants. Select ${ctx.name} ${lineIndex} again to confirm`
+            )
             console.groupEnd()
             return undefined
         } else {
-            console.info(`${numberOfCombinations.toLocaleString()} possible variants`)
+            console.info(`${numberOfCombinations.toLocaleString()} possible variant(s)`)
         }
         this.variant = new Array<VariantPiece>(this.hintLength)
         this.solution = new Array<BOARD_CELL>(this.dataLength)
@@ -99,7 +113,11 @@ export class LineSolver {
             console.error(`No variants found in ${durationStr}ms`)
             appliedIndexes = null
         }
-        console.info(`${appliedIndexes?.length} changes applied to line ${lineIndex}`)
+        console.info(
+            `%c${appliedIndexes?.length ?? 'no'}`,
+            appliedIndexes != null && appliedIndexes.length > 0 ? 'color: #6F6' : 'color: #F99',
+            `change(s) applied to ${ctx.name} ${lineIndex}`
+        )
         console.groupEnd()
         return appliedIndexes
     }

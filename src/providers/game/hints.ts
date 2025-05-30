@@ -5,6 +5,7 @@ import { LineSolver } from './line-solver'
 import { combinations } from './game.utils'
 
 export abstract class Hints {
+    readonly name!: string
 
     hints: HintCell[][] = []
     matching: boolean[] = []
@@ -172,6 +173,7 @@ export abstract class Hints {
 
 
 export class ColumnHints extends Hints  {
+    readonly name = 'column'
 
     getBoardLength(): number {
         return this.game.boardData.length
@@ -295,6 +297,7 @@ export class ColumnHints extends Hints  {
 
 
 export class RowHints extends Hints {
+    readonly name = 'row'
 
     getBoardLength(): number {
         return this.game.boardData[0]?.length
