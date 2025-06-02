@@ -63,12 +63,6 @@ export class ZoomableDirective implements OnInit {
         return event.changedTouches?.length === 2
     }
 
-    @HostListener('touchstart', ['$event'])
-    handlePinchZoomStart(event: TouchEvent) {
-        // This is required to prevent mobile web browsers from auto-zooming the while page
-        event.preventDefault()
-    }
-
     @HostListener('touchmove', ['$event'])
     handlePinchZoom(event: TouchEvent) {
         if (!this.isPinchZoomEvent(event)) { return }

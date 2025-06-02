@@ -149,4 +149,10 @@ ion-content {
         --button-color: var(--ion-color-medium);
 
     }
+    :focus-visible {
+        outline-color: rgba(var(--ion-color-lightest-rgb), 0.5);
+        outline-style: solid;
+        outline-width: 2px;
+        outline-offset: 1px;
+    }
 }
