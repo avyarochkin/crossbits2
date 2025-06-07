@@ -1,4 +1,5 @@
 import { Directive, Input, ElementRef, OnInit, Output, EventEmitter, Renderer2, HostListener } from '@angular/core'
+import { IonContent } from '@ionic/angular'
 import { Point } from 'src/providers/game/game.interface'
 
 /** Delta-factor of scale elasticity when it exceeds min limit */
@@ -17,13 +18,8 @@ export class ZoomableDirective implements OnInit {
 
     @Input() set scale(value: number) {
         if (this.currentScale === value) { return }
-        this.currentScale = value
-        this.contentSize = {
-            x: Math.round(this.zoomEl.clientWidth * value),
-            y: Math.round(this.zoomEl.clientHeight * value)
-        }
-        this.applyScale()
-        this.scaleChange.emit(value)
+        this.setDefaultScaleCenter()
+        this.setScale(value)
     }
     get scale() { return this.currentScale }
 
@@ -33,15 +29,15 @@ export class ZoomableDirective implements OnInit {
     /** Emits new scale value when it changes */
     @Output() readonly scaleChange = new EventEmitter<number>()
 
+    private scrollerEl: HTMLElement | undefined
     private scrollEl: HTMLElement
     private zoomEl: HTMLElement
-    private contentSize: Point
     private currentScale = 1
-    private pinchCenter: Point | null
+    private lastScale = 1
+    private scaleCenter: Point | null
 
     // values stored when the pinch/zoom operation starts
-    private startScale: number | null
-    private startPinchCenter: Point | null
+    private pinchStartScale: number | null
 
     constructor(
         private readonly hostRef: ElementRef<HTMLElement>,
@@ -49,14 +45,15 @@ export class ZoomableDirective implements OnInit {
     ) { }
 
 
-    ngOnInit() {
+    async ngOnInit() {
         // by default the scroll element is the parent of the zoomable element
         this.scrollEl = this.hostRef.nativeElement.parentElement!
-
         this.zoomEl = this.hostRef.nativeElement
         this.renderer.setStyle(this.zoomEl, 'width', 'fit-content')
         this.renderer.setStyle(this.zoomEl, 'height', 'initial')
         this.renderer.setStyle(this.zoomEl, 'will-change', 'scroll-position, transform')
+        const content = this.scrollEl.parentElement as IonContent | null
+        this.scrollerEl = await content?.getScrollElement()
     }
 
     private isPinchZoomEvent(event: TouchEvent) {
@@ -66,18 +63,17 @@ export class ZoomableDirective implements OnInit {
     @HostListener('touchmove', ['$event'])
     handlePinchZoom(event: TouchEvent) {
         if (!this.isPinchZoomEvent(event)) { return }
-        if (this.startScale == null) {
-            this.startScale = this.currentScale
-            this.startPinchCenter = this.getMidPoint(event.changedTouches)
+        if (this.pinchStartScale == null) {
+            this.pinchStartScale = this.currentScale
+            this.scaleCenter = this.getMidPoint(event.changedTouches)
         }
         if ('scale' in event && typeof event.scale === 'number') {
-            this.scale = this.adjustScale(event.scale)
-            this.pinchCenter = this.getMidPoint(event.changedTouches)
+            this.setScale(this.adjustedScale(event.scale))
         }
     }
 
-    private adjustScale(value: number): number {
-        let scale = this.startScale! * value
+    private adjustedScale(value: number): number {
+        let scale = this.pinchStartScale! * value
         // when new scale exceeds min/max limit it should resist the further it moves away
         if (scale > this.maxScale) {
             scale = this.maxScale + (1 - this.maxScale / scale) * MAX_SCALE_BOUNCE
@@ -89,15 +85,13 @@ export class ZoomableDirective implements OnInit {
 
     @HostListener('touchend')
     handlePinchZoomEnd() {
-        if (this.startScale == null) { return }
-        this.startScale = null
+        if (this.pinchStartScale == null) { return }
+        this.pinchStartScale = null
         // when final scale is outside of min/max boundaries, it should bounce back
         if (this.currentScale > this.maxScale) {
             this.animateScale(this.maxScale)
         } else if (this.currentScale < this.minScale) {
             this.animateScale(this.minScale)
-        } else {
-            this.applyScale()
         }
     }
 
@@ -111,30 +105,39 @@ export class ZoomableDirective implements OnInit {
             : null
     }
 
-    private applyScale() {
-        if (this.zoomEl == null || this.scrollEl == null) { return }
-        this.renderer.setStyle(this.zoomEl, 'transformOrigin', '0 0')
-        // this.renderer.setStyle(this.zoomEl, 'transition', 'transform 150ms')
-        this.renderer.setStyle(this.zoomEl, 'transform', `scale3d(${this.currentScale}, ${this.currentScale}, 1)`)
-        this.renderer.setStyle(this.scrollEl, 'width', `${this.contentSize.x}px`)
-        this.renderer.setStyle(this.scrollEl, 'height', `${this.contentSize.y}px`)
-        // this.adjustCenter()
+    private setDefaultScaleCenter() {
+        if (this.scrollerEl == null) { return }
+        this.scaleCenter = {
+            x: this.scrollerEl.clientWidth / 2,
+            y: this.scrollerEl.clientHeight / 2
+        }
     }
 
-    /** @todo fix calculation of the offset x/y */
-    private adjustCenter() {
-        if (this.zoomEl == null || this.scrollEl == null
-            || this.startPinchCenter == null || this.pinchCenter == null
-        ) { return }
-        const x = Math.round(this.startPinchCenter.x * this.currentScale - this.pinchCenter.x)
-        const y = Math.round(this.startPinchCenter.y * this.currentScale - this.pinchCenter.y)
+    private setScale(value: number) {
+        this.lastScale = this.currentScale
+        this.currentScale = value
+        this.applyScale(value)
+        this.scaleChange.emit(value)
+    }
 
-        this.renderer.setStyle(this.zoomEl, 'left', `${ x > 0 ? 0 : -x }px`)
-        this.renderer.setStyle(this.zoomEl, 'top', `${ y > 0 ? 0 : -y }px`)
+    private applyScale(scale: number) {
+        if (this.zoomEl == null || this.scrollEl == null) { return }
+        this.renderer.setStyle(this.zoomEl, 'transformOrigin', '0 0')
+        this.renderer.setStyle(this.zoomEl, 'transform', `scale3d(${scale}, ${scale}, 1)`)
 
-        this.scrollEl.scrollLeft = x > 0 ? x : 0
-        this.scrollEl.scrollTop = y > 0 ? y : 0
-        // console.log(`adjusting center with ${x}:${y}, scrollEl:${this.scrollEl.scrollLeft}:${this.scrollEl.scrollTop}`)
+        const contentWidth = Math.round(this.zoomEl.clientWidth * scale)
+        const contentHeight = Math.round(this.zoomEl.clientHeight * scale)
+        this.renderer.setStyle(this.scrollEl, 'width', `${contentWidth}px`)
+        this.renderer.setStyle(this.scrollEl, 'height', `${contentHeight}px`)
+        this.scrollToScaleCenter()
+    }
+
+    private scrollToScaleCenter() {
+        if (this.scrollerEl == null || this.scaleCenter == null) { return }
+        const deltaScale = this.currentScale / this.lastScale
+        const left = Math.max((this.scaleCenter.x + this.scrollerEl.scrollLeft) * deltaScale - this.scaleCenter.x, 0)
+        const top = Math.max((this.scaleCenter.y + this.scrollerEl.scrollTop) * deltaScale - this.scaleCenter.y, 0)
+        this.scrollerEl.scrollTo({ left, top })
     }
 
     /**
@@ -144,13 +147,14 @@ export class ZoomableDirective implements OnInit {
      * @param finalScale target scale
      */
     private animateScale(finalScale: number) {
+        this.lastScale = this.currentScale
         this.currentScale += (finalScale - this.currentScale) * SCALE_BOUNCE_BACK_SECTION
 
         if (Math.abs(this.currentScale - finalScale) > SCALE_BOUNCE_BACK_ERROR) {
-            this.applyScale()
+            this.applyScale(this.currentScale)
             window.requestAnimationFrame(this.animateScale.bind(this, finalScale) as FrameRequestCallback)
         } else {
-            this.scale = finalScale
+            this.setScale(finalScale)
         }
     }
 }

@@ -3,7 +3,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone'
 import { filter, fromEvent, Observable, scan, timeInterval } from 'rxjs'
 import { register } from 'swiper/element/bundle'
 
-const MAX_DOUBLE_TAP_MSEC = 500
+const MAX_DOUBLE_TAP_MSEC = 300
 
 @Component({
     selector: 'app-root',
