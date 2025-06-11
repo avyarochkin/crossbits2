@@ -13,7 +13,9 @@ import {
 
 import { Point, BoardData, GAME_STATUS, SOLUTION_STATUS } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
-import { BoardCanvasComponent, IScrollChangeEvent } from 'src/components/board-canvas/board-canvas'
+import {
+    BoardCanvasComponent, getEventPos, HybridTouchEvent, IScrollChangeEvent
+} from 'src/components/board-canvas/board-canvas'
 import { SetupBoardCanvasComponent } from 'src/components/board-canvas/setup-board-canvas'
 import { GameBoardCanvasComponent } from 'src/components/board-canvas/game-board-canvas'
 import { ZoomableDirective } from 'src/directives/zoomable/zoomable'
@@ -204,16 +206,17 @@ export class BoardPage {
         }
     }
 
-    panMove(event: PointerEvent) {
+    panMove(event: HybridTouchEvent) {
+        const eventPos = getEventPos(event)
         // calculates horizontal scroll speed: positive if panning approaches
         // right edge and negative if panning approaches left edge
-        const scrollSpeedX = scrollSpeed(this.contentEl.clientWidth - event.clientX)
-            ?? scrollSpeed(-event.clientX)
+        const scrollSpeedX = scrollSpeed(this.contentEl.clientWidth - eventPos.x)
+            ?? scrollSpeed(-eventPos.x)
             ?? 0
         // calculates vertical scroll speed: positive if panning approaches
         // bottom edge and negative if panning approaches top edge
-        const scrollSpeedY = scrollSpeed(this.contentEl.clientHeight - event.clientY)
-            ?? scrollSpeed(-event.clientY)
+        const scrollSpeedY = scrollSpeed(this.contentEl.clientHeight - eventPos.y)
+            ?? scrollSpeed(-eventPos.y)
             ?? 0
 
         // check if auto-scroll should start with calculated scroll speed

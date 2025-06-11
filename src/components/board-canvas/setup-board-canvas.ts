@@ -6,7 +6,7 @@ import { GameProvider } from 'src/providers/game/game'
 import { Hints } from 'src/providers/game/hints'
 import { HintPoint } from 'src/providers/game/hints.interface'
 import { HintPickerPage } from 'src/pages/hint-picker/hint-picker.page'
-import { BoardCanvasComponent } from './board-canvas'
+import { BoardCanvasComponent, HybridTouchEvent } from './board-canvas'
 
 @Component({
     selector: 'setup-board-canvas',
@@ -27,7 +27,7 @@ export class SetupBoardCanvasComponent extends BoardCanvasComponent {
         super(renderer, game)
     }
 
-    protected handleTap(event: PointerEvent) {
+    protected handleTap(event: HybridTouchEvent) {
         const boardPos = this.getBoardPos(event)
         if (boardPos == null || this.isGameOver()) { return }
 

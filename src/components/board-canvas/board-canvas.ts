@@ -3,7 +3,8 @@ import { debounceTime, filter, fromEvent, Subject, takeUntil, tap } from 'rxjs'
 
 import { GameProvider } from 'src/providers/game/game'
 import {
-    BOARD_CELL, BOARD_PART, BOARD_SIDE, BoardSide, CELLS_IN_GROUP, CELL_SIZE, GAME_STATUS
+    BOARD_CELL, BOARD_PART, BOARD_SIDE, BoardSide, CELLS_IN_GROUP, CELL_SIZE, GAME_STATUS,
+    Point
 } from 'src/providers/game/game.interface'
 import { HintPoint } from 'src/providers/game/hints.interface'
 
@@ -18,6 +19,7 @@ interface SolvePos {
     kind: string
 }
 
+export type HybridTouchEvent = TouchEvent | MouseEvent
 /** Interface event object emitted by `scrollChange` */
 export interface IScrollChangeEvent {
     enable?: boolean
@@ -98,13 +100,14 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
         this.game.saveBoard()
     }
 
-    protected getBoardPos(event: PointerEvent) {
+    protected getBoardPos(event: HybridTouchEvent) {
+        const eventPos = getEventPos(event)
         const target = this.canvasRef.nativeElement
         const rect = target.getBoundingClientRect()
         const scaleX = rect.width / target.clientWidth
         const scaleY = rect.height / target.clientHeight
-        const offsetX = (event.clientX - rect.left) / scaleX
-        const offsetY = (event.clientY - rect.top) / scaleY
+        const offsetX = (eventPos.x - rect.left) / scaleX
+        const offsetY = (eventPos.y - rect.top) / scaleY
 
         const maxBoardX = this.game.boardData[0].length
         const maxBoardY = this.game.boardData.length
@@ -468,12 +471,17 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
     }
 
     protected setupTouchEvents() {
+        const eventNames = 'ontouchstart' in window
+            ? { start: 'touchstart', move: 'touchmove', end: 'touchend' }
+            : { start: 'mousedown', move: 'mousemove', end: 'mouseup' }
+
         const canvasEl = this.canvasRef.nativeElement
         // indicates that user touched and not moved / released finger
         let tapping = false
 
-        fromEvent<PointerEvent>(canvasEl, 'pointerdown', { passive: false })
+        fromEvent<HybridTouchEvent>(canvasEl, eventNames.start, { passive: false })
             .pipe(
+                filter(event => getNumberOfTouches(event) === 1),
                 tap(() => tapping = true),
                 debounceTime(PRESS_TIME_MSEC),
                 filter(() => tapping),
@@ -484,14 +492,14 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
                 this.handleLongPress(event)
             })
 
-        fromEvent<PointerEvent>(canvasEl, 'pointermove', { passive: false })
+        fromEvent<HybridTouchEvent>(canvasEl, eventNames.move, { passive: false })
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(event => {
                 tapping = false
                 this.handlePanMove(event)
             })
 
-        fromEvent<PointerEvent>(canvasEl, 'pointerup', { passive: false })
+        fromEvent<HybridTouchEvent>(canvasEl, eventNames.end, { passive: false })
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(event => {
                 if (tapping) {
@@ -502,8 +510,19 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             })
     }
 
-    protected abstract handleTap(event: PointerEvent): void
-    protected abstract handleLongPress(event: PointerEvent): void
-    protected abstract handlePanMove(event: PointerEvent): void
+    protected abstract handleTap(event: HybridTouchEvent): void
+    protected abstract handleLongPress(event: HybridTouchEvent): void
+    protected abstract handlePanMove(event: HybridTouchEvent): void
     protected abstract handlePanEnd(): void
+}
+
+export function getEventPos(event: HybridTouchEvent): Point {
+    return 'changedTouches' in event
+        ? { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY }
+        : { x: event.clientX, y: event.clientY }
+
+}
+
+export function getNumberOfTouches(event: HybridTouchEvent): number {
+    return 'changedTouches' in event ? event.changedTouches.length : 1
 }

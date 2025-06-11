@@ -3,7 +3,7 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics'
 
 import { BOARD_CELL, BOARD_PART, Point } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
-import { BoardCanvasComponent } from './board-canvas'
+import { BoardCanvasComponent, HybridTouchEvent } from './board-canvas'
 
 const SOLVE_DELAY_MSEC = 25
 
@@ -27,7 +27,7 @@ interface PanData {
 export class GameBoardCanvasComponent extends BoardCanvasComponent {
 
     /** Emits `PointerEvent` during panning */
-    @Output() readonly panMove = new EventEmitter<PointerEvent>
+    @Output() readonly panMove = new EventEmitter<HybridTouchEvent>
     /** Emits at the end of panning */
     @Output() readonly panEnd = new EventEmitter<void>
 
@@ -40,7 +40,7 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         super(renderer, game)
     }
 
-    protected handleTap(event: PointerEvent) {
+    protected handleTap(event: HybridTouchEvent) {
         const boardPos = this.getBoardPos(event)
         if (boardPos == null || this.isGameOver()) { return }
         // console.log('[tap event]')
@@ -61,7 +61,7 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         }
     }
 
-    protected handleLongPress(event: PointerEvent) {
+    protected handleLongPress(event: HybridTouchEvent) {
         const boardPos = this.getBoardPos(event)
         if (this.isGame() && boardPos?.kind === BOARD_PART.DATA) {
             this.panData = {
@@ -81,7 +81,7 @@ export class GameBoardCanvasComponent extends BoardCanvasComponent {
         }
     }
 
-    protected handlePanMove(event: PointerEvent) {
+    protected handlePanMove(event: HybridTouchEvent) {
         const boardPos = this.getBoardPos(event)
         if (boardPos == null || this.isGameOver() || this.panData == null) { return }
 
