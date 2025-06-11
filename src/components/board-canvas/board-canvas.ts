@@ -248,7 +248,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
                 ctx.fillStyle = this.isSetup()
                     ? this.colors.dark
-                    : this.game.columnHints.matching[x] ? this.colors.lightest : this.colors.ultraLight
+                    : this.game.columnHints.matching[x] ? this.colors.lightest : this.colors.light
                 // cell text
                 const topHint = this.game.columnHints.getHintAt({ x, y, side: BOARD_SIDE.TOP })
                 if (topHint) {
@@ -334,7 +334,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
                 ctx.fillStyle = this.isSetup()
                     ? this.colors.dark
-                    : this.game.columnHints.matching[x] ? this.colors.lightest : this.colors.ultraLight
+                    : this.game.rowHints.matching[y] ? this.colors.lightest : this.colors.light
                 // cell text
                 const leftHint = this.game.rowHints.getHintAt({ x, y, side: BOARD_SIDE.LEFT })
                 if (leftHint) {
