@@ -1,0 +1,41 @@
+<ion-content [forceOverscroll]="false">
+    <div class="background" slot="fixed"></div>
+    <div class="page-content" slot="fixed">
+        <h1 class="title">cross<span class="highlight">bits</span></h1>
+
+        <ion-button class="button main" [routerLink]="'/list'">START</ion-button>
+        <ion-button id="open-about-modal" class="button">ABOUT</ion-button>
+
+        <div class="footnote">Version {{ version }}</div>
+    </div>
+</ion-content>
+
+<ion-modal #aboutModal id="about-modal" trigger="open-about-modal" animated="false" [backdropDismiss]="true">
+    <ng-template>
+        <section class="about-content" (click)="aboutModal.dismiss()">
+            <h2>About this game</h2>
+            <p>
+                CrossBits, also known as <i>Nonogram</i>, is a logic puzzle where you reveal a hidden
+                picture by filling in squares on a grid based on numeric clues.
+            </p>
+            <p>
+                Each row and column has a sequence of numbers:
+            </p>
+            <ul>
+                <li>Each number represents a group of consecutive filled squares.</li>
+                <li>Multiple numbers mean there is at least one empty square between groups.</li>
+            </ul>
+            <h2>How to play</h2>
+            <ol>
+                <li>Look at the numbers on the top (bottom) for grid columns and on the left (right) side for grid rows.</li>
+                <li>Determine which squares must be filled based on the clues.</li>
+                <li>Mark filled (light) squares.</li>
+                <li>Mark empty (dark) squares to help with logic.</li>
+                <li>Continue until the entire grid reveals a picture!</li>
+            </ol>
+            <p>
+                You win when all filled and empty squares match the clues, revealing a complete picture!
+            </p>
+        </section>
+    </ng-template>
+</ion-modal>

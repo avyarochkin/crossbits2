@@ -18,6 +18,11 @@ import { LocalStorageProvider } from './providers/local-storage/local-storage'
 const ROUTES: Routes = [
     {
         path: '',
+        loadComponent: () => import('src/pages/start/start.page')
+            .then(m => m.StartPage)
+    },
+    {
+        path: 'list',
         loadComponent: () => import('src/pages/board-list/board-list.page')
             .then(m => m.BoardListPage)
     },
