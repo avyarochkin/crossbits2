@@ -2,12 +2,11 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewC
 import { OverlayEventDetail } from '@ionic/core'
 import {
     NavController, PickerController, PickerColumnOption, ActionSheetController, AlertController, AlertOptions,
-    IonHeader, IonToolbar, IonIcon, IonButton, IonButtons, IonTitle,
-    IonContent
+    IonHeader, IonToolbar, IonIcon, IonButton, IonButtons, IonTitle, IonContent, IonBackButton
 } from '@ionic/angular/standalone'
 import { addIcons } from 'ionicons'
 import {
-    add, checkmarkDoneOutline, chevronBack, chevronForward, createOutline, settingsOutline, trophy
+    add, arrowBack, arrowForward, checkmarkDoneOutline, createOutline, settingsOutline, trophy
 } from 'ionicons/icons'
 
 import { GAME_STATUS, Board, SerializedBoardData } from 'src/providers/game/game.interface'
@@ -30,7 +29,7 @@ const ROLES = {
     templateUrl: 'board-list.page.html',
     styleUrls: ['board-list.page.scss'],
     imports: [
-        IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon
+        IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonBackButton, IonIcon
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
@@ -52,7 +51,7 @@ export class BoardListPage {
         public game: GameProvider
     ) {
         this.allBoards = this.game.allBoards
-        addIcons({ chevronBack, chevronForward, createOutline, settingsOutline, trophy, checkmarkDoneOutline, add })
+        addIcons({ arrowBack, arrowForward, createOutline, settingsOutline, trophy, checkmarkDoneOutline, add })
     }
 
     ionViewWillEnter() {

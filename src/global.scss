@@ -40,20 +40,34 @@ ion-content {
             --background: transparent;
             &:first-of-type, &:last-of-type { --border-width: 0; }
             ion-title {
-                --color: var(--ion-color-ultra-light);
+                --color: var(--ion-color-light);
                 padding-inline-start: 4rem;
                 padding-inline-end: 4rem;
                 .title-block {
                     margin: 0;
+                    position: relative;
                     display: inline-flex;
                     font-size: 1.4rem;
                     background: rgba(var(--ion-color-semi-dark-rgb), 0.5);
-                    padding: 0.2rem 1rem;
+                    padding: 0.2rem 2.2rem;
                     border-radius: 1rem;
+                    > * {
+                        margin: 0;
+                        line-height: 1.1;
+                    }
+                    ion-button {
+                        position: absolute;
+                        --color: var(--ion-color-lightest);
+                        top: 0;
+                        height: 100%;
+                        &:first-child { left: 0; }
+                        &:last-child { right: 0; }
+                        ion-icon { font-size: 1.5rem; }
+                    }
                 }
             }
-            ion-button.button-solid {
-                min-height: 2rem;
+            .button-solid {
+                min-height: 36px;
                 pointer-events: auto !important;
                 --color: var(--ion-color-ultra-light);
                 --background: rgba(var(--ion-color-semi-dark-rgb), 0.5);

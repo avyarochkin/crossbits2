@@ -2,25 +2,28 @@
     @if (swiperRef.nativeElement.swiper; as swiper) {
         <ion-toolbar mode="ios">
             <ion-buttons slot="start">
-                @if (swiper.activeIndex > 0) {
-                    <ion-button class="prev-stage-button" fill="solid"
-                        (click)="swiper.slidePrev()">
-                        <ion-icon slot="icon-only" name="chevron-back"/>
-                    </ion-button>
-                }
+                <ion-back-button class="button-solid" text="BACK" icon=""></ion-back-button>
             </ion-buttons>
             <ion-title>
-                <h1 class="title-block">
-                    {{ swiper.activeIndex < allBoards.length - 1 ? 'STAGE ' + (swiper.activeIndex + 1): 'SAVED BOARDS' }}
-                </h1>
+                <div class="title-block">
+                    @if (swiper.activeIndex > 0) {
+                        <ion-button class="prev-stage-button" fill="clear"
+                            (click)="swiper.slidePrev()">
+                            <ion-icon slot="icon-only" name="arrow-back"/>
+                        </ion-button>
+                    }
+                    <h1>
+                        {{ swiper.activeIndex < allBoards.length - 1 ? 'STAGE ' + (swiper.activeIndex + 1): 'MY BOARDS' }}
+                    </h1>
+                    @if (swiper.activeIndex < allBoards.length - 1) {
+                        <ion-button class="next-stage-button" fill="clear"
+                            (click)="swiper.slideNext()">
+                            <ion-icon slot="icon-only" name="arrow-forward"/>
+                        </ion-button>
+                    }
+                </div>
             </ion-title>
             <ion-buttons slot="end">
-                @if (swiper.activeIndex < allBoards.length - 1) {
-                    <ion-button class="next-stage-button" fill="solid"
-                        (click)="swiper.slideNext()">
-                        <ion-icon slot="icon-only" name="chevron-forward"/>
-                    </ion-button>
-                }
                 @if (swiper.activeIndex === allBoards.length - 1) {
                     <ion-button class="editing-button" fill="solid"
                         (click)="editing = !editing">
