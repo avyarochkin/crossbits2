@@ -4,38 +4,85 @@
         <h1 class="title">cross<span class="highlight">bits</span></h1>
 
         <ion-button class="button main" [routerLink]="'/list'">START</ion-button>
+        <ion-button id="open-settings-sheet" class="button">SETTINGS</ion-button>
         <ion-button id="open-about-modal" class="button">ABOUT</ion-button>
 
         <div class="footnote">Version {{ version }}</div>
     </div>
 </ion-content>
 
-<ion-modal #aboutModal id="about-modal" trigger="open-about-modal" animated="false" [backdropDismiss]="true">
+<ion-modal #aboutModal id="about-modal" trigger="open-about-modal" [backdropDismiss]="true">
     <ng-template>
-        <section class="about-content" (click)="aboutModal.dismiss()">
-            <h2>About this game</h2>
-            <p>
-                CrossBits, also known as <i>Nonogram</i>, is a logic puzzle where you reveal a hidden
-                picture by filling in squares on a grid based on numeric clues.
-            </p>
-            <p>
-                Each row and column has a sequence of numbers:
-            </p>
-            <ul>
-                <li>Each number represents a group of consecutive filled squares.</li>
-                <li>Multiple numbers mean there is at least one empty square between groups.</li>
-            </ul>
-            <h2>How to play</h2>
-            <ol>
-                <li>Look at the numbers on the top (bottom) for grid columns and on the left (right) side for grid rows.</li>
-                <li>Determine which squares must be filled based on the clues.</li>
-                <li>Mark filled (light) squares.</li>
-                <li>Mark empty (dark) squares to help with logic.</li>
-                <li>Continue until the entire grid reveals a picture!</li>
-            </ol>
-            <p>
-                You win when all filled and empty squares match the clues, revealing a complete picture!
-            </p>
-        </section>
+        <ion-header mode="ios">
+            <ion-toolbar mode="ios">
+                <ion-buttons slot="end">
+                    <ion-button fill="solid"
+                        (click)="aboutModal.dismiss()">
+                        <ion-icon slot="icon-only" name="close"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content>
+            <section class="about-content">
+                <h2>About this game</h2>
+                <p>
+                    CrossBits, also known as <i>Nonogram</i>, is a logic puzzle where you reveal a hidden
+                    picture by filling in squares on a grid based on numeric clues.
+                </p>
+                <p>Each row and column has a sequence of numbers:</p>
+                <ul>
+                    <li>Each number represents a group of consecutive filled squares.</li>
+                    <li>Multiple numbers mean there is at least one empty square between groups.</li>
+                </ul>
+
+                <h2>How to play</h2>
+                <p>You win when all filled and empty squares match the clues, revealing a complete picture!</p>
+
+                <h3>Understanding the grid</h3>
+                <ul>
+                    <li>Numbers at the top or bottom of the grid represent the clues for columns</li>
+                    <li>Numbers on the left or right side represent the clues for rows</li>
+                </ul>
+                <h3>Interacting with grid squares</h3>
+                <ul>
+                    <li>Tap a square once to fill it. The square will become light</li>
+                    <li>Tap a filled square again to clear it. The square will become dark</li>
+                </ul>
+                <h3>Drawing lines</h3>
+                <ul>
+                    <li>Press and hold the first square, then drag across the grid to draw a line</li>
+                    <li>Release on the final square to complete the line</li>
+                </ul>
+                <h3>Undo, redo &amp; reset</h3>
+                <ul>
+                    <li>
+                        At any time during the game, you can undo, redo, or clear the entire board by
+                        tapping the corresponding icon at the bottom
+                    </li>
+                </ul>
+                <h3>Moving around</h3>
+                <ul>
+                    <li>Pan, zoom, or pinch the grid to navigate and explore different areas</li>
+                </ul>
+
+                <h2>Auto-solve options</h2>
+                <ul>
+                    <li>
+                        Tap any number at the top or bottom of a column or at the left or right of a row
+                        to auto-solve it based on its current state
+                    </li>
+                    <li>Tap the bulb icon at the bottom to auto-solve the entire board</li>
+                </ul>
+            </section>
+        </ion-content>
     </ng-template>
 </ion-modal>
+
+<ion-action-sheet id="settings-sheet" trigger="open-settings-sheet" header="Settings"
+    [buttons]="settingsButtons"
+    (didDismiss)="callSettings($event)">
+</ion-action-sheet>
+
+<a download id="downloadAnchor"></a>
+<input type="file" id="uploadInput">

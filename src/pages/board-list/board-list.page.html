@@ -26,12 +26,9 @@
             <ion-buttons slot="end">
                 @if (swiper.activeIndex === allBoards.length - 1) {
                     <ion-button class="editing-button" fill="solid"
+                        [class.active]="editing"
                         (click)="editing = !editing">
-                        <ion-icon slot="icon-only" [name]="editing ? 'checkmark-done-outline' : 'create-outline'"/>
-                    </ion-button>
-                    <ion-button class="options-button" fill="solid" [disabled]="editing"
-                        (click)="showSettings()">
-                        <ion-icon slot="icon-only" name="settings-outline"/>
+                        EDIT
                     </ion-button>
                 }
             </ion-buttons>
@@ -72,6 +69,3 @@
         }
     </swiper-container>
 </ion-content>
-
-<a download id="downloadAnchor"></a>
-<input type="file" id="uploadInput">

@@ -2,12 +2,13 @@ import { isDevMode } from '@angular/core'
 import { bootstrapApplication } from '@angular/platform-browser'
 import { provideRouter, RouteReuseStrategy, Routes } from '@angular/router'
 import { provideServiceWorker } from '@angular/service-worker'
-import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone'
+import { IonicRouteStrategy, mdTransitionAnimation, provideIonicAngular } from '@ionic/angular/standalone'
 
 import { MyApp } from './app/app.component'
 import { GameGuard } from './app/game.guard'
 import { GameProvider } from './providers/game/game'
 import { LocalStorageProvider } from './providers/local-storage/local-storage'
+import { SettingsProvider } from './providers/settings/settings'
 
 // import { environment } from './environments/environment'
 
@@ -38,13 +39,17 @@ const ROUTES: Routes = [
 bootstrapApplication(MyApp, {
     providers: [
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-        provideIonicAngular(),
+        provideIonicAngular({
+            navAnimation: mdTransitionAnimation,
+            swipeBackEnabled: false
+        }),
         provideRouter(ROUTES),
         GameProvider,
         provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'
         }),
-        LocalStorageProvider
+        LocalStorageProvider,
+        SettingsProvider
     ],
 }).catch(err => console.error(err))

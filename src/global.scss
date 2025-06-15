@@ -47,22 +47,24 @@ ion-content {
                     margin: 0;
                     position: relative;
                     display: inline-flex;
-                    font-size: 1.4rem;
+                    align-items: center;
+                    height: 36px;
                     background: rgba(var(--ion-color-semi-dark-rgb), 0.5);
                     padding: 0.2rem 2.2rem;
                     border-radius: 1rem;
-                    > * {
+                    h1 {
                         margin: 0;
-                        line-height: 1.1;
+                        font-size: 1.2rem;
                     }
                     ion-button {
+                        margin: 0;
                         position: absolute;
                         --color: var(--ion-color-lightest);
                         top: 0;
                         height: 100%;
                         &:first-child { left: 0; }
                         &:last-child { right: 0; }
-                        ion-icon { font-size: 1.5rem; }
+                        ion-icon { font-size: 1.3rem; }
                     }
                 }
             }
@@ -83,6 +85,9 @@ ion-content {
                 &:not(.button-has-icon-only) {
                     --padding-start: 0.75rem;
                     --padding-end: 0.75rem;
+                }
+                &.active {
+                    --background: rgba(var(--ion-color-medium-rgb), 0.6);
                 }
             }
         }
