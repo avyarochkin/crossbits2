@@ -36,59 +36,61 @@ ion-content {
         position: absolute;
         pointer-events: none;
         &::before { background: none; }
-        ion-toolbar {
-            --background: transparent;
-            &:first-of-type, &:last-of-type { --border-width: 0; }
-            ion-title {
-                --color: var(--ion-color-light);
-                padding-inline-start: 4rem;
-                padding-inline-end: 4rem;
-                .title-block {
+    }
+    ion-toolbar {
+        --background: transparent;
+        &:first-of-type, &:last-of-type { --border-width: 0; }
+        ion-title {
+            --color: var(--ion-color-light);
+            padding-inline-start: 4rem;
+            padding-inline-end: 4rem;
+            .title-block {
+                margin: 0;
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                box-sizing: content-box;
+                height: 36px;
+                background: rgba(var(--ion-color-semi-dark-rgb), 0.5);
+                padding: 0 2.2rem;
+                border-radius: 1rem;
+                h1 {
                     margin: 0;
-                    position: relative;
-                    display: inline-flex;
-                    align-items: center;
-                    height: 36px;
-                    background: rgba(var(--ion-color-semi-dark-rgb), 0.5);
-                    padding: 0.2rem 2.2rem;
-                    border-radius: 1rem;
-                    h1 {
-                        margin: 0;
-                        font-size: 1.2rem;
-                    }
-                    ion-button {
-                        margin: 0;
-                        position: absolute;
-                        --color: var(--ion-color-lightest);
-                        top: 0;
-                        height: 100%;
-                        &:first-child { left: 0; }
-                        &:last-child { right: 0; }
-                        ion-icon { font-size: 1.3rem; }
-                    }
+                    font-size: 1.2rem;
+                    line-height: 1.8;
+                }
+                ion-button {
+                    margin: 0;
+                    position: absolute;
+                    --color: var(--ion-color-lightest);
+                    top: 0;
+                    height: 100%;
+                    &:first-child { left: 0; }
+                    &:last-child { right: 0; }
+                    ion-icon { font-size: 1.3rem; }
                 }
             }
-            .button-solid {
-                min-height: 36px;
-                pointer-events: auto !important;
-                --color: var(--ion-color-ultra-light);
-                --background: rgba(var(--ion-color-semi-dark-rgb), 0.5);
-                --border-radius: 64px;
-                --background-hover: none;
-                &:hover:not(.button-disabled) {
-                    --background-hover: rgba(var(--ion-color-semi-dark-rgb), 0.6);
-                }
-                --padding-top: 0.25rem;
-                --padding-bottom: 0.25rem;
-                --padding-start: 0.25rem;
-                --padding-end: 0.25rem;
-                &:not(.button-has-icon-only) {
-                    --padding-start: 0.75rem;
-                    --padding-end: 0.75rem;
-                }
-                &.active {
-                    --background: rgba(var(--ion-color-medium-rgb), 0.6);
-                }
+        }
+        .button-solid {
+            min-height: 36px;
+            pointer-events: auto !important;
+            --color: var(--ion-color-ultra-light);
+            --background: rgba(var(--ion-color-semi-dark-rgb), 0.5);
+            --border-radius: 64px;
+            --background-hover: none;
+            &:hover:not(.button-disabled) {
+                --background-hover: rgba(var(--ion-color-semi-dark-rgb), 0.6);
+            }
+            --padding-top: 0.25rem;
+            --padding-bottom: 0.25rem;
+            --padding-start: 0.25rem;
+            --padding-end: 0.25rem;
+            &:not(.button-has-icon-only) {
+                --padding-start: 0.75rem;
+                --padding-end: 0.75rem;
+            }
+            &.active {
+                --background: rgba(var(--ion-color-medium-rgb), 0.6);
             }
         }
     }
@@ -113,7 +115,7 @@ ion-content {
     }
     ion-modal {
         &.auto-height {
-            --border-radius: 1rem 1rem 0 0;
+            --border-radius: 1.5rem;
             --height: auto;
         }
     }

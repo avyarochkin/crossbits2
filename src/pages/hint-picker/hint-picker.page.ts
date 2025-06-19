@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { IonButton, IonButtons, IonIcon, IonToolbar, ModalController } from '@ionic/angular/standalone'
 import { addIcons } from 'ionicons'
-import { close } from 'ionicons/icons'
+import { arrowBack, arrowDown, arrowForward, arrowUp, close } from 'ionicons/icons'
 
 import { LocalStorageProvider } from 'src/providers/local-storage/local-storage'
 import { HintPoint } from 'src/providers/game/hints.interface'
-import { Point } from 'src/providers/game/game.interface'
+import { BoardSide, Point } from 'src/providers/game/game.interface'
 import { Hints } from 'src/providers/game/hints'
 
 type HintChangeHandler = (hintPos: HintPoint) => void
@@ -30,11 +30,24 @@ export class HintPickerPage implements OnInit {
 
     protected autoAdvance = false
 
+    protected readonly retreatIcon: Record<BoardSide, string> = {
+        T: 'arrow-down',
+        B: 'arrow-up',
+        L: 'arrow-forward',
+        R: 'arrow-back'
+    }
+    protected readonly advanceIcon: Record<BoardSide, string> = {
+        T: 'arrow-up',
+        B: 'arrow-down',
+        L: 'arrow-back',
+        R: 'arrow-forward'
+    }
+
     constructor(
         private readonly localStorage: LocalStorageProvider,
         private readonly modalCtrl: ModalController
     ) {
-        addIcons({ close })
+        addIcons({ close, arrowUp, arrowDown, arrowForward, arrowBack })
     }
 
     ngOnInit(): void {

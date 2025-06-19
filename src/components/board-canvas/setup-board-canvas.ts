@@ -61,6 +61,7 @@ export class SetupBoardCanvasComponent extends BoardCanvasComponent {
             breakpoints: [0, 1],
             initialBreakpoint: 1,
             cssClass: 'auto-height',
+            mode: 'ios',
             componentProps: {
                 hints,
                 hintPos: this.hintPos,

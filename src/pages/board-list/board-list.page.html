@@ -41,7 +41,7 @@
         (slidermove)="toggleSliding(true)"
         (touchend)="toggleSliding(false)"
         (slidechange)="changeSlide()">
-        @for (stageBoards of allBoards; track $index; let i = $index) {
+        @for (stageBoards of allBoards; track $index; let i = $index, lastBoard = $last) {
             <swiper-slide class="stage-slide"
                 [class.sliding]="sliding">
                 <div class="stage-slide-container">
@@ -58,7 +58,7 @@
                                 <span class="board-size">{{ board.columnHints.hints.length }}&times;{{ board.rowHints.hints.length }}</span>
                             </button>
                         }
-                        @if (i === allBoards.length - 1 && editing) {
+                        @if (lastBoard) {
                             <button class="stage-board new editable" [class.editing]="editing" (click)="createGame()">
                                 <ion-icon name="add"/>
                             </button>

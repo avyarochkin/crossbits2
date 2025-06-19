@@ -185,7 +185,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // COLUMN HINTS
 
-        ctx.fillStyle = this.isSetup() ? this.colors.light : this.colors.semiDark
+        ctx.fillStyle = this.colors.semiDark
         // common top and bottom rectangle
         ctx.fillRect(
             pxRowHintWidth,
@@ -227,7 +227,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             // add text and focus highlight for top and bottom hint cells in one common loop
             for (let y = 0; y < maxColHintY; y++) {
 
-                ctx.fillStyle = this.colors.lightest
+                ctx.fillStyle = this.colors.medium
                 // focus highlights
                 if (this.hintPadAt(x, y, BOARD_SIDE.TOP)) {
                     ctx.fillRect(
@@ -247,7 +247,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
                 }
 
                 ctx.fillStyle = this.isSetup()
-                    ? this.colors.dark
+                    ? this.colors.lightest
                     : this.game.columnHints.matching[x] ? this.colors.lightest : this.colors.light
                 // cell text
                 const topHint = this.game.columnHints.getHintAt({ x, y, side: BOARD_SIDE.TOP })
@@ -271,7 +271,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // ROW HINTS
 
-        ctx.fillStyle = this.isSetup() ? this.colors.light : this.colors.semiDark
+        ctx.fillStyle = this.colors.semiDark
         // common left and right rectangle
         ctx.fillRect(
             0,
@@ -313,7 +313,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             // add text and focus highlight for left and right hint cells in one common loop
             for (let x = 0; x < maxRowHintX; x++) {
 
-                ctx.fillStyle = this.colors.lightest
+                ctx.fillStyle = this.colors.medium
                 // focus highlights
                 if (this.hintPadAt(x, y, BOARD_SIDE.LEFT)) {
                     ctx.fillRect(
@@ -333,7 +333,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
                 }
 
                 ctx.fillStyle = this.isSetup()
-                    ? this.colors.dark
+                    ? this.colors.lightest
                     : this.game.rowHints.matching[y] ? this.colors.lightest : this.colors.light
                 // cell text
                 const leftHint = this.game.rowHints.getHintAt({ x, y, side: BOARD_SIDE.LEFT })
@@ -357,7 +357,7 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 
         // BOARD
 
-        ctx.fillStyle = this.isSetup() ? this.colors.semiDark : this.colors.medium
+        ctx.fillStyle = this.isSetup() ? this.colors.dark : this.colors.medium
         // common board rectangle
         ctx.fillRect(
             pxRowHintWidth,

@@ -124,6 +124,7 @@ export class BoardPage {
             message: 'Saved',
             cssClass: 'success',
             position: 'top',
+            duration: 2000,
             animated: true,
             keyboardClose: true,
             swipeGesture: 'vertical',
