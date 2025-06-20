@@ -1,7 +1,7 @@
 {
   "name": "crossbits",
   "description": "CrossBits",
-  "version": "2.0.9",
+  "version": "2.0.11",
   "author": "Alexey Yarochkin",
   "homepage": "https://github.com/avyarochkin/crossbits2",
   "private": true,
@@ -26,6 +26,7 @@
     "@angular/platform-browser-dynamic": "^19.2.9",
     "@angular/router": "^19.2.9",
     "@angular/service-worker": "^19.2.9",
+    "@capacitor/android": "5.7.3",
     "@capacitor/app": "5.0.7",
     "@capacitor/core": "5.7.3",
     "@capacitor/haptics": "^5.0.7",
@@ -38,7 +39,7 @@
     "ionicons": "^7.4.0",
     "npm": "^8.19.4",
     "rxjs": "^7.5.0",
-    "swiper": "^9.4.1",
+    "swiper": "^11.2.8",
     "tslib": "^2.6.2",
     "zone.js": "^0.15.0"
   },
