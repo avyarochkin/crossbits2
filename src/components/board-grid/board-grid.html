@@ -1,12 +1,12 @@
 <div #canvas class="board-canvas"
-    [ngClass]="game.boardStatus">
+    [ngClass]="gameData.boardStatus">
     <div class="column-hints first">
         <ng-container *ngTemplateOutlet="columnHints; context: { side: 'first' }"/>
     </div>
     <div class="row-hints first">
         <ng-container *ngTemplateOutlet="rowHints; context: { side: 'first' }"/>
     </div>
-    <div class="board">
+    <div class="board" [ngClass]="colorMode">
         <ng-container *ngTemplateOutlet="board"/>
     </div>
     <div class="row-hints last">
@@ -18,7 +18,7 @@
 </div>
 
 <ng-template #board>
-    @for (boardLine of game.boardData; track $index) {
+    @for (boardLine of gameData.boardData; track $index) {
         <div class="board-line">
             @for (boardDataItem of boardLine; track $index) {
                 <div class="board-cell" [ngClass]="boardCell[boardDataItem.value]"></div>
@@ -28,15 +28,15 @@
 </ng-template>
 
 <ng-template #columnHints let-side="side">
-    @for (hintLine of game.columnHints.hints; track $index) {
+    @for (hintLine of gameData.columnHints.hints; track $index) {
         <div class="hint-line">
-            @if (side === 'first' && game.boardStatus === 'setup') {
+            @if (side === 'first' && gameData.boardStatus === 'setup') {
                 <div class="hint-cell"></div>
             }
             @for (hintCell of hintLine; track $index) {
                 <div class="hint-cell">{{ hintCell.hint }}</div>
             }
-            @if (side === 'last' && game.boardStatus === 'setup') {
+            @if (side === 'last' && gameData.boardStatus === 'setup') {
                 <div class="hint-cell"></div>
             }
         </div>
@@ -44,15 +44,15 @@
 </ng-template>
 
 <ng-template #rowHints let-side="side">
-    @for (hintLine of game.rowHints.hints; track $index) {
+    @for (hintLine of gameData.rowHints.hints; track $index) {
         <div class="hint-line">
-            @if (side === 'first' && game.boardStatus === 'setup') {
+            @if (side === 'first' && gameData.boardStatus === 'setup') {
                 <div class="hint-cell"></div>
             }
             @for (hintCell of hintLine; track $index) {
                 <div class="hint-cell">{{ hintCell.hint }}</div>
             }
-            @if (side === 'last' && game.boardStatus === 'setup') {
+            @if (side === 'last' && gameData.boardStatus === 'setup') {
                 <div class="hint-cell"></div>
             }
         </div>

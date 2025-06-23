@@ -10,9 +10,10 @@
             [minScale]="minZoom"
             [maxScale]="maxZoom"
             (scaleChange)="zoomChange($event)">
-            <!-- <board-grid #boardCanvas></board-grid> -->
+            <!-- <board-grid #boardCanvas [gameData]="game"></board-grid> -->
              @if (!isSetup()) {
                 <board-canvas #boardCanvas class="board-canvas"
+                    [colorMode]="colorMode"
                     (statusChange)="statusChange($event)"
                     (scrollChange)="scrollChange($event)"
                     (panMove)="panMove($event)"

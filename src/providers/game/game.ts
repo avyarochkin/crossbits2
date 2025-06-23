@@ -1,19 +1,24 @@
 import { Injectable } from '@angular/core'
-import { LocalStorageProvider } from '../local-storage/local-storage'
+import { LocalStorageProvider } from 'src/providers/local-storage/local-storage'
 import { STATIC_BOARDS } from './data'
 import {
     BOARD_CELL, BOARD_KEY, Board, BoardData, BoardDataItem, CELLS_IN_GROUP, CELL_SIZE,
     GAME_STATUS, Point, SOLVED_KEY, SerializedBoardData, SerializedBoard,
     SOLUTION_STATUS
 } from './game.interface'
-import { ColumnHints, RowHints } from './hints'
+import { ColumnHints, IHints, RowHints } from './hints'
 import { UndoStack } from './undo-stack'
 import { GameSolver } from './game-solver'
 
-
+export interface IGameProvider {
+    boardStatus: GAME_STATUS
+    boardData: BoardData
+    columnHints: IHints
+    rowHints: IHints
+}
 
 @Injectable()
-export class GameProvider {
+export class GameProvider implements IGameProvider {
 
     columnHints: ColumnHints
     rowHints: RowHints

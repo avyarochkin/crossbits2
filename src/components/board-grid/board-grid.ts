@@ -1,21 +1,22 @@
-import { NgClass } from '@angular/common'
-import { Component, ElementRef, ViewChild } from '@angular/core'
+import { NgClass, NgTemplateOutlet } from '@angular/common'
+import { Component, ElementRef, Input, ViewChild } from '@angular/core'
 
-import { GameProvider } from 'src/providers/game/game'
+import { IGameProvider } from 'src/providers/game/game'
+import { ColorMode } from 'src/components/board-canvas/board-canvas'
 
 @Component({
     selector: 'board-grid',
     templateUrl: 'board-grid.html',
     styleUrls: ['board-grid.scss'],
-    imports: [NgClass],
-    standalone: true
+    imports: [NgClass, NgTemplateOutlet]
 })
 export class BoardGridComponent {
     @ViewChild('canvas', { static: true }) canvasRef: ElementRef<HTMLElement>
 
+    @Input() gameData: IGameProvider
+
+    @Input() colorMode: ColorMode = 'light-dark'
+
     readonly boardCell = ['off', 'on']
 
-    constructor(
-        readonly game: GameProvider
-    ) {}
 }

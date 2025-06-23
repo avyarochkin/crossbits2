@@ -4,7 +4,11 @@ import { HintCell, HintLineIndexes, HintPoint } from './hints.interface'
 import { LineSolver } from './line-solver'
 import { combinations } from './game.utils'
 
-export abstract class Hints {
+export interface IHints {
+    hints: HintCell[][]
+}
+
+export abstract class Hints implements IHints {
     readonly name!: string
 
     hints: HintCell[][] = []

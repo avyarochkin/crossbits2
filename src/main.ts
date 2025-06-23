@@ -33,6 +33,11 @@ const ROUTES: Routes = [
         canActivate: [GameGuard],
         loadComponent: () => import('src/pages/board/board.page')
             .then(m => m.BoardPage)
+    },
+    {
+        path: 'color-mode',
+        loadComponent: () => import('src/pages/settings/color-mode/color-mode.page')
+            .then(m => m.ColorModePage)
     }
 ]
 

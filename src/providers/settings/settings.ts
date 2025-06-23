@@ -1,8 +1,13 @@
 import { Injectable } from '@angular/core'
-import { GameProvider } from '../game/game'
 import { AlertOptions, OverlayEventDetail } from '@ionic/core'
-import { SerializedBoardData } from '../game/game.interface'
 import { AlertController } from '@ionic/angular'
+
+import { ColorMode } from 'src/components/board-canvas/board-canvas'
+import { GameProvider } from 'src/providers/game/game'
+import { SerializedBoardData } from 'src/providers/game/game.interface'
+import { LocalStorageProvider } from 'src/providers/local-storage/local-storage'
+
+const COLOR_MODE = 'color-mode'
 
 const ROLES = {
     CONFIRM: 'confirm',
@@ -12,9 +17,18 @@ const ROLES = {
 @Injectable()
 export class SettingsProvider {
     constructor(
-        public alertCtrl: AlertController,
+        private readonly alertCtrl: AlertController,
+        private readonly localStorage: LocalStorageProvider,
         private readonly game: GameProvider
     ) {}
+
+    getColorMode(): ColorMode {
+        return this.localStorage.getValue(COLOR_MODE)
+    }
+
+    setColorMode(colorMode: ColorMode) {
+        this.localStorage.setValue(COLOR_MODE, colorMode)
+    }
 
     backupData(downloadAnchor: HTMLAnchorElement) {
         const data = JSON.stringify(this.game.boardDataToObject(), null, 2)

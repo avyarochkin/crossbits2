@@ -14,13 +14,15 @@ import {
 import { Point, BoardData, GAME_STATUS, SOLUTION_STATUS } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
 import {
-    BoardCanvasComponent, getEventPos, HybridTouchEvent, IScrollChangeEvent
+    BoardCanvasComponent, ColorMode, getEventPos, HybridTouchEvent, IScrollChangeEvent
 } from 'src/components/board-canvas/board-canvas'
 import { SetupBoardCanvasComponent } from 'src/components/board-canvas/setup-board-canvas'
 import { GameBoardCanvasComponent } from 'src/components/board-canvas/game-board-canvas'
 import { ZoomableDirective } from 'src/directives/zoomable/zoomable'
+import { SettingsProvider } from 'src/providers/settings/settings'
 
 const ZOOM_FACTOR = 1.2
+const MAX_ZOOM = 1.44
 const TOAST_DATA = {
     [SOLUTION_STATUS.FINISHED]: { icon: 'trophy', message: 'Solved!' },
     [SOLUTION_STATUS.UNFINISHED]: { icon: 'hand-left', message: 'Cannot solve automatically. Try yourself' },
@@ -56,10 +58,11 @@ export class BoardPage {
 
     boardData: BoardData
     boardSize: Point
+    colorMode: ColorMode
 
     zoom = 1
     minZoom = 1
-    maxZoom = 1
+    maxZoom = MAX_ZOOM
     solvingBoard = false
     scrollEnabled = true
 
@@ -72,10 +75,12 @@ export class BoardPage {
         private readonly navCtrl: NavController,
         private readonly alertCtrl: AlertController,
         private readonly toastCtrl: ToastController,
-        private readonly game: GameProvider
+        private readonly settings: SettingsProvider,
+        protected readonly game: GameProvider
     ) {
         this.boardData = this.game.boardData
         this.boardSize = this.game.boardSize
+        this.colorMode = this.settings.getColorMode()
         addIcons({
             addCircleOutline, removeCircleOutline, banOutline, arrowUndoOutline, arrowRedoOutline,
             bulbOutline, checkmarkCircle, trashOutline, trophy, handLeft, sad, skull, closeCircle

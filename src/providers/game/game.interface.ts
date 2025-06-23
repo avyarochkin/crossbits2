@@ -27,7 +27,9 @@ export type BoardAxis = 'V' | 'H'
 export type BoardSide = 'L' | 'R' | 'T' | 'B'
 
 export const CELL_SIZE = 25
+export const HALF_CELL_SIZE = CELL_SIZE / 2
 export const CELLS_IN_GROUP = 5
+export const CELL_X_PADDING = 7
 
 export const BOARD_SIDE: Record<string, BoardSide> = {
     LEFT: 'L',

@@ -1,0 +1,29 @@
+<ion-header mode="ios">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button class="button-solid" text="BACK" icon=""></ion-back-button>
+        </ion-buttons>
+        <ion-title>
+            <div class="title-block">COLOR MODE</div>
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content [forceOverscroll]="false">
+    <ion-list class="color-mode-list" slot="fixed">
+        <ion-radio-group [value]="selectedColorMode"
+            (ionChange)="setMode($event)">
+            @for (mode of colorModes; track $index) {
+                <ion-radio [value]="mode.value">
+                    <ion-item class="color-mode-item">
+                        <div [innerHTML]="mode.label"></div>
+                        <board-grid class="thumbnail" slot="end"
+                            [gameData]="gameData"
+                            [colorMode]="mode.value">
+                        </board-grid>
+                    </ion-item>
+                </ion-radio>
+            }
+        </ion-radio-group>
+    </ion-list>
+</ion-content>
