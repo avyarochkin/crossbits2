@@ -2,13 +2,12 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, View
 import { NgClass } from '@angular/common'
 import {
     NavController, AlertController, ToastController, IonContent, IonButton, IonButtons, IonIcon, IonFooter,
-    IonToolbar, IonSpinner,
-    ToastButton
+    IonToolbar, IonSpinner, ToastButton
 } from '@ionic/angular/standalone'
 import { addIcons } from 'ionicons'
 import {
     addCircleOutline, arrowRedoOutline, arrowUndoOutline, banOutline, bulbOutline, checkmarkCircle, closeCircle,
-    handLeft, removeCircleOutline, sad, skull, trashOutline, trophy
+    gridOutline, handLeft, removeCircleOutline, sad, skull, trashOutline, trophy
 } from 'ionicons/icons'
 
 import { Point, BoardData, GAME_STATUS, SOLUTION_STATUS } from 'src/providers/game/game.interface'
@@ -47,9 +46,8 @@ const AUTO_SCROLL_INTERVAL = 100
     styleUrls: ['board.page.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgClass,
         IonFooter, IonToolbar, IonContent, IonButton, IonButtons, IonIcon, IonSpinner,
-        GameBoardCanvasComponent, SetupBoardCanvasComponent, ZoomableDirective
+        NgClass, GameBoardCanvasComponent, SetupBoardCanvasComponent, ZoomableDirective
     ]
 })
 export class BoardPage {
@@ -83,7 +81,7 @@ export class BoardPage {
         this.colorMode = this.settings.getColorMode()
         addIcons({
             addCircleOutline, removeCircleOutline, banOutline, arrowUndoOutline, arrowRedoOutline,
-            bulbOutline, checkmarkCircle, trashOutline, trophy, handLeft, sad, skull, closeCircle
+            bulbOutline, gridOutline, checkmarkCircle, trashOutline, trophy, handLeft, sad, skull, closeCircle
         })
     }
 
@@ -129,16 +127,14 @@ export class BoardPage {
             message: 'Saved',
             cssClass: 'success',
             position: 'top',
-            duration: 2000,
+            duration: 1000,
             animated: true,
             keyboardClose: true,
             swipeGesture: 'vertical',
             buttons: [TOAST_BUTTONS.CANCEL]
         })
-        void toast.onDidDismiss().then(async () => {
-            await this.navCtrl.navigateRoot('/')
-        })
         await toast.present()
+        await this.navCtrl.pop()
     }
 
     async delete() {
@@ -152,7 +148,7 @@ export class BoardPage {
                 text: 'Delete',
                 handler: async () => {
                     this.game.deleteCurrentBoard()
-                    await this.navCtrl.navigateRoot('/')
+                    await this.navCtrl.pop()
                 }
             }]
         })

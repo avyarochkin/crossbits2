@@ -1,16 +1,24 @@
 <ion-header mode="ios">
     <ion-toolbar>
         <ion-buttons slot="start">
-            <ion-back-button class="button-solid" text="BACK" icon=""></ion-back-button>
+            @if (!initial) {
+                <ion-back-button class="button-solid" text="" icon="chevron-down"></ion-back-button>
+            }
         </ion-buttons>
         <ion-title>
-            <div class="title-block">COLOR MODE</div>
+            <div class="title-block">
+                @if (initial) { <em>NEW</em> }
+                COLOR MODE
+            </div>
         </ion-title>
     </ion-toolbar>
 </ion-header>
 
 <ion-content [forceOverscroll]="false">
     <ion-list class="color-mode-list" slot="fixed">
+
+        <p class="info">Select your preferred color mode. You can change it later in Settings.</p>
+
         <ion-radio-group [value]="selectedColorMode"
             (ionChange)="setMode($event)">
             @for (mode of colorModes; track $index) {
@@ -27,3 +35,17 @@
         </ion-radio-group>
     </ion-list>
 </ion-content>
+
+<ion-footer>
+    <ion-toolbar>
+        <ion-title>
+            @if (initial) {
+                <ion-button fill="solid"
+                    [disabled]="selectedColorMode == null"
+                    (click)="continue()">
+                    CONTINUE
+                </ion-button>
+            }
+        </ion-title>
+    </ion-toolbar>
+</ion-footer>

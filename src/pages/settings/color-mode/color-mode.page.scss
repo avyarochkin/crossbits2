@@ -6,6 +6,12 @@
         justify-content: center;
     }
 
+    .info {
+        text-align: center;
+        color: var(--ion-color-ultra-light);
+        margin: 0 2rem 1rem;
+    }
+
     ion-radio {
         display: block;
         margin-inline: 1rem;
@@ -20,21 +26,19 @@
     }
 
     .color-mode-item {
-        font-size: 1.1rem;
-        line-height: 1.2;
         --color: var(--ion-color-light);
         --inner-border-width: 0;
         --padding-top: 0;
         --padding-bottom: 0;
         --padding-start: 1rem;
         --padding-end: 0;
-        --inner-padding-end: 0;
+        --inner-padding-end: 0.5rem;
         --border-radius: 1rem;
         --border-width: 1px;
         --border-color: transparent;
         --transition: border-color 1s;
         .thumbnail {
-            margin: -3rem;
+            margin: -3.5rem;
             transform: scale(0.35);
             transition: transform 400ms;
         }

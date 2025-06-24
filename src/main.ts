@@ -5,6 +5,7 @@ import { provideServiceWorker } from '@angular/service-worker'
 import { IonicRouteStrategy, mdTransitionAnimation, provideIonicAngular } from '@ionic/angular/standalone'
 
 import { MyApp } from './app/app.component'
+import { StartGuard } from './app/start.guard'
 import { GameGuard } from './app/game.guard'
 import { GameProvider } from './providers/game/game'
 import { LocalStorageProvider } from './providers/local-storage/local-storage'
@@ -19,6 +20,8 @@ import { SettingsProvider } from './providers/settings/settings'
 const ROUTES: Routes = [
     {
         path: '',
+        providers: [StartGuard],
+        canActivate: [StartGuard],
         loadComponent: () => import('src/pages/start/start.page')
             .then(m => m.StartPage)
     },

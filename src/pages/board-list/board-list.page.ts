@@ -4,7 +4,7 @@ import {
     IonHeader, IonToolbar, IonIcon, IonButton, IonButtons, IonTitle, IonContent, IonBackButton
 } from '@ionic/angular/standalone'
 import { addIcons } from 'ionicons'
-import { add, arrowBack, arrowForward, trophy } from 'ionicons/icons'
+import { add, arrowBack, arrowForward, homeOutline, trophy } from 'ionicons/icons'
 
 import { GAME_STATUS, Board } from 'src/providers/game/game.interface'
 import { GameProvider } from 'src/providers/game/game'
@@ -41,7 +41,7 @@ export class BoardListPage {
         public game: GameProvider
     ) {
         this.allBoards = this.game.allBoards
-        addIcons({ arrowBack, arrowForward, trophy, add })
+        addIcons({ arrowBack, arrowForward, trophy, add, homeOutline })
     }
 
     ionViewWillEnter() {

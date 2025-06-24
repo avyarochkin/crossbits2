@@ -7,7 +7,11 @@ import { GameProvider } from 'src/providers/game/game'
 import { SerializedBoardData } from 'src/providers/game/game.interface'
 import { LocalStorageProvider } from 'src/providers/local-storage/local-storage'
 
-const COLOR_MODE = 'color-mode'
+export enum QUERY_PARAMS {
+    INITIAL = 'initial'
+}
+
+export const COLOR_MODE = 'color-mode'
 
 const ROLES = {
     CONFIRM: 'confirm',

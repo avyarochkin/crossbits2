@@ -59,6 +59,14 @@ ion-content {
                     font-size: 1.2rem;
                     line-height: 1.8;
                 }
+                em {
+                    margin-inline: -1.5rem 0.5rem;
+                    padding-inline: 0.5rem;
+                    border-radius: 0.5rem;
+                    color: var(--ion-color-semi-dark);
+                    font-style: normal;
+                    background-color: var(--ion-color-ultra-light);
+                }
                 ion-button {
                     margin: 0;
                     position: absolute;
@@ -72,6 +80,7 @@ ion-content {
             }
         }
         .button-solid {
+            min-width: 36px;
             min-height: 36px;
             pointer-events: auto !important;
             --color: var(--ion-color-ultra-light);
@@ -85,12 +94,20 @@ ion-content {
             --padding-bottom: 0.25rem;
             --padding-start: 0.25rem;
             --padding-end: 0.25rem;
-            &:not(.button-has-icon-only) {
+            &:not(.button-has-icon-only, .back-button-has-icon-only) {
                 --padding-start: 0.75rem;
                 --padding-end: 0.75rem;
             }
             &.active {
                 --background: rgba(var(--ion-color-medium-rgb), 0.6);
+            }
+            ion-icon {
+                font-size: 1.75rem;
+            }
+            &.back-button ion-icon,
+            &::part(icon) {
+                margin: auto;
+                font-size: 1.5rem;
             }
         }
     }
