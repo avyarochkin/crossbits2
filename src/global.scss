@@ -42,8 +42,8 @@ ion-content {
         &:first-of-type, &:last-of-type { --border-width: 0; }
         ion-title {
             --color: var(--ion-color-light);
-            padding-inline-start: 4rem;
-            padding-inline-end: 4rem;
+            padding-inline-start: 3rem;
+            padding-inline-end: 3rem;
             .title-block {
                 margin: 0;
                 position: relative;
@@ -73,6 +73,7 @@ ion-content {
                     --color: var(--ion-color-lightest);
                     top: 0;
                     height: 100%;
+                    min-height: auto;
                     &:first-child { left: 0; }
                     &:last-child { right: 0; }
                     ion-icon { font-size: 1.3rem; }

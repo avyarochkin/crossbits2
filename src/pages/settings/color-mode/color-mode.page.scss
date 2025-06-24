@@ -38,8 +38,8 @@
         --border-color: transparent;
         --transition: border-color 1s;
         .thumbnail {
-            margin: -3.5rem;
-            transform: scale(0.35);
+            margin: -3rem;
+            transform: scale(0.4);
             transition: transform 400ms;
         }
     }
@@ -47,7 +47,7 @@
         .color-mode-item {
             --border-color: var(--ion-color-lightest);
             .thumbnail {
-                transform: scale(0.4);
+                transform: scale(0.45);
             }
         }
     }
