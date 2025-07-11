@@ -37,7 +37,8 @@ export class ZoomableDirective implements OnInit {
     private scaleCenter: Point | null
 
     // values stored when the pinch/zoom operation starts
-    private pinchStartScale: number | null
+    private pinchStartScale: number | undefined
+    private pinchStartDistance: number
 
     constructor(
         private readonly hostRef: ElementRef<HTMLElement>,
@@ -65,10 +66,13 @@ export class ZoomableDirective implements OnInit {
         if (!this.isPinchZoomEvent(event)) { return }
         if (this.pinchStartScale == null) {
             this.pinchStartScale = this.currentScale
+            this.pinchStartDistance = this.getDistance(event.changedTouches)
             this.scaleCenter = this.getMidPoint(event.changedTouches)
         }
-        if ('scale' in event && typeof event.scale === 'number') {
-            this.setScale(this.adjustedScale(event.scale))
+        if (this.pinchStartDistance > 0) {
+            const pinchDistance = this.getDistance(event.changedTouches)
+            const pinchScale = pinchDistance / this.pinchStartDistance
+            this.setScale(this.adjustedScale(pinchScale))
         }
     }
 
@@ -86,7 +90,7 @@ export class ZoomableDirective implements OnInit {
     @HostListener('touchend')
     handlePinchZoomEnd() {
         if (this.pinchStartScale == null) { return }
-        this.pinchStartScale = null
+        this.pinchStartScale = undefined
         // when final scale is outside of min/max boundaries, it should bounce back
         if (this.currentScale > this.maxScale) {
             this.animateScale(this.maxScale)
@@ -103,6 +107,14 @@ export class ZoomableDirective implements OnInit {
                 y: (point1.clientY + point2.clientY) / 2
             }
             : null
+    }
+
+    private getDistance(touches: TouchList): number {
+        const { 0: point1, 1: point2 } = touches
+        const dx = point2.clientX - point1.clientX
+        const dy = point2.clientY - point1.clientY
+        return Math.sqrt(dx * dx + dy * dy)
+
     }
 
     private setDefaultScaleCenter() {

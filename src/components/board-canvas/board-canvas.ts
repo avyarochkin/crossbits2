@@ -567,41 +567,51 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
             : { start: 'mousedown', move: 'mousemove', end: 'mouseup' }
 
         const canvasEl = this.canvasRef.nativeElement
+        const touchStart$ = fromEvent<HybridTouchEvent>(canvasEl, eventNames.start, { passive: false })
+        const touchMove$ = fromEvent<HybridTouchEvent>(canvasEl, eventNames.move, { passive: false })
+        const touchEnd$ = fromEvent<HybridTouchEvent>(canvasEl, eventNames.end, { passive: false })
         // indicates that user touched and not moved / released finger
-        let tapping = false
+        let tapEvent: HybridTouchEvent | null = null
 
-        fromEvent<HybridTouchEvent>(canvasEl, eventNames.start, { passive: false })
-            .pipe(
-                filter(event => getNumberOfTouches(event) === 1),
-                tap(() => tapping = true),
-                debounceTime(PRESS_TIME_MSEC),
-                filter(() => tapping),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(event => {
-                tapping = false
-                this.handleLongPress(event)
-            })
+        // observing 1-touch short and long press
+        touchStart$.pipe(
+            filter(event => getNumberOfTouches(event) === 1),
+            tap(event => tapEvent = event),
+            debounceTime(PRESS_TIME_MSEC),
+            filter(() => tapEvent != null),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(event => {
+            tapEvent = null
+            this.handleLongPress(event)
+        })
 
-        fromEvent<HybridTouchEvent>(canvasEl, eventNames.move, { passive: false })
-            .pipe(
-                filter(event => getNumberOfTouches(event) === 1),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(event => {
-                tapping = false
-                this.handlePanMove(event)
-            })
+        // observing "1-touch -> 2-touch" mutations to avoid tap/zoom conflicts
+        touchMove$.pipe(
+            filter(event => getNumberOfTouches(event) > 1),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(() => {
+            tapEvent = null
+        })
 
-        fromEvent<HybridTouchEvent>(canvasEl, eventNames.end, { passive: false })
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(event => {
-                if (tapping) {
-                    this.handleTap(event)
-                    tapping = false
-                }
-                this.handlePanEnd()
-            })
+        // observing 1-touch move
+        touchMove$.pipe(
+            filter(event => getNumberOfTouches(event) === 1),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(event => {
+            tapEvent = null
+            this.handlePanMove(event)
+        })
+
+        // observing touch end to register a 1-touch tap
+        touchEnd$.pipe(
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(() => {
+            if (tapEvent != null) {
+                this.handleTap(tapEvent)
+                tapEvent = null
+            }
+            this.handlePanEnd()
+        })
     }
 
     protected abstract handleTap(event: HybridTouchEvent): void
@@ -611,12 +621,12 @@ export abstract class BoardCanvasComponent implements OnInit, OnDestroy {
 }
 
 export function getEventPos(event: HybridTouchEvent): Point {
-    return 'changedTouches' in event
-        ? { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY }
+    return 'touches' in event
+        ? { x: event.touches[0].clientX, y: event.touches[0].clientY }
         : { x: event.clientX, y: event.clientY }
 
 }
 
 export function getNumberOfTouches(event: HybridTouchEvent): number {
-    return 'changedTouches' in event ? event.changedTouches.length : 1
+    return 'touches' in event ? event.touches.length : 1
 }
