@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { LocalStorageProvider } from 'src/providers/local-storage/local-storage'
+import { LocalStorageProvider } from '../local-storage/local-storage'
 import { STATIC_BOARDS } from './data'
 import {
     BOARD_CELL, BOARD_KEY, Board, BoardData, BoardDataItem, CELLS_IN_GROUP, CELL_SIZE,
@@ -42,7 +42,7 @@ export class GameProvider implements IGameProvider {
 
     sourceBoard?: Board
     savedBoardIndex = 0
-    savedBoardNr: string
+    savedBoardNr: string | undefined = undefined
     boardStatus: GAME_STATUS = GAME_STATUS.OVER
     boardSize: Point = { x: 0, y: 0 }
 
@@ -73,7 +73,7 @@ export class GameProvider implements IGameProvider {
      * Loads board solutions for the backup to a file
      */
     boardDataToObject(): Record<string, SerializedBoardData> {
-        const result = {}
+        const result: Record<string, SerializedBoardData> = {}
         STATIC_BOARDS.forEach(stage =>
             stage
                 .map(board => ({
@@ -82,7 +82,7 @@ export class GameProvider implements IGameProvider {
                 }))
                 .filter(({ savedData }) => savedData != null)
                 .forEach(({ nr, savedData }) => {
-                    result[nr] = savedData
+                    result[nr] = savedData!
                 })
         )
         return result
@@ -281,7 +281,7 @@ export class GameProvider implements IGameProvider {
 
     saveCurrentBoard() {
         const board: SerializedBoard = {
-            nr: this.savedBoardNr,
+            nr: this.savedBoardNr!,
             boardData: [],
             columnHints: { hints: this.columnHints.getHints() },
             rowHints: { hints: this.rowHints.getHints() },

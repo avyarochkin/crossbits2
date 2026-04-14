@@ -1,5 +1,5 @@
 import { LineSolver } from './line-solver'
-import { Hints, RowHints } from './hints'
+import { RowHints } from './hints'
 import { GameProvider } from './game'
 import { HintCell } from './hints.interface'
 import { BOARD_CELL } from './game.interface'
@@ -14,7 +14,7 @@ describe('LineSolver', () => {
     const emptyLine = (length: number) => Array.from({ length }, () => -1)
     const hintCellsFrom = (numbers: number[]) => numbers.map(hint => ({ hint }))
 
-    jest.mocked(RowHints, { shallow: true }).mockImplementation(() => ({
+    jest.mocked(RowHints, { shallow: true }).mockImplementation((game) => ({
         hints: hintsData,
         getBoardLength: () => boardData.length,
         getBoardDataValue: (lineIndex: number, indexInLine: number) => BOARD_CELL.NIL,
@@ -22,7 +22,7 @@ describe('LineSolver', () => {
             boardData[indexInLine] = value
         },
         getNumberOfCombinations: (lineIndex: number) => 1
-    } as Hints))
+    } as RowHints))
 
     beforeEach(() => {
         solver = new LineSolver()
