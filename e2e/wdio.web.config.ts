@@ -5,12 +5,16 @@ export const config = {
     specs: ['./**/*.e2e.ts'],
     services: (mainConfig.services ?? []).concat([
         [
-            'chromedriver',
+            'selenium-standalone',
             {
-                args: [
-                    '--use-fake-ui-for-media-stream',
-                    '--use-fake-device-for-media-stream'
-                ]
+                seleniumInstallArgs: {
+                    drivers: {
+                        chrome: { version: 'latest' }
+                    }
+                },
+                seleniumArgs: {
+                    javaArgs: ['-Xmx1024m']
+                }
             }
         ]
     ]),
