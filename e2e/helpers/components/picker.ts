@@ -1,4 +1,4 @@
-import { Component } from './component.js';
+import { Component } from './component.js'
 
 export class Picker extends Component {
     get picker() {
@@ -18,6 +18,6 @@ export class Picker extends Component {
     }
 
     constructor() {
-        super('ion-picker')
+        super('ion-picker, ion-picker-legacy')
     }
 }

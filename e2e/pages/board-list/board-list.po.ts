@@ -43,23 +43,41 @@ class BoardListPageObject {
     }
 
     async openLoadedBoard(index: number) {
-        await this.boardButtons[index].click()
+        const button = await this.boardButtons[index]
+        await button.click()
+        await pause(500)
+    }
+
+    async goToNextStage() {
+        await this.nextStageButton.click()
+        await pause(500)
+    }
+
+    async goToPreviousStage() {
+        await this.prevStageButton.click()
         await pause(500)
     }
 
     async goToLastStage() {
-        await this.nextStageButton.click()
-        await this.nextStageButton.click()
-        await this.nextStageButton.click()
-        await this.nextStageButton.click()
-        await pause(500)
+        const slides = await this.swiper.slides
+        const stageCount = await slides.length
+        for (let targetStage = 1; targetStage < stageCount; targetStage++) {
+            await this.goToNextStage()
+        }
     }
 
     async openNewBoard() {
-        await this.newBoardButton.click()
+        const button = await this.newBoardButton
+        await button.click()
         await pause(500)
-        await this.picker.buttonOK.click()
+        const buttonOK = this.picker.buttonOK
+        await buttonOK.click()
         await pause(1000)
+    }
+
+    async clickEditButton() {
+        await this.editButton.click()
+        await pause(500)
     }
 }
 export default new BoardListPageObject()

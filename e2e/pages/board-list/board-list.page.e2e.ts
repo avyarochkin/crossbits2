@@ -4,34 +4,37 @@ import BoardList from './board-list.po.js'
 
 describe('Board List', () => {
     beforeEach(async () => {
-        await restartApp('/')
-        await url('/')
+        await restartApp('/list')
+        await url('/list')
         await pause(500)
     })
 
     it('should load all swiper slides', async () => {
-        await expect(await BoardList.swiper.slides).toHaveLength(5)
+        const slides = await BoardList.swiper.slides
+        await expect(slides).toHaveLength(6)
     })
 
     it('should open loaded board page', async () => {
-        await BoardList.boardButtons[0].click()
-        await pause(500)
-        await expect((await getUrl()).pathname).toBe('/board')
+        await BoardList.openLoadedBoard(0)
+        const url = await getUrl()
+        await expect(url.pathname).toBe('/board')
     })
 
     it('should navigate to next stage', async () => {
-        await BoardList.nextStageButton.click()
-        await BoardList.nextStageButton.click()
+        await BoardList.goToNextStage()
+        await BoardList.goToNextStage()
         const title = await BoardList.pageTitle
-        expect(await title.getText()).toBe('STAGE 3')
+        const titleText = await title.getText()
+        expect(titleText).toBe('STAGE 3')
     })
 
     it('should navigate to previous stage', async () => {
-        await BoardList.nextStageButton.click()
-        await BoardList.nextStageButton.click()
-        await BoardList.prevStageButton.click()
+        await BoardList.goToNextStage()
+        await BoardList.goToNextStage()
+        await BoardList.goToPreviousStage()
         const title = await BoardList.pageTitle
-        expect(await title.getText()).toBe('STAGE 2')
+        const titleText = await title.getText()
+        expect(titleText).toBe('STAGE 2')
     })
 
     describe('Last Stage', () => {
@@ -39,18 +42,26 @@ describe('Board List', () => {
             await BoardList.goToLastStage()
         })
 
-        it('should open new board page', async () => {
-            await BoardList.openNewBoard()
-            await expect((await getUrl()).pathname).toBe('/board')
+        it('should contain new board button with 0 width and height on last stage', async () => {
+            const newBoardButton = await BoardList.newBoardButton
+            const dimensions = await newBoardButton.getSize()
+            await expect(dimensions.width).toBe(0)
+            await expect(dimensions.height).toBe(0)
         })
 
-        it('should switch to edit mode', async () => {
-            const editButton = await BoardList.editButton
-            await expect(await editButton.getText()).toBe('EDIT')
-            await BoardList.editButton.click()
-            await pause(500)
-            const doneButton = await BoardList.editButton
-            await expect(await doneButton.getText()).toBe('DONE')
+        it('should contain new board button with non-zero width and height in edit mode', async () => {
+            await BoardList.clickEditButton()
+            const newBoardButton = await BoardList.newBoardButton
+            const dimensions = await newBoardButton.getSize()
+            await expect(dimensions.width).toBeGreaterThan(0)
+            await expect(dimensions.height).toBeGreaterThan(0)
+        })
+
+        it('should open new board page in edit mode', async () => {
+            await BoardList.clickEditButton()
+            await BoardList.openNewBoard()
+            const url = await getUrl()
+            await expect(url.pathname).toBe('/board')
         })
     })
 })

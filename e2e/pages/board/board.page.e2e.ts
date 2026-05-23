@@ -5,36 +5,32 @@ import Board from './board.po.js'
 
 describe('Board', () => {
     beforeEach(async () => {
-        await restartApp('/')
-        await url('/')
+        await restartApp('/list')
+        await url('/list')
         await pause(500)
     })
 
     describe('New board', () => {
         beforeEach(async () => {
             await BoardList.goToLastStage()
+            await BoardList.clickEditButton()
             await BoardList.openNewBoard()
         })
 
         it('should save new board', async () => {
-            await Board.saveBoardButton.click()
-            await pause(2500)
-            await expect((await getUrl()).pathname).toBe('/')
+            await Board.clickSaveBoardButton()
+            const url = await getUrl()
+            await expect(url.pathname).toBe('/list')
         })
 
         it('should delete new board', async () => {
-            await Board.saveBoardButton.click()
-            await pause(2500)
-            await BoardList.editButton.click()
-            await pause(500)
+            await Board.clickSaveBoardButton()
+            await BoardList.clickEditButton()
             const stageButtonCount = await BoardList.boardButtons.length
             await BoardList.openLoadedBoard(stageButtonCount - 2)
-            await pause(500)
-            await Board.deleteBoardButton.click()
-            await pause(500)
-            await Board.alert.buttonDelete.click()
-            await pause(500)
-            await expect((await getUrl()).pathname).toBe('/')
+            await Board.clickDeleteBoardButton()
+            const url = await getUrl()
+            await expect(url.pathname).toBe('/list')
         })
     })
 
@@ -44,13 +40,14 @@ describe('Board', () => {
         })
 
         it('should draw loaded board', async () => {
-            await expect((await getUrl()).pathname).toBe('/board')
+            const url = await getUrl()
+            await expect(url.pathname).toBe('/board')
         })
 
         it('should go back to board list', async () => {
-            await Board.backButton.click()
-            await pause(500)
-            await expect((await getUrl()).pathname).toBe('/')
+            await Board.clickBackButton()
+            const url = await getUrl()
+            await expect(url.pathname).toBe('/list')
         })
     })
 })

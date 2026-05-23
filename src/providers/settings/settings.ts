@@ -27,7 +27,7 @@ export class SettingsProvider {
     ) {}
 
     getColorMode(): ColorMode {
-        return this.localStorage.getValue(COLOR_MODE)
+        return this.localStorage.getValue<ColorMode>(COLOR_MODE) ?? 'light-dark'
     }
 
     setColorMode(colorMode: ColorMode) {

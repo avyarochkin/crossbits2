@@ -6,7 +6,7 @@ export class Swiper extends Component {
     rects?: RectReturn
 
     get slides() {
-        return this.$.$$('swiper-slide')
+        return browser.$$(`${this.selector} swiper-slide`)
     }
 
     /**
@@ -59,9 +59,10 @@ export class Swiper extends Component {
         // Get the rectangles of the Swiper and store it in a global that will be used for a next call.
         // We don't want ask for the rectangles of the Swiper if we already know them.
         // This will save unneeded webdriver calls.
-        this.rects = this.rects
-            ?? await driver.getElementRect(slides.elementId)
-
+        if (!this.rects) {
+            const elementId = await slides.elementId
+            this.rects = await driver.getElementRect(elementId)
+        }
         return this.rects
     }
 }

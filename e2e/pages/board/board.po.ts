@@ -1,4 +1,5 @@
 import { Alert } from '../../helpers/components/index.js'
+import { pause } from '../../helpers/index.js'
 
 class BoardPageObject {
     get alert() {
@@ -39,6 +40,23 @@ class BoardPageObject {
 
     get redoMoveButton() {
         return $('.redo-move-button')
+    }
+
+    async clickSaveBoardButton() {
+        await this.saveBoardButton.click()
+        await pause(2500)
+    }
+
+    async clickDeleteBoardButton() {
+        await this.deleteBoardButton.click()
+        await pause(500)
+        await this.alert.buttonDelete.click()
+        await pause(500)
+    }
+
+    async clickBackButton() {
+        await this.backButton.click()
+        await pause(500)
     }
 }
 export default new BoardPageObject()
