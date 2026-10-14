@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { LocalStorageProvider } from '../local-storage/local-storage'
-import { STATIC_BOARDS } from './data'
+import staticBoards from './data.json'
 import {
     BOARD_CELL, BOARD_KEY, Board, BoardData, BoardDataItem, CELLS_IN_GROUP, CELL_SIZE,
     GAME_STATUS, Point, SOLVED_KEY, SerializedBoardData, SerializedBoard,
@@ -74,7 +74,7 @@ export class GameProvider implements IGameProvider {
      */
     boardDataToObject(): Record<string, SerializedBoardData> {
         const result: Record<string, SerializedBoardData> = {}
-        STATIC_BOARDS.forEach(stage =>
+        staticBoards.forEach(stage =>
             stage
                 .map(board => ({
                     nr: board.nr,
@@ -101,7 +101,7 @@ export class GameProvider implements IGameProvider {
     }
 
     initAllStaticBoards() {
-        this.allBoards = STATIC_BOARDS.map((stage) => {
+        this.allBoards = staticBoards.map((stage) => {
             return stage.map((board) => {
                 let boardData: BoardData = []
                 let boardSolved = false
@@ -325,6 +325,5 @@ export class GameProvider implements IGameProvider {
         }
     }
 }
-
 
 

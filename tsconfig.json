@@ -12,6 +12,8 @@
     ],
     "module": "es2020",
     "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "sourceMap": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
